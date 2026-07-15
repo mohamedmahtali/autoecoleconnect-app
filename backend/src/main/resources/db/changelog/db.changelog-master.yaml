@@ -3,3 +3,9 @@ databaseChangeLog:
       file: db/changelog/v1.0/001-create-app-info.sql
   - include:
       file: db/changelog/v1.0/002-create-clients.sql
+  - include:
+      file: db/changelog/v1.0/003-align-clients-schema-cible.sql
+  - include:
+      file: db/changelog/v1.0/004-create-voitures.sql
+  - include:
+      file: db/changelog/v1.0/005-create-forfaits.sql

@@ -2,8 +2,10 @@ package app.autoeecoleconnect.controllers;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
-import app.autoeecoleconnect.controllers.dto.ClientRequest;
+import app.autoeecoleconnect.controllers.dto.ClientCreationRequest;
+import app.autoeecoleconnect.controllers.dto.ClientMiseAJourRequest;
 import app.autoeecoleconnect.controllers.dto.ClientResponse;
 import app.autoeecoleconnect.models.Client;
 import app.autoeecoleconnect.services.ClientService;
@@ -31,7 +33,7 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-    @Operation(summary = "Lister tous les clients")
+    @Operation(summary = "Lister les clients actifs")
     @GetMapping
     public List<ClientResponse> lister() {
         return clientService.lister().stream().map(ClientResponse::depuis).toList();
@@ -39,13 +41,13 @@ public class ClientController {
 
     @Operation(summary = "Consulter un client")
     @GetMapping("/{id}")
-    public ClientResponse trouver(@PathVariable Long id) {
+    public ClientResponse trouver(@PathVariable UUID id) {
         return ClientResponse.depuis(clientService.trouver(id));
     }
 
     @Operation(summary = "Créer un client")
     @PostMapping
-    public ResponseEntity<ClientResponse> creer(@Valid @RequestBody ClientRequest request) {
+    public ResponseEntity<ClientResponse> creer(@Valid @RequestBody ClientCreationRequest request) {
         Client client = clientService.creer(request);
         return ResponseEntity
                 .created(URI.create("/api/clients/" + client.getId()))
@@ -54,14 +56,14 @@ public class ClientController {
 
     @Operation(summary = "Mettre à jour un client")
     @PutMapping("/{id}")
-    public ClientResponse mettreAJour(@PathVariable Long id,
-                                      @Valid @RequestBody ClientRequest request) {
+    public ClientResponse mettreAJour(@PathVariable UUID id,
+                                      @Valid @RequestBody ClientMiseAJourRequest request) {
         return ClientResponse.depuis(clientService.mettreAJour(id, request));
     }
 
-    @Operation(summary = "Supprimer un client")
+    @Operation(summary = "Désactiver un client (soft delete)")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> supprimer(@PathVariable Long id) {
+    public ResponseEntity<Void> supprimer(@PathVariable UUID id) {
         clientService.supprimer(id);
         return ResponseEntity.noContent().build();
     }

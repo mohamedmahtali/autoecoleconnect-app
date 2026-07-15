@@ -1,67 +1,49 @@
 package app.autoeecoleconnect.controllers;
 
-import java.time.LocalDate;
 import java.util.Map;
+import java.util.UUID;
 
-import app.autoeecoleconnect.controllers.dto.ClientRequest;
+import app.autoeecoleconnect.AbstractIntegrationTest;
+import app.autoeecoleconnect.controllers.dto.ClientCreationRequest;
+import app.autoeecoleconnect.controllers.dto.ClientMiseAJourRequest;
 import app.autoeecoleconnect.controllers.dto.ClientResponse;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Test d'intégration de bout en bout : vrai PostgreSQL (Testcontainers),
- * migrations Liquibase appliquées au démarrage du contexte.
- */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
-class ClientControllerIntegrationTest {
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
-
-    @Autowired
-    private TestRestTemplate rest;
+class ClientControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void cycle_de_vie_complet_dun_client() {
-        // Création
-        ClientRequest creation = new ClientRequest("Martin", "Lucas",
-                "lucas.martin@example.fr", "0698765432", LocalDate.of(2003, 9, 30), null);
-        ResponseEntity<ClientResponse> cree =
-                rest.postForEntity("/api/clients", creation, ClientResponse.class);
-        assertThat(cree.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        Long id = cree.getBody().id();
-        assertThat(cree.getHeaders().getLocation().getPath()).isEqualTo("/api/clients/" + id);
+        // Création — le mot de passe ne doit jamais ressortir dans la réponse
+        ClientCreationRequest creation = new ClientCreationRequest("Martin", "Lucas",
+                "lucas.martin@example.fr", "motdepasse-solide", "0698765432",
+                "5 avenue de la République, Lyon", null);
+        ResponseEntity<String> creeBrut =
+                rest.postForEntity("/api/clients", creation, String.class);
+        assertThat(creeBrut.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(creeBrut.getBody()).doesNotContain("password", "motdepasse", "$2a$");
 
-        // Lecture
-        ResponseEntity<ClientResponse> lu =
-                rest.getForEntity("/api/clients/" + id, ClientResponse.class);
+        ResponseEntity<ClientResponse> lu = rest.getForEntity(
+                creeBrut.getHeaders().getLocation(), ClientResponse.class);
         assertThat(lu.getStatusCode()).isEqualTo(HttpStatus.OK);
+        UUID id = lu.getBody().id();
         assertThat(lu.getBody().email()).isEqualTo("lucas.martin@example.fr");
-        assertThat(lu.getBody().statut().name()).isEqualTo("PROSPECT");
+        assertThat(lu.getBody().active()).isTrue();
 
         // Mise à jour
-        ClientRequest maj = new ClientRequest("Martin", "Lucas",
-                "lucas.martin@example.fr", "0600000000", LocalDate.of(2003, 9, 30), null);
+        ClientMiseAJourRequest maj = new ClientMiseAJourRequest("Martin", "Lucas",
+                "lucas.martin@example.fr", "0600000000", "5 avenue de la République, Lyon", "RDV lundi");
         ResponseEntity<ClientResponse> modifie = rest.exchange("/api/clients/" + id,
                 HttpMethod.PUT, new HttpEntity<>(maj), ClientResponse.class);
         assertThat(modifie.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(modifie.getBody().telephone()).isEqualTo("0600000000");
 
-        // Suppression puis 404
+        // Soft delete puis 404
         ResponseEntity<Void> supprime = rest.exchange("/api/clients/" + id,
                 HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
         assertThat(supprime.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -73,7 +55,7 @@ class ClientControllerIntegrationTest {
     @Test
     void creer_avec_un_email_invalide_repond_400_avec_le_detail() {
         Map<String, String> invalide = Map.of("nom", "Durand", "prenom", "Emma",
-                "email", "pas-un-email");
+                "email", "pas-un-email", "motDePasse", "motdepasse-solide");
         ResponseEntity<String> reponse =
                 rest.postForEntity("/api/clients", invalide, String.class);
         assertThat(reponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -82,8 +64,8 @@ class ClientControllerIntegrationTest {
 
     @Test
     void creer_deux_fois_le_meme_email_repond_409() {
-        ClientRequest requete = new ClientRequest("Bernard", "Chloé",
-                "chloe.bernard@example.fr", null, null, null);
+        ClientCreationRequest requete = new ClientCreationRequest("Bernard", "Chloé",
+                "chloe.bernard@example.fr", "motdepasse-solide", null, null, null);
         rest.postForEntity("/api/clients", requete, ClientResponse.class);
 
         ResponseEntity<String> doublon =

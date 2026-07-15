@@ -1,19 +1,19 @@
 package app.autoeecoleconnect.services;
 
-import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
-import app.autoeecoleconnect.controllers.dto.ClientRequest;
+import app.autoeecoleconnect.controllers.dto.ClientCreationRequest;
 import app.autoeecoleconnect.exceptions.EmailDejaUtiliseException;
 import app.autoeecoleconnect.exceptions.RessourceIntrouvableException;
 import app.autoeecoleconnect.models.Client;
-import app.autoeecoleconnect.models.StatutClient;
 import app.autoeecoleconnect.repositories.ClientRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -28,23 +28,27 @@ class ClientServiceTest {
     @Mock
     private ClientRepository clientRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private ClientService clientService;
 
-    private ClientRequest requeteValide() {
-        return new ClientRequest("Dupont", "Marie", "marie.dupont@example.fr",
-                "0612345678", LocalDate.of(2004, 5, 12), null);
+    private ClientCreationRequest requeteValide() {
+        return new ClientCreationRequest("Dupont", "Marie", "marie.dupont@example.fr",
+                "motdepasse-solide", "0612345678", "12 rue des Lilas, Lyon", null);
     }
 
     @Test
-    void creer_enregistre_le_client_avec_statut_prospect_par_defaut() {
+    void creer_hache_le_mot_de_passe_et_enregistre_le_client() {
         when(clientRepository.existsByEmail("marie.dupont@example.fr")).thenReturn(false);
+        when(passwordEncoder.encode("motdepasse-solide")).thenReturn("$2a$10$hash");
         when(clientRepository.save(any(Client.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Client client = clientService.creer(requeteValide());
 
-        assertThat(client.getNom()).isEqualTo("Dupont");
-        assertThat(client.getStatut()).isEqualTo(StatutClient.PROSPECT);
+        assertThat(client.getPasswordHash()).isEqualTo("$2a$10$hash");
+        assertThat(client.isActive()).isTrue();
         verify(clientRepository).save(any(Client.class));
     }
 
@@ -60,10 +64,26 @@ class ClientServiceTest {
 
     @Test
     void trouver_leve_une_exception_si_le_client_est_introuvable() {
-        when(clientRepository.findById(42L)).thenReturn(Optional.empty());
+        UUID id = UUID.randomUUID();
+        when(clientRepository.findByIdAndActiveTrue(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> clientService.trouver(42L))
+        assertThatThrownBy(() -> clientService.trouver(id))
                 .isInstanceOf(RessourceIntrouvableException.class)
-                .hasMessageContaining("42");
+                .hasMessageContaining(id.toString());
+    }
+
+    @Test
+    void supprimer_desactive_le_client_sans_le_supprimer_de_la_base() {
+        UUID id = UUID.randomUUID();
+        Client client = new Client();
+        client.setActive(true);
+        when(clientRepository.findByIdAndActiveTrue(id)).thenReturn(Optional.of(client));
+        when(clientRepository.save(any(Client.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        clientService.supprimer(id);
+
+        assertThat(client.isActive()).isFalse();
+        verify(clientRepository).save(client);
+        verify(clientRepository, never()).delete(any());
     }
 }

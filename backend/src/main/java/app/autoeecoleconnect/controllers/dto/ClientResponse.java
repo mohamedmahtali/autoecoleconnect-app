@@ -1,21 +1,21 @@
 package app.autoeecoleconnect.controllers.dto;
 
-import java.time.Instant;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import app.autoeecoleconnect.models.Client;
-import app.autoeecoleconnect.models.StatutClient;
 
+// Ne jamais exposer passwordHash dans une réponse API.
 public record ClientResponse(
-        Long id,
+        UUID id,
         String nom,
         String prenom,
         String email,
         String telephone,
-        LocalDate dateNaissance,
-        StatutClient statut,
-        Instant creeLe,
-        Instant modifieLe) {
+        String adresse,
+        String notes,
+        boolean active,
+        LocalDateTime createdAt) {
 
     public static ClientResponse depuis(Client client) {
         return new ClientResponse(
@@ -24,9 +24,9 @@ public record ClientResponse(
                 client.getPrenom(),
                 client.getEmail(),
                 client.getTelephone(),
-                client.getDateNaissance(),
-                client.getStatut(),
-                client.getCreeLe(),
-                client.getModifieLe());
+                client.getAdresse(),
+                client.getNotes(),
+                client.isActive(),
+                client.getCreatedAt());
     }
 }

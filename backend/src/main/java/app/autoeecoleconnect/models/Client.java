@@ -1,26 +1,23 @@
 package app.autoeecoleconnect.models;
 
-import java.time.Instant;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "clients")
 public class Client {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false, length = 100)
     private String nom;
@@ -31,34 +28,26 @@ public class Client {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
     @Column(length = 20)
     private String telephone;
 
-    @Column(name = "date_naissance")
-    private LocalDate dateNaissance;
+    @Column(columnDefinition = "text")
+    private String adresse;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private StatutClient statut = StatutClient.PROSPECT;
+    @Column(columnDefinition = "text")
+    private String notes;
 
-    @Column(name = "cree_le", nullable = false, updatable = false)
-    private Instant creeLe;
+    @Column(nullable = false)
+    private boolean active = true;
 
-    @Column(name = "modifie_le", nullable = false)
-    private Instant modifieLe;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-    @PrePersist
-    void onCreate() {
-        creeLe = Instant.now();
-        modifieLe = creeLe;
-    }
-
-    @PreUpdate
-    void onUpdate() {
-        modifieLe = Instant.now();
-    }
-
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -86,6 +75,14 @@ public class Client {
         this.email = email;
     }
 
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
     public String getTelephone() {
         return telephone;
     }
@@ -94,27 +91,31 @@ public class Client {
         this.telephone = telephone;
     }
 
-    public LocalDate getDateNaissance() {
-        return dateNaissance;
+    public String getAdresse() {
+        return adresse;
     }
 
-    public void setDateNaissance(LocalDate dateNaissance) {
-        this.dateNaissance = dateNaissance;
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
     }
 
-    public StatutClient getStatut() {
-        return statut;
+    public String getNotes() {
+        return notes;
     }
 
-    public void setStatut(StatutClient statut) {
-        this.statut = statut;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
-    public Instant getCreeLe() {
-        return creeLe;
+    public boolean isActive() {
+        return active;
     }
 
-    public Instant getModifieLe() {
-        return modifieLe;
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }
