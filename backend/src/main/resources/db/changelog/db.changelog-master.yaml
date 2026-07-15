@@ -13,3 +13,5 @@ databaseChangeLog:
       file: db/changelog/v1.0/006-create-moniteurs.sql
   - include:
       file: db/changelog/v1.0/007-create-reservations.sql
+  - include:
+      file: db/changelog/v1.0/008-create-seances.sql
