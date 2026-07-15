@@ -1,0 +1,14 @@
+# Surcharges locales — copier ce fichier en docker-compose.override.yml
+# (non versionné) puis adapter. Docker Compose l'applique automatiquement.
+services:
+  backend:
+    # Exemple : changer le port exposé si 8080 est déjà pris
+    ports:
+      - "8081:8080"
+
+  frontend:
+    # Exemple : pointer vers un backend lancé hors Docker (mvn spring-boot:run)
+    environment:
+      BACKEND_URL: http://host.docker.internal:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

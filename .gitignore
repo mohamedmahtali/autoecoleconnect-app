@@ -1,0 +1,25 @@
+# Outils locaux
+.notebook/
+
+# Java / Maven
+backend/target/
+*.class
+
+# Node / Next.js
+node_modules/
+frontend/.next/
+frontend/out/
+*.tsbuildinfo
+npm-debug.log*
+
+# Environnement
+.env
+.env.*
+!.env.example
+docker-compose.override.yml
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
