@@ -9,3 +9,7 @@ databaseChangeLog:
       file: db/changelog/v1.0/004-create-voitures.sql
   - include:
       file: db/changelog/v1.0/005-create-forfaits.sql
+  - include:
+      file: db/changelog/v1.0/006-create-moniteurs.sql
+  - include:
+      file: db/changelog/v1.0/007-create-reservations.sql
