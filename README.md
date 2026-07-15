@@ -53,6 +53,18 @@ docker compose up -d --build
 # RabbitMQ  → http://localhost:15672 (guest/guest)
 ```
 
+L'API est protégée par JWT. Un compte directeur bootstrap est créé au premier
+démarrage (`admin@autoecoleconnect.local` / `changez-moi-en-production`, surchargeable
+via `ADMIN_EMAIL` / `ADMIN_PASSWORD`) :
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@autoecoleconnect.local","motDePasse":"changez-moi-en-production"}'
+# → {"token":"...", ...} puis Authorization: Bearer <token>
+# (bouton « Authorize » dans Swagger UI)
+```
+
 Pour des surcharges locales (ports, volumes), copier `docker-compose.override.yml.example` en `docker-compose.override.yml` (non versionné).
 
 Le `docker-compose.yml` reproduit en local la stack d'un tenant (sans K8s) : Next.js, Spring Boot, PostgreSQL et RabbitMQ. Les migrations Liquibase s'appliquent automatiquement au démarrage du backend.

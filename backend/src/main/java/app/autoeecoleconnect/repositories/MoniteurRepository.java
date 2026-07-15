@@ -13,5 +13,7 @@ public interface MoniteurRepository extends JpaRepository<Moniteur, UUID> {
 
     Optional<Moniteur> findByIdAndActiveTrue(UUID id);
 
+    Optional<Moniteur> findByEmailAndActiveTrue(String email);
+
     boolean existsByEmail(String email);
 }

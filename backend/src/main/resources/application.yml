@@ -24,6 +24,16 @@ spring:
 server:
   port: 8080
 
+app:
+  security:
+    # HS256 exige au moins 32 octets — à surcharger impérativement en production
+    jwt-secret: ${JWT_SECRET:dev-secret-a-changer-en-production-0123456789}
+    jwt-duree-minutes: ${JWT_DUREE_MINUTES:1440}
+  bootstrap:
+    # Compte directeur créé au premier démarrage si la table est vide
+    admin-email: ${ADMIN_EMAIL:admin@autoecoleconnect.local}
+    admin-password: ${ADMIN_PASSWORD:changez-moi-en-production}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
