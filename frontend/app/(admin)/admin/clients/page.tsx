@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { fetchBackend } from "@/lib/api";
 import type { ClientDto } from "@/types/api";
 
@@ -12,7 +14,12 @@ export default async function PageClients() {
 
   return (
     <section>
-      <h2 style={{ marginBottom: "1rem" }}>Élèves ({clients.length})</h2>
+      <div className="entete-page">
+        <h2>Élèves ({clients.length})</h2>
+        <Link href="/admin/clients/nouveau" className="bouton-secondaire">
+          + Nouvel élève
+        </Link>
+      </div>
       <div className="tableau-conteneur">
         {clients.length === 0 ? (
           <p className="vide">Aucun élève pour l’instant.</p>

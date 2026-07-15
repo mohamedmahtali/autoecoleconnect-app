@@ -14,6 +14,9 @@ export default async function AdminLayout({
         <div className="marque">AutoEcoleConnect</div>
         <Link href="/admin">Tableau de bord</Link>
         <Link href="/admin/clients">Élèves</Link>
+        <Link href="/admin/moniteurs">Moniteurs</Link>
+        <Link href="/admin/voitures">Véhicules</Link>
+        <Link href="/admin/forfaits">Forfaits</Link>
       </nav>
       <div className="admin-contenu">
         <header className="admin-entete">

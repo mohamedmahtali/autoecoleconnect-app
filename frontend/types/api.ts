@@ -29,6 +29,51 @@ export interface ClientDto {
   createdAt: string;
 }
 
+export type StatutMoniteur = "PENDING" | "APPROVED" | "REJECTED" | "INACTIVE";
+
+export interface MoniteurDto {
+  id: string;
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string | null;
+  statut: StatutMoniteur;
+  notes: string | null;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface VoitureDto {
+  id: string;
+  nom: string;
+  marque: string;
+  transmission: "MANUELLE" | "AUTOMATIQUE";
+  doubleCommande: boolean;
+  carburant: string | null;
+  couleur: string | null;
+  nbPortes: number | null;
+  nbPassagers: number | null;
+  airConditionne: boolean;
+  note: string | null;
+  active: boolean;
+}
+
+export interface ForfaitDto {
+  id: string;
+  nom: string;
+  nombreHeure: number;
+  validite: number;
+  unite: "MOIS" | "JOUR";
+  prix: number;
+  conditions: string | null;
+  categorie: "CONDUITE" | "JOURNALIER";
+  transmission: "MANUELLE" | "AUTOMATIQUE" | null;
+  kilometrage: "ILLIMITE" | "LIMITE";
+  nbKilometre: number | null;
+  carburant: "INCLUS" | "NON_INCLUS";
+  active: boolean;
+}
+
 // Pour les compteurs du tableau de bord, seule la présence des éléments compte.
 export interface Identifiable {
   id: string;
