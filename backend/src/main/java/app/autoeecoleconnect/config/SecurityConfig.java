@@ -14,7 +14,9 @@ import org.springframework.security.web.SecurityFilterChain;
 /**
  * API stateless sécurisée par JWT (voir docs/12-securite.md §12.5).
  * Matrice d'accès Phase 0 :
- * - public : login, ping, catalogue forfaits en lecture, health, Swagger
+ * - public : login, ping, catalogue forfaits en lecture, health, métriques
+ *   Prometheus (scrapées en interne au cluster, jamais exposées via la
+ *   Gateway publique), Swagger
  * - lecture (GET) : tout profil authentifié
  * - écriture : DIRECTEUR uniquement (affinage par espace prévu avec le frontend)
  */
@@ -34,7 +36,7 @@ public class SecurityConfig {
                         // Catalogue consultable sans compte (site vitrine)
                         .requestMatchers(HttpMethod.GET, "/api/forfaits", "/api/forfaits/*")
                         .permitAll()
-                        .requestMatchers("/actuator/health/**").permitAll()
+                        .requestMatchers("/actuator/health/**", "/actuator/prometheus").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("DIRECTEUR")
