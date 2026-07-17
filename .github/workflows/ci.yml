@@ -22,6 +22,22 @@ jobs:
       - name: Tests et vérification
         run: mvn -B verify
 
+  control-plane-backend:
+    name: Control Plane — tests Maven
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: control-plane/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Tests et vérification
+        run: mvn -B verify
+
   frontend:
     name: Frontend — build Next.js
     runs-on: ubuntu-latest

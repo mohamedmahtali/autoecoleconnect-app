@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: autoeecoleconnect-control-plane
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:controlplane}
+    username: ${DB_USER:controlplane}
+    password: ${DB_PASSWORD:controlplane}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+server:
+  port: 8080
+
+app:
+  provisioning:
+    # Domaine (IP sslip.io en Phase 1-3, remplacé par un vrai domaine plus tard)
+    domaine: ${PROVISIONING_DOMAINE:167.233.170.196.sslip.io}
+    github-owner: ${GITHUB_OWNER:mohamedmahtali}
+    github-repo: ${GITHUB_REPO:autoecoleconnect-infra}
+    # Absent en local → bascule automatique sur GitHubService de logging
+    github-pat: ${GITHUB_PAT:}
+    resend-api-key: ${RESEND_API_KEY:}
+    resend-from: ${RESEND_FROM:onboarding@resend.dev}
+    # Header X-Invite-Token exigé sur /api/inscription
+    invite-token: ${INVITE_TOKEN:dev-invite-token}
+    poll-interval-ms: ${PROVISIONING_POLL_INTERVAL_MS:15000}
+    timeout-minutes: ${PROVISIONING_TIMEOUT_MINUTES:15}
+    trial-days: ${PROVISIONING_TRIAL_DAYS:30}
+    argocd-namespace: ${ARGOCD_NAMESPACE:argocd}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      app: control-plane

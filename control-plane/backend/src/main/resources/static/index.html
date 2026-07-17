@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Rejoindre AutoEcoleConnect</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 480px; margin: 4rem auto; padding: 0 1rem; color: #1a1a1a; }
+  h1 { font-size: 1.4rem; }
+  label { display: block; margin-top: 1rem; font-weight: 600; }
+  input, select { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
+  button { margin-top: 1.5rem; padding: 0.6rem 1.2rem; background: #1a1a1a; color: white; border: none; cursor: pointer; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  #resultat { margin-top: 1.5rem; padding: 1rem; border-radius: 4px; display: none; }
+  #resultat.ok { background: #e6f4ea; color: #1e4620; display: block; }
+  #resultat.erreur { background: #fce8e6; color: #611a15; display: block; }
+</style>
+</head>
+<body>
+  <h1>Rejoindre AutoEcoleConnect</h1>
+  <p>Créez l'espace de votre auto-école — provisionné automatiquement en quelques minutes.</p>
+
+  <form id="inscriptionForm">
+    <label for="nomAutoEcole">Nom de l'auto-école</label>
+    <input id="nomAutoEcole" name="nomAutoEcole" required>
+
+    <label for="emailGerant">Email du gérant</label>
+    <input id="emailGerant" name="emailGerant" type="email" required>
+
+    <label for="plan">Plan</label>
+    <select id="plan" name="plan">
+      <option value="solo">Solo — 29€/mois</option>
+      <option value="pro">Pro — 59€/mois</option>
+      <option value="groupe">Groupe — 99€/mois</option>
+    </select>
+
+    <label for="inviteToken">Token d'invitation</label>
+    <input id="inviteToken" name="inviteToken" required>
+
+    <button type="submit">Créer mon espace</button>
+  </form>
+
+  <div id="resultat"></div>
+
+  <script>
+    document.getElementById('inscriptionForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const bouton = e.target.querySelector('button');
+      const resultat = document.getElementById('resultat');
+      bouton.disabled = true;
+      resultat.className = '';
+      resultat.style.display = 'none';
+
+      try {
+        const reponse = await fetch('/api/inscription', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Invite-Token': document.getElementById('inviteToken').value
+          },
+          body: JSON.stringify({
+            nomAutoEcole: document.getElementById('nomAutoEcole').value,
+            emailGerant: document.getElementById('emailGerant').value,
+            plan: document.getElementById('plan').value
+          })
+        });
+
+        const corps = await reponse.json();
+
+        if (reponse.ok) {
+          resultat.className = 'ok';
+          resultat.textContent = `Votre espace "${corps.slug}" est en cours de création (statut : ${corps.statut}). `
+            + `Vous recevrez un email dès qu'il sera prêt : ${corps.url}`;
+        } else {
+          resultat.className = 'erreur';
+          resultat.textContent = corps.detail || 'Une erreur est survenue.';
+        }
+      } catch (err) {
+        resultat.className = 'erreur';
+        resultat.textContent = 'Impossible de contacter le serveur.';
+      } finally {
+        bouton.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

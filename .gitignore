@@ -3,6 +3,7 @@
 
 # Java / Maven
 backend/target/
+control-plane/backend/target/
 *.class
 
 # Node / Next.js
