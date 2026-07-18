@@ -95,7 +95,7 @@
           + ` — fin d'essai : ${finEssai}`;
       document.getElementById('bandeau').textContent = bandeau;
 
-      const prix = { solo: '29 €/mois', pro: '59 €/mois', groupe: '99 €/mois' };
+      const prix = { solo: '59 € HT/mois', pro: '99 € HT/mois', groupe: '149 € HT/mois' };
       const zoneAbo = document.getElementById('abonnement');
       if (['trial', 'suspended'].includes(corps.statutOrganisation) && prix[corps.plan]) {
         document.getElementById('boutonAbonnement').textContent =
