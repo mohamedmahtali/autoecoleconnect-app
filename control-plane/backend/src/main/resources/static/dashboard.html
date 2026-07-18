@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mon espace gérant — AutoEcoleConnect</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 640px; margin: 4rem auto; padding: 0 1rem; color: #1a1a1a; }
+  h1 { font-size: 1.4rem; }
+  label { display: block; margin-top: 1rem; font-weight: 600; }
+  input { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
+  button { margin-top: 1.5rem; padding: 0.6rem 1.2rem; background: #1a1a1a; color: white; border: none; cursor: pointer; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  #erreur { margin-top: 1.5rem; padding: 1rem; border-radius: 4px; background: #fce8e6; color: #611a15; display: none; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+  th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #ddd; }
+  .statut { padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.85rem; }
+  .statut.trial { background: #e8f0fe; color: #174ea6; }
+  .statut.active { background: #e6f4ea; color: #1e4620; }
+  .statut.suspended { background: #fce8e6; color: #611a15; }
+  .statut.provisioning { background: #fef7e0; color: #7a5900; }
+  .statut.failed { background: #fce8e6; color: #611a15; }
+  #deconnexion { background: none; color: #611a15; border: 1px solid #ddd; float: right; margin: 0; padding: 0.3rem 0.8rem; }
+  #bandeau { margin-top: 1rem; color: #555; }
+</style>
+</head>
+<body>
+  <h1>Mon espace gérant</h1>
+
+  <section id="vueLogin">
+    <p>Connectez-vous avec l'email et le mot de passe choisis à l'inscription.</p>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input id="email" type="email" required>
+
+      <label for="motDePasse">Mot de passe</label>
+      <input id="motDePasse" type="password" required>
+
+      <button type="submit">Se connecter</button>
+    </form>
+  </section>
+
+  <section id="vueDashboard" style="display:none">
+    <button id="deconnexion">Se déconnecter</button>
+    <div id="bandeau"></div>
+    <table>
+      <thead>
+        <tr><th>Auto-école</th><th>URL</th><th>Statut</th><th>Suspendu le</th></tr>
+      </thead>
+      <tbody id="lignesTenants"></tbody>
+    </table>
+  </section>
+
+  <div id="erreur"></div>
+
+  <script>
+    const erreur = document.getElementById('erreur');
+
+    function afficherErreur(message) {
+      erreur.textContent = message;
+      erreur.style.display = 'block';
+    }
+
+    function masquerErreur() {
+      erreur.style.display = 'none';
+    }
+
+    async function chargerDashboard() {
+      const token = localStorage.getItem('cpToken');
+      if (!token) return false;
+
+      const reponse = await fetch('/api/mes-tenants', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!reponse.ok) {
+        localStorage.removeItem('cpToken');
+        return false;
+      }
+
+      const corps = await reponse.json();
+      const finEssai = corps.trialEndsAt
+        ? new Date(corps.trialEndsAt).toLocaleDateString('fr-FR') : '—';
+      document.getElementById('bandeau').textContent =
+        `${corps.organisation} — plan ${corps.plan} — statut ${corps.statutOrganisation}`
+        + ` — fin d'essai : ${finEssai}`;
+
+      const lignes = document.getElementById('lignesTenants');
+      lignes.innerHTML = '';
+      for (const t of corps.tenants) {
+        const tr = document.createElement('tr');
+
+        const tdNom = document.createElement('td');
+        tdNom.textContent = t.nom;
+
+        const tdUrl = document.createElement('td');
+        const lien = document.createElement('a');
+        lien.href = 'https://' + t.url;
+        lien.textContent = t.slug;
+        tdUrl.appendChild(lien);
+
+        const tdStatut = document.createElement('td');
+        const badge = document.createElement('span');
+        badge.className = 'statut ' + t.statut;
+        badge.textContent = t.statut;
+        tdStatut.appendChild(badge);
+
+        const tdSuspendu = document.createElement('td');
+        tdSuspendu.textContent = t.suspendedAt
+          ? new Date(t.suspendedAt).toLocaleDateString('fr-FR') : '—';
+
+        tr.append(tdNom, tdUrl, tdStatut, tdSuspendu);
+        lignes.appendChild(tr);
+      }
+
+      document.getElementById('vueLogin').style.display = 'none';
+      document.getElementById('vueDashboard').style.display = 'block';
+      return true;
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      masquerErreur();
+      const bouton = e.target.querySelector('button');
+      bouton.disabled = true;
+
+      try {
+        const reponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('email').value,
+            motDePasse: document.getElementById('motDePasse').value
+          })
+        });
+
+        if (!reponse.ok) {
+          const corps = await reponse.json().catch(() => ({}));
+          afficherErreur(corps.detail || 'Connexion impossible.');
+          return;
+        }
+
+        const corps = await reponse.json();
+        localStorage.setItem('cpToken', corps.token);
+        await chargerDashboard();
+      } catch (err) {
+        afficherErreur('Impossible de contacter le serveur.');
+      } finally {
+        bouton.disabled = false;
+      }
+    });
+
+    document.getElementById('deconnexion').addEventListener('click', () => {
+      localStorage.removeItem('cpToken');
+      document.getElementById('vueDashboard').style.display = 'none';
+      document.getElementById('vueLogin').style.display = 'block';
+    });
+
+    chargerDashboard().catch(() => {});
+  </script>
+</body>
+</html>

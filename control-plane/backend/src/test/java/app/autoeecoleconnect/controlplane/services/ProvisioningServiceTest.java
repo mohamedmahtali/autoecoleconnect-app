@@ -40,7 +40,8 @@ class ProvisioningServiceTest {
     private ProvisioningService provisioningService;
 
     private static final InscriptionRequest REQUEST =
-            new InscriptionRequest("Auto-École Test Marseille", "gerant@marseille.fr", "solo");
+            new InscriptionRequest("Auto-École Test Marseille", "gerant@marseille.fr", "solo",
+                    "MotDePasse123!");
 
     @BeforeEach
     void setUp() {
@@ -48,8 +49,13 @@ class ProvisioningServiceTest {
                 "167.233.170.196.sslip.io", "mohamedmahtali", "autoecoleconnect-infra",
                 "", "", "", "invite-token", 15000L, 15L, 30L, "argocd");
         provisioningService = new ProvisioningService(organisationRepository, tenantRepository,
-                provisioningLogRepository, slugService, gitHubService, properties, new ObjectMapper());
+                provisioningLogRepository, slugService, gitHubService, properties, new ObjectMapper(),
+                new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder());
+    }
 
+    // Pas dans setUp : le test de rejet d'email n'atteint jamais les save —
+    // Mockito (strict stubs) considérerait ces stubs comme inutiles.
+    private void stubberLesSaves() {
         when(organisationRepository.save(any(Organisation.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
         when(tenantRepository.saveAndFlush(any(Tenant.class)))
@@ -58,6 +64,7 @@ class ProvisioningServiceTest {
 
     @Test
     void inscrireCreeUnTenantEnProvisioning() {
+        stubberLesSaves();
         when(organisationRepository.existsByEmailGerant(anyString())).thenReturn(false);
         when(slugService.genererSlugUnique(anyString())).thenReturn("auto-ecole-test-marseille");
 
@@ -78,6 +85,7 @@ class ProvisioningServiceTest {
 
     @Test
     void inscrireMarqueEnEchecSiLeCommitGitHubEchoue() {
+        stubberLesSaves();
         when(organisationRepository.existsByEmailGerant(anyString())).thenReturn(false);
         when(slugService.genererSlugUnique(anyString())).thenReturn("auto-ecole-test-marseille");
         doThrow(new ProvisioningException("boom", new RuntimeException()))

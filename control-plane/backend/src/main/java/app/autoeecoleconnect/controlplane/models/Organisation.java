@@ -33,6 +33,14 @@ public class Organisation {
     @Column(name = "trial_ends_at", nullable = false)
     private LocalDateTime trialEndsAt;
 
+    @Column(name = "reminder_sent", nullable = false)
+    private boolean reminderSent = false;
+
+    // Nullable : organisations créées avant la Slice B — login refusé tant
+    // qu'aucun hash n'est défini (voir AuthService).
+    @Column(name = "mot_de_passe_hash")
+    private String motDePasseHash;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -79,6 +87,22 @@ public class Organisation {
 
     public void setTrialEndsAt(LocalDateTime trialEndsAt) {
         this.trialEndsAt = trialEndsAt;
+    }
+
+    public boolean isReminderSent() {
+        return reminderSent;
+    }
+
+    public void setReminderSent(boolean reminderSent) {
+        this.reminderSent = reminderSent;
+    }
+
+    public String getMotDePasseHash() {
+        return motDePasseHash;
+    }
+
+    public void setMotDePasseHash(String motDePasseHash) {
+        this.motDePasseHash = motDePasseHash;
     }
 
     public LocalDateTime getCreatedAt() {

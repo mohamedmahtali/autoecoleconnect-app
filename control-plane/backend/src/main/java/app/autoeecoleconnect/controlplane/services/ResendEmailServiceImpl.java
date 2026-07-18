@@ -32,13 +32,6 @@ public class ResendEmailServiceImpl implements EmailService {
     @Override
     public void envoyerBienvenue(String destinataire, String nomAutoEcole, String url,
                                   String adminEmail, String adminPassword) {
-        if (properties.resendApiKey() == null || properties.resendApiKey().isBlank()) {
-            log.info("[RESEND_API_KEY absent] Email de bienvenue simulé pour {} ({}) → {} "
-                            + "(identifiants directeur : {} / {})",
-                    destinataire, nomAutoEcole, url, adminEmail, adminPassword);
-            return;
-        }
-
         String html = """
                 <p>Bonjour,</p>
                 <p>Votre espace <strong>%s</strong> est prêt : <a href="%s">%s</a></p>
@@ -47,10 +40,45 @@ public class ResendEmailServiceImpl implements EmailService {
                 <p>Pensez à changer ce mot de passe dès votre première connexion.</p>
                 """.formatted(nomAutoEcole, url, url, adminEmail, adminPassword);
 
+        envoyer(destinataire, "Votre espace AutoEcoleConnect est prêt", html);
+    }
+
+    @Override
+    public void envoyerRappelEssai(String destinataire, String nomOrganisation, long joursRestants) {
+        String html = """
+                <p>Bonjour,</p>
+                <p>La période d'essai de <strong>%s</strong> se termine dans <strong>%d jour(s)</strong>.</p>
+                <p>Au-delà, l'accès à votre espace sera suspendu — vos données restent
+                conservées et l'accès sera rétabli dès l'activation de votre abonnement.</p>
+                """.formatted(nomOrganisation, joursRestants);
+
+        envoyer(destinataire, "Votre essai AutoEcoleConnect se termine bientôt", html);
+    }
+
+    @Override
+    public void envoyerFinEssai(String destinataire, String nomOrganisation) {
+        String html = """
+                <p>Bonjour,</p>
+                <p>La période d'essai de <strong>%s</strong> est terminée : l'accès à votre
+                espace est suspendu.</p>
+                <p>Vos données sont conservées — contactez-nous pour activer votre
+                abonnement et rétablir l'accès.</p>
+                """.formatted(nomOrganisation);
+
+        envoyer(destinataire, "Votre essai AutoEcoleConnect est terminé", html);
+    }
+
+    private void envoyer(String destinataire, String sujet, String html) {
+        if (properties.resendApiKey() == null || properties.resendApiKey().isBlank()) {
+            log.info("[RESEND_API_KEY absent] Email « {} » simulé pour {} — contenu : {}",
+                    sujet, destinataire, html);
+            return;
+        }
+
         Map<String, Object> body = Map.of(
                 "from", properties.resendFrom(),
                 "to", List.of(destinataire),
-                "subject", "Votre espace AutoEcoleConnect est prêt",
+                "subject", sujet,
                 "html", html);
 
         try {
@@ -60,9 +88,9 @@ public class ResendEmailServiceImpl implements EmailService {
                     .retrieve()
                     .toBodilessEntity();
         } catch (RestClientResponseException e) {
-            // Ne bloque jamais le flip de statut trial — l'email est une notification,
-            // pas une condition de succès du provisioning.
-            log.warn("Échec envoi email de bienvenue à {} : HTTP {}", destinataire, e.getStatusCode());
+            // Ne bloque jamais le flux appelant — l'email est une notification,
+            // pas une condition de succès (provisioning comme cycle de vie).
+            log.warn("Échec envoi email « {} » à {} : HTTP {}", sujet, destinataire, e.getStatusCode());
         }
     }
 }

@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -36,6 +37,7 @@ public class ProvisioningService {
     private final GitHubService gitHubService;
     private final ProvisioningProperties properties;
     private final ObjectMapper objectMapper;
+    private final PasswordEncoder passwordEncoder;
     private final Yaml yaml;
 
     public ProvisioningService(OrganisationRepository organisationRepository,
@@ -44,7 +46,8 @@ public class ProvisioningService {
                                 SlugService slugService,
                                 GitHubService gitHubService,
                                 ProvisioningProperties properties,
-                                ObjectMapper objectMapper) {
+                                ObjectMapper objectMapper,
+                                PasswordEncoder passwordEncoder) {
         this.organisationRepository = organisationRepository;
         this.tenantRepository = tenantRepository;
         this.provisioningLogRepository = provisioningLogRepository;
@@ -52,6 +55,7 @@ public class ProvisioningService {
         this.gitHubService = gitHubService;
         this.properties = properties;
         this.objectMapper = objectMapper;
+        this.passwordEncoder = passwordEncoder;
 
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -75,6 +79,9 @@ public class ProvisioningService {
         organisation.setEmailGerant(request.emailGerant());
         organisation.setPlan(request.plan());
         organisation.setTrialEndsAt(LocalDateTime.now().plusDays(properties.trialDays()));
+        // Slice B : mot de passe choisi par le gérant à l'inscription — sert
+        // au login Control Plane (dashboard), pas au compte directeur du tenant.
+        organisation.setMotDePasseHash(passwordEncoder.encode(request.motDePasse()));
         organisation = organisationRepository.save(organisation);
 
         String jwtSecret = genererSecretAleatoire();

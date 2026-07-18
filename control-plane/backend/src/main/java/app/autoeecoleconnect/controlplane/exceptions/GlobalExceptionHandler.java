@@ -24,6 +24,16 @@ public class GlobalExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
+    @ExceptionHandler(IdentifiantsInvalidesException.class)
+    public ProblemDetail identifiantsInvalides(IdentifiantsInvalidesException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    @ExceptionHandler(OrganisationIntrouvableException.class)
+    public ProblemDetail organisationIntrouvable(OrganisationIntrouvableException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
     @ExceptionHandler(ProvisioningException.class)
     public ProblemDetail provisioningEchoue(ProvisioningException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY,

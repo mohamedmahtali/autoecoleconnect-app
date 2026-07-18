@@ -27,6 +27,9 @@
     <label for="emailGerant">Email du gérant</label>
     <input id="emailGerant" name="emailGerant" type="email" required>
 
+    <label for="motDePasse">Mot de passe (accès gérant)</label>
+    <input id="motDePasse" name="motDePasse" type="password" minlength="8" maxlength="72" required>
+
     <label for="plan">Plan</label>
     <select id="plan" name="plan">
       <option value="solo">Solo — 29€/mois</option>
@@ -61,6 +64,7 @@
           body: JSON.stringify({
             nomAutoEcole: document.getElementById('nomAutoEcole').value,
             emailGerant: document.getElementById('emailGerant').value,
+            motDePasse: document.getElementById('motDePasse').value,
             plan: document.getElementById('plan').value
           })
         });

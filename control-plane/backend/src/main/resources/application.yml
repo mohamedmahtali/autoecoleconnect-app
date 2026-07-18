@@ -35,6 +35,17 @@ app:
     trial-days: ${PROVISIONING_TRIAL_DAYS:30}
     argocd-namespace: ${ARGOCD_NAMESPACE:argocd}
 
+  security:
+    # HS256 exige >= 32 octets — le défaut ne sert qu'en dev local
+    jwt-secret: ${JWT_SECRET:dev-jwt-secret-control-plane-a-remplacer-en-prod}
+    jwt-duree-minutes: ${JWT_DUREE_MINUTES:120}
+
+  lifecycle:
+    # Cron Spring (6 champs) — rappel à 8h, suspension à 9h, tous les jours
+    reminder-cron: ${LIFECYCLE_REMINDER_CRON:0 0 8 * * *}
+    suspend-cron: ${LIFECYCLE_SUSPEND_CRON:0 0 9 * * *}
+    reminder-jours-avant: ${LIFECYCLE_REMINDER_JOURS_AVANT:5}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

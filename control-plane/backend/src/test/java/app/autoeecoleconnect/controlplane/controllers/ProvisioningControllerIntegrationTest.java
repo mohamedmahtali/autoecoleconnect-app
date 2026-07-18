@@ -23,7 +23,8 @@ class ProvisioningControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void inscriptionSansTokenEstRejetee() {
-        InscriptionRequest requete = new InscriptionRequest("Auto-École Sans Token", "sanstoken@test.fr", "solo");
+        InscriptionRequest requete = new InscriptionRequest(
+                "Auto-École Sans Token", "sanstoken@test.fr", "solo", "MotDePasse123!");
 
         ResponseEntity<String> reponse = rest.postForEntity(
                 url("/api/inscription"), requeteAvecToken(requete, null), String.class);
@@ -33,7 +34,8 @@ class ProvisioningControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void inscriptionAvecTokenValideDemarreLeProvisioning() {
-        InscriptionRequest requete = new InscriptionRequest("Auto-École Test Marseille", "gerant@marseille.fr", "solo");
+        InscriptionRequest requete = new InscriptionRequest(
+                "Auto-École Test Marseille", "gerant@marseille.fr", "solo", "MotDePasse123!");
 
         ResponseEntity<InscriptionResponse> reponse = rest.postForEntity(
                 url("/api/inscription"), requeteAvecToken(requete, "test-invite-token"),
@@ -46,7 +48,8 @@ class ProvisioningControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void inscriptionAvecEmailDejaUtiliseEstRejetee() {
-        InscriptionRequest requete = new InscriptionRequest("Auto-École Doublon", "doublon@test.fr", "solo");
+        InscriptionRequest requete = new InscriptionRequest(
+                "Auto-École Doublon", "doublon@test.fr", "solo", "MotDePasse123!");
         rest.postForEntity(url("/api/inscription"), requeteAvecToken(requete, "test-invite-token"), String.class);
 
         ResponseEntity<String> reponse = rest.postForEntity(
