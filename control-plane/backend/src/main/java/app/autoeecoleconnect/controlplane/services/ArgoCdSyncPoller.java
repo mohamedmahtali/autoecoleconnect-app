@@ -126,7 +126,7 @@ public class ArgoCdSyncPoller {
             emailService.envoyerBienvenue(
                     tenant.getOrganisation().getEmailGerant(),
                     tenant.getNom(),
-                    "http://" + tenant.getUrl(),
+                    "https://" + tenant.getUrl(),
                     config.get("adminEmail"),
                     config.get("adminPassword"));
         } catch (Exception e) {
