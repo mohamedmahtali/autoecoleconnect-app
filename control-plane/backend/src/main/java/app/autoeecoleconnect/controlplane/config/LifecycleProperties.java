@@ -6,5 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record LifecycleProperties(
         String reminderCron,
         String suspendCron,
-        long reminderJoursAvant) {
+        long reminderJoursAvant,
+        String deleteCron,
+        long suppressionJoursApres) {
 }

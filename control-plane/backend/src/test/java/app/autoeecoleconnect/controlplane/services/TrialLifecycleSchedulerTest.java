@@ -38,6 +38,8 @@ class TrialLifecycleSchedulerTest {
     private TenantScaleService tenantScaleService;
     @Mock
     private EmailService emailService;
+    @Mock
+    private GitHubService gitHubService;
 
     private TrialLifecycleScheduler scheduler;
 
@@ -47,9 +49,10 @@ class TrialLifecycleSchedulerTest {
     @BeforeEach
     void setUp() {
         LifecycleProperties properties =
-                new LifecycleProperties("0 0 8 * * *", "0 0 9 * * *", 5L);
+                new LifecycleProperties("0 0 8 * * *", "0 0 9 * * *", 5L, "0 0 10 * * *", 60L);
         scheduler = new TrialLifecycleScheduler(organisationRepository, tenantRepository,
-                provisioningLogRepository, tenantScaleService, emailService, properties);
+                provisioningLogRepository, tenantScaleService, emailService, gitHubService,
+                properties);
 
         organisation = new Organisation();
         organisation.setNom("Auto-École Test");
@@ -128,5 +131,43 @@ class TrialLifecycleSchedulerTest {
         verify(tenantScaleService, never()).scalerAZero(anyString());
         // Tous les tenants déjà traités : l'organisation passe bien en suspended
         assertThat(organisation.getStatut()).isEqualTo("suspended");
+    }
+
+    @Test
+    void suppressionJ60SupprimeGitOpsEtAnonymise() {
+        organisation.setStatut("suspended");
+        organisation.setMotDePasseHash("hash");
+        tenant.setStatut("suspended");
+        tenant.setSuspendedAt(LocalDateTime.now().minusDays(61));
+        when(tenantRepository.findByStatutAndSuspendedAtBefore(anyString(), any()))
+                .thenReturn(List.of(tenant));
+        when(tenantRepository.findByOrganisationId(any())).thenReturn(List.of(tenant));
+
+        scheduler.supprimerComptesExpires();
+
+        verify(gitHubService).deleteTenantValues("auto-ecole-test");
+        assertThat(tenant.getStatut()).isEqualTo("deleted");
+        assertThat(tenant.getDeletedAt()).isNotNull();
+        verify(emailService).envoyerConfirmationSuppression("gerant@test.fr", "Auto-École Test");
+        // Anonymisation RGPD
+        assertThat(organisation.getStatut()).isEqualTo("deleted");
+        assertThat(organisation.getNom()).isEqualTo("[supprimé]");
+        assertThat(organisation.getEmailGerant()).endsWith("@anonyme.invalid");
+        assertThat(organisation.getMotDePasseHash()).isNull();
+    }
+
+    @Test
+    void suppressionEpargneUneOrganisationRedevenueActive() {
+        // Réabonnement Stripe pendant la fenêtre J+60 : plus de suppression
+        organisation.setStatut("active");
+        tenant.setStatut("suspended");
+        tenant.setSuspendedAt(LocalDateTime.now().minusDays(61));
+        when(tenantRepository.findByStatutAndSuspendedAtBefore(anyString(), any()))
+                .thenReturn(List.of(tenant));
+
+        scheduler.supprimerComptesExpires();
+
+        verify(gitHubService, never()).deleteTenantValues(anyString());
+        assertThat(tenant.getStatut()).isEqualTo("suspended");
     }
 }

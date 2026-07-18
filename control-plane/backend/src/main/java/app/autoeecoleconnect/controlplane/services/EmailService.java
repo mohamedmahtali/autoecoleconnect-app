@@ -12,4 +12,10 @@ public interface EmailService {
     void envoyerRappelEssai(String destinataire, String nomOrganisation, long joursRestants);
 
     void envoyerFinEssai(String destinataire, String nomOrganisation);
+
+    void envoyerConfirmationAbonnement(String destinataire, String nomOrganisation, String plan);
+
+    void envoyerEchecPaiement(String destinataire, String nomOrganisation);
+
+    void envoyerConfirmationSuppression(String destinataire, String nomOrganisation);
 }

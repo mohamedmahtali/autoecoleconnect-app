@@ -63,6 +63,12 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- Slice C : billing B2B (Checkout Subscriptions + webhooks). -->
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>33.1.1</version>
+        </dependency>
         <!-- Génération du values.yaml tenant sans concaténation de string —
              nomAutoEcole est une entrée utilisateur, l'échappement YAML doit
              être automatique (risque d'injection sinon). -->

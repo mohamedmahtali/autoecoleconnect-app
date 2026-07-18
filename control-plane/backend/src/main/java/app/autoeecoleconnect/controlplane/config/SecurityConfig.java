@@ -33,6 +33,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         // X-Invite-Token vérifié en temps constant dans ProvisioningController
                         .requestMatchers(HttpMethod.POST, "/api/inscription").permitAll()
+                        // Sécurité = signature HMAC Stripe-Signature (whsec)
+                        .requestMatchers(HttpMethod.POST, "/api/webhooks/stripe").permitAll()
                         .requestMatchers("/actuator/health/**", "/actuator/prometheus").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                         .permitAll()

@@ -41,10 +41,22 @@ app:
     jwt-duree-minutes: ${JWT_DUREE_MINUTES:120}
 
   lifecycle:
-    # Cron Spring (6 champs) — rappel à 8h, suspension à 9h, tous les jours
+    # Cron Spring (6 champs) — rappel à 8h, suspension à 9h, suppression à 10h
     reminder-cron: ${LIFECYCLE_REMINDER_CRON:0 0 8 * * *}
     suspend-cron: ${LIFECYCLE_SUSPEND_CRON:0 0 9 * * *}
     reminder-jours-avant: ${LIFECYCLE_REMINDER_JOURS_AVANT:5}
+    delete-cron: ${LIFECYCLE_DELETE_CRON:0 0 10 * * *}
+    suppression-jours-apres: ${LIFECYCLE_SUPPRESSION_JOURS_APRES:60}
+
+stripe:
+  # Vide en dev local / CI → checkouts refusés proprement (409), webhooks
+  # rejetés par la signature.
+  api-key: ${STRIPE_API_KEY:}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+  price-solo: ${STRIPE_PRICE_SOLO:}
+  price-pro: ${STRIPE_PRICE_PRO:}
+  price-groupe: ${STRIPE_PRICE_GROUPE:}
+  base-url: ${STRIPE_BASE_URL:https://app.autoecoleconnect.fr}
 
 springdoc:
   swagger-ui:

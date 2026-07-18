@@ -19,4 +19,6 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     // Suspension J+30 : trial déjà expiré
     List<Organisation> findByStatutAndTrialEndsAtBefore(String statut, LocalDateTime limite);
+
+    Optional<Organisation> findByStripeCustomerId(String stripeCustomerId);
 }

@@ -68,6 +68,43 @@ public class ResendEmailServiceImpl implements EmailService {
         envoyer(destinataire, "Votre essai AutoEcoleConnect est terminé", html);
     }
 
+    @Override
+    public void envoyerConfirmationAbonnement(String destinataire, String nomOrganisation, String plan) {
+        String html = """
+                <p>Bonjour,</p>
+                <p>Votre abonnement <strong>%s</strong> pour <strong>%s</strong> est actif :
+                votre espace est (ré)ouvert et le restera tant que l'abonnement court.</p>
+                <p>Merci de votre confiance !</p>
+                """.formatted(plan, nomOrganisation);
+
+        envoyer(destinataire, "Votre abonnement AutoEcoleConnect est actif", html);
+    }
+
+    @Override
+    public void envoyerEchecPaiement(String destinataire, String nomOrganisation) {
+        String html = """
+                <p>Bonjour,</p>
+                <p>Le dernier paiement de l'abonnement de <strong>%s</strong> a échoué.
+                De nouvelles tentatives auront lieu automatiquement — pensez à vérifier
+                votre moyen de paiement pour éviter la suspension de votre espace.</p>
+                """.formatted(nomOrganisation);
+
+        envoyer(destinataire, "Échec de paiement — action requise", html);
+    }
+
+    @Override
+    public void envoyerConfirmationSuppression(String destinataire, String nomOrganisation) {
+        String html = """
+                <p>Bonjour,</p>
+                <p>L'espace <strong>%s</strong> et l'ensemble de ses données viennent
+                d'être définitivement supprimés, conformément à notre politique de
+                rétention (60 jours après suspension).</p>
+                <p>Merci d'avoir essayé AutoEcoleConnect.</p>
+                """.formatted(nomOrganisation);
+
+        envoyer(destinataire, "Votre espace AutoEcoleConnect a été supprimé", html);
+    }
+
     private void envoyer(String destinataire, String sujet, String html) {
         if (properties.resendApiKey() == null || properties.resendApiKey().isBlank()) {
             log.info("[RESEND_API_KEY absent] Email « {} » simulé pour {} — contenu : {}",

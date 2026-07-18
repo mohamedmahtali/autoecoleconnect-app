@@ -22,6 +22,11 @@
   .statut.failed { background: #fce8e6; color: #611a15; }
   #deconnexion { background: none; color: #611a15; border: 1px solid #ddd; float: right; margin: 0; padding: 0.3rem 0.8rem; }
   #bandeau { margin-top: 1rem; color: #555; }
+  #abonnement { margin-top: 1rem; }
+  #boutonAbonnement { margin-top: 0; background: #174ea6; }
+  #infoCheckout { margin-top: 1rem; padding: 1rem; border-radius: 4px; display: none; }
+  #infoCheckout.ok { background: #e6f4ea; color: #1e4620; display: block; }
+  #infoCheckout.annule { background: #fef7e0; color: #7a5900; display: block; }
 </style>
 </head>
 <body>
@@ -43,6 +48,10 @@
   <section id="vueDashboard" style="display:none">
     <button id="deconnexion">Se déconnecter</button>
     <div id="bandeau"></div>
+    <div id="infoCheckout"></div>
+    <div id="abonnement" style="display:none">
+      <button id="boutonAbonnement"></button>
+    </div>
     <table>
       <thead>
         <tr><th>Auto-école</th><th>URL</th><th>Statut</th><th>Suspendu le</th></tr>
@@ -80,9 +89,21 @@
       const corps = await reponse.json();
       const finEssai = corps.trialEndsAt
         ? new Date(corps.trialEndsAt).toLocaleDateString('fr-FR') : '—';
-      document.getElementById('bandeau').textContent =
-        `${corps.organisation} — plan ${corps.plan} — statut ${corps.statutOrganisation}`
-        + ` — fin d'essai : ${finEssai}`;
+      const bandeau = corps.statutOrganisation === 'active'
+        ? `${corps.organisation} — plan ${corps.plan} — abonnement actif ✓`
+        : `${corps.organisation} — plan ${corps.plan} — statut ${corps.statutOrganisation}`
+          + ` — fin d'essai : ${finEssai}`;
+      document.getElementById('bandeau').textContent = bandeau;
+
+      const prix = { solo: '29 €/mois', pro: '59 €/mois', groupe: '99 €/mois' };
+      const zoneAbo = document.getElementById('abonnement');
+      if (['trial', 'suspended'].includes(corps.statutOrganisation) && prix[corps.plan]) {
+        document.getElementById('boutonAbonnement').textContent =
+          `S'abonner — ${prix[corps.plan]}`;
+        zoneAbo.style.display = 'block';
+      } else {
+        zoneAbo.style.display = 'none';
+      }
 
       const lignes = document.getElementById('lignesTenants');
       lignes.innerHTML = '';
@@ -154,6 +175,42 @@
       document.getElementById('vueDashboard').style.display = 'none';
       document.getElementById('vueLogin').style.display = 'block';
     });
+
+    document.getElementById('boutonAbonnement').addEventListener('click', async () => {
+      masquerErreur();
+      const bouton = document.getElementById('boutonAbonnement');
+      bouton.disabled = true;
+      try {
+        const reponse = await fetch('/api/abonnement/checkout', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + localStorage.getItem('cpToken') }
+        });
+        const corps = await reponse.json().catch(() => ({}));
+        if (!reponse.ok) {
+          afficherErreur(corps.detail || 'Abonnement impossible pour le moment.');
+          return;
+        }
+        window.location = corps.url; // page Stripe Checkout hébergée
+      } catch (err) {
+        afficherErreur('Impossible de contacter le serveur.');
+      } finally {
+        bouton.disabled = false;
+      }
+    });
+
+    // Bannière au retour de Stripe Checkout (?checkout=success|cancel)
+    const retourCheckout = new URLSearchParams(window.location.search).get('checkout');
+    if (retourCheckout) {
+      const info = document.getElementById('infoCheckout');
+      if (retourCheckout === 'success') {
+        info.className = 'ok';
+        info.textContent = 'Paiement confirmé — votre espace est en cours de (ré)activation, '
+          + 'rechargez la page dans quelques secondes.';
+      } else {
+        info.className = 'annule';
+        info.textContent = 'Paiement annulé — vous pouvez réessayer quand vous voulez.';
+      }
+    }
 
     chargerDashboard().catch(() => {});
   </script>

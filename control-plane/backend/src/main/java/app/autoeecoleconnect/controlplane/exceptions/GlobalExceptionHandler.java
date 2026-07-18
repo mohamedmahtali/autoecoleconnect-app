@@ -34,6 +34,11 @@ public class GlobalExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(AbonnementImpossibleException.class)
+    public ProblemDetail abonnementImpossible(AbonnementImpossibleException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     @ExceptionHandler(ProvisioningException.class)
     public ProblemDetail provisioningEchoue(ProvisioningException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY,

@@ -28,16 +28,24 @@ public class TenantScaleService {
     }
 
     public void scalerAZero(String namespace) throws ApiException {
+        scalerA(namespace, 0);
+    }
+
+    // Slice C : la réactivation remonte les Deployments à 1 (valeur déclarée
+    // par le chart tenant — ArgoCD ignore le drift de replicas, voir
+    // applicationset-tenants.yaml ignoreDifferences).
+    public void scalerA(String namespace, int replicas) throws ApiException {
         V1DeploymentList deployments = appsV1Api.listNamespacedDeployment(namespace).execute();
         for (V1Deployment deployment : deployments.getItems()) {
             String nom = deployment.getMetadata().getName();
             V1Scale scale = appsV1Api.readNamespacedDeploymentScale(nom, namespace).execute();
-            if (scale.getSpec() != null && Integer.valueOf(0).equals(scale.getSpec().getReplicas())) {
+            if (scale.getSpec() != null
+                    && Integer.valueOf(replicas).equals(scale.getSpec().getReplicas())) {
                 continue;
             }
-            scale.getSpec().setReplicas(0);
+            scale.getSpec().setReplicas(replicas);
             appsV1Api.replaceNamespacedDeploymentScale(nom, namespace, scale).execute();
-            log.info("Deployment {}/{} scalé à 0 replica", namespace, nom);
+            log.info("Deployment {}/{} scalé à {} replica(s)", namespace, nom, replicas);
         }
     }
 }

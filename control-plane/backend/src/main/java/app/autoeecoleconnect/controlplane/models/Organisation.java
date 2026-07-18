@@ -41,6 +41,15 @@ public class Organisation {
     @Column(name = "mot_de_passe_hash")
     private String motDePasseHash;
 
+    @Column(name = "stripe_customer_id", unique = true)
+    private String stripeCustomerId;
+
+    @Column(name = "stripe_subscription_id")
+    private String stripeSubscriptionId;
+
+    @Column(name = "payment_failed_at")
+    private LocalDateTime paymentFailedAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -103,6 +112,30 @@ public class Organisation {
 
     public void setMotDePasseHash(String motDePasseHash) {
         this.motDePasseHash = motDePasseHash;
+    }
+
+    public String getStripeCustomerId() {
+        return stripeCustomerId;
+    }
+
+    public void setStripeCustomerId(String stripeCustomerId) {
+        this.stripeCustomerId = stripeCustomerId;
+    }
+
+    public String getStripeSubscriptionId() {
+        return stripeSubscriptionId;
+    }
+
+    public void setStripeSubscriptionId(String stripeSubscriptionId) {
+        this.stripeSubscriptionId = stripeSubscriptionId;
+    }
+
+    public LocalDateTime getPaymentFailedAt() {
+        return paymentFailedAt;
+    }
+
+    public void setPaymentFailedAt(LocalDateTime paymentFailedAt) {
+        this.paymentFailedAt = paymentFailedAt;
     }
 
     public LocalDateTime getCreatedAt() {

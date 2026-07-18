@@ -9,3 +9,7 @@ databaseChangeLog:
       file: db/changelog/v1.1/004-organisations-reminder-sent.sql
   - include:
       file: db/changelog/v1.1/005-organisations-mot-de-passe-gerant.sql
+  - include:
+      file: db/changelog/v1.2/006-organisations-stripe.sql
+  - include:
+      file: db/changelog/v1.2/007-webhook-events.sql

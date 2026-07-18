@@ -33,6 +33,7 @@ public class TrialLifecycleScheduler {
     private final ProvisioningLogRepository provisioningLogRepository;
     private final TenantScaleService tenantScaleService;
     private final EmailService emailService;
+    private final GitHubService gitHubService;
     private final LifecycleProperties properties;
 
     public TrialLifecycleScheduler(OrganisationRepository organisationRepository,
@@ -40,12 +41,14 @@ public class TrialLifecycleScheduler {
                                     ProvisioningLogRepository provisioningLogRepository,
                                     TenantScaleService tenantScaleService,
                                     EmailService emailService,
+                                    GitHubService gitHubService,
                                     LifecycleProperties properties) {
         this.organisationRepository = organisationRepository;
         this.tenantRepository = tenantRepository;
         this.provisioningLogRepository = provisioningLogRepository;
         this.tenantScaleService = tenantScaleService;
         this.emailService = emailService;
+        this.gitHubService = gitHubService;
         this.properties = properties;
     }
 
@@ -134,5 +137,67 @@ public class TrialLifecycleScheduler {
                         organisation.getEmailGerant(), e);
             }
         }
+    }
+
+    // Suppression J+60 (docs/09 §9.7, Slice C) : le retrait du values.yaml du
+    // repo GitOps déclenche le prune ArgoCD (toutes les ressources du tenant,
+    // y compris la base CNPG et ses PVC — données définitivement effacées).
+    // Le namespace K8s reste un shell vide, accepté (le purger exigerait un
+    // ClusterRole delete namespaces, disproportionné).
+    @Scheduled(cron = "${app.lifecycle.delete-cron}")
+    public void supprimerComptesExpires() {
+        LocalDateTime limite = LocalDateTime.now().minusDays(properties.suppressionJoursApres());
+        List<Tenant> aSupprimer = tenantRepository.findByStatutAndSuspendedAtBefore("suspended", limite);
+
+        for (Tenant tenant : aSupprimer) {
+            try {
+                supprimer(tenant);
+            } catch (Exception e) {
+                log.error("Échec de la suppression du tenant {}", tenant.getSlug(), e);
+            }
+        }
+    }
+
+    private void supprimer(Tenant tenant) {
+        Organisation organisation = tenant.getOrganisation();
+        // Sécurité : une organisation redevenue active (réabonnement pendant la
+        // fenêtre J+60) ne doit jamais être supprimée.
+        if ("active".equals(organisation.getStatut())) {
+            return;
+        }
+
+        gitHubService.deleteTenantValues(tenant.getSlug());
+
+        tenant.setStatut("deleted");
+        tenant.setDeletedAt(LocalDateTime.now());
+        tenantRepository.save(tenant);
+        provisioningLogRepository.save(new ProvisioningLog(tenant, "delete", "success",
+                "Fin de vie J+" + properties.suppressionJoursApres() + " après suspension"));
+        log.info("Tenant {} supprimé (GitOps prune déclenché)", tenant.getSlug());
+
+        boolean tousSupprimes = tenantRepository.findByOrganisationId(organisation.getId()).stream()
+                .allMatch(t -> "deleted".equals(t.getStatut()));
+        if (tousSupprimes) {
+            // Email AVANT anonymisation (après, l'adresse n'existe plus).
+            try {
+                emailService.envoyerConfirmationSuppression(
+                        organisation.getEmailGerant(), organisation.getNom());
+            } catch (Exception e) {
+                log.warn("Impossible d'envoyer la confirmation de suppression", e);
+            }
+            anonymiser(organisation);
+        }
+    }
+
+    // RGPD : plus aucune donnée personnelle en base après suppression.
+    private void anonymiser(Organisation organisation) {
+        organisation.setNom("[supprimé]");
+        organisation.setEmailGerant("supprime-" + organisation.getId() + "@anonyme.invalid");
+        organisation.setMotDePasseHash(null); // login définitivement impossible
+        organisation.setStripeCustomerId(null);
+        organisation.setStripeSubscriptionId(null);
+        organisation.setStatut("deleted");
+        organisationRepository.save(organisation);
+        log.info("Organisation {} anonymisée (RGPD)", organisation.getId());
     }
 }

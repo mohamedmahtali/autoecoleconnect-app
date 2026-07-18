@@ -12,4 +12,11 @@ public interface GitHubService {
      * si le commit échoue.
      */
     void commitTenantValues(String slug, String valuesYamlContent);
+
+    /**
+     * Supprime {@code tenants/<slug>/values.yaml} (suppression J+60, docs/09
+     * §9.7) — l'ApplicationSet ArgoCD prune alors toutes les ressources du
+     * tenant, y compris sa base CNPG. Lève ProvisioningException en cas d'échec.
+     */
+    void deleteTenantValues(String slug);
 }

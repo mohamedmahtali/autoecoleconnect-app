@@ -76,6 +76,40 @@ public class GitHubServiceImpl implements GitHubService {
         }
     }
 
+    @Override
+    public void deleteTenantValues(String slug) {
+        if (properties.githubPat() == null || properties.githubPat().isBlank()) {
+            log.info("[GITHUB_PAT absent] Suppression simulée de tenants/{}/values.yaml", slug);
+            return;
+        }
+
+        String path = "tenants/" + slug + "/values.yaml";
+        String contentsUrl = "/repos/%s/%s/contents/%s".formatted(
+                properties.githubOwner(), properties.githubRepo(), path);
+
+        String sha = trouverShaExistant(contentsUrl);
+        if (sha == null) {
+            log.warn("tenants/{}/values.yaml déjà absent du repo — suppression considérée faite", slug);
+            return;
+        }
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "chore: suppression tenant " + slug + " (fin de vie J+60)");
+        body.put("sha", sha);
+        body.put("branch", "main");
+
+        try {
+            restClient.method(org.springframework.http.HttpMethod.DELETE)
+                    .uri(contentsUrl)
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (RestClientResponseException e) {
+            throw new ProvisioningException(
+                    "Échec de la suppression GitHub pour " + slug + " : HTTP " + e.getStatusCode(), e);
+        }
+    }
+
     private String trouverShaExistant(String contentsUrl) {
         try {
             JsonNode response = restClient.get()
