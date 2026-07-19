@@ -9,6 +9,7 @@
   h1 { font-size: 1.4rem; }
   label { display: block; margin-top: 1rem; font-weight: 600; }
   input, select { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
+  .aide { font-size: 0.85rem; color: #555; margin-top: 0.35rem; font-weight: 400; }
   button { margin-top: 1.5rem; padding: 0.6rem 1.2rem; background: #1a1a1a; color: white; border: none; cursor: pointer; }
   button:disabled { opacity: 0.5; cursor: default; }
   #resultat { margin-top: 1.5rem; padding: 1rem; border-radius: 4px; display: none; }
@@ -37,8 +38,14 @@
       <option value="groupe">Groupe — 149 € HT/mois</option>
     </select>
 
-    <label for="inviteToken">Token d'invitation</label>
-    <input id="inviteToken" name="inviteToken" required>
+    <div id="blocInvitation">
+      <label for="inviteToken">Code d'invitation</label>
+      <input id="inviteToken" name="inviteToken" required>
+      <p class="aide">AutoEcoleConnect est en cours de lancement : les inscriptions se font
+        sur invitation. Vous n'avez pas encore de code&nbsp;? Écrivez-nous à
+        <a href="mailto:contact@autoecoleconnect.fr?subject=Demande%20d%27invitation%20AutoEcoleConnect">contact@autoecoleconnect.fr</a>
+        — nous vous l'envoyons rapidement.</p>
+    </div>
 
     <button type="submit">Créer mon espace</button>
   </form>
@@ -46,6 +53,14 @@
   <div id="resultat"></div>
 
   <script>
+    // Lien d'invitation (?invitation=XXX) : le code est pré-rempli et le champ
+    // masqué — l'invité ne voit qu'un formulaire classique.
+    const codeInvitation = new URLSearchParams(location.search).get('invitation');
+    if (codeInvitation) {
+      document.getElementById('inviteToken').value = codeInvitation;
+      document.getElementById('blocInvitation').style.display = 'none';
+    }
+
     document.getElementById('inscriptionForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const bouton = e.target.querySelector('button');
