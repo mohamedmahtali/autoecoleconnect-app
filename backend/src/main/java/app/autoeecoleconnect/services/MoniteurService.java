@@ -21,10 +21,13 @@ public class MoniteurService {
 
     private final MoniteurRepository moniteurRepository;
     private final PasswordEncoder passwordEncoder;
+    private final QuotaService quotaService;
 
-    public MoniteurService(MoniteurRepository moniteurRepository, PasswordEncoder passwordEncoder) {
+    public MoniteurService(MoniteurRepository moniteurRepository, PasswordEncoder passwordEncoder,
+                           QuotaService quotaService) {
         this.moniteurRepository = moniteurRepository;
         this.passwordEncoder = passwordEncoder;
+        this.quotaService = quotaService;
     }
 
     @Transactional(readOnly = true)
@@ -42,6 +45,7 @@ public class MoniteurService {
         if (moniteurRepository.existsByEmail(request.email())) {
             throw new EmailDejaUtiliseException(request.email());
         }
+        quotaService.verifierPeutAjouterMoniteur();
         Moniteur moniteur = new Moniteur();
         moniteur.setNom(request.nom());
         moniteur.setPrenom(request.prenom());

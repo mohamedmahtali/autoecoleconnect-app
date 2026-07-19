@@ -11,6 +11,8 @@ public interface MoniteurRepository extends JpaRepository<Moniteur, UUID> {
 
     List<Moniteur> findByActiveTrue();
 
+    long countByActiveTrue();
+
     Optional<Moniteur> findByIdAndActiveTrue(UUID id);
 
     Optional<Moniteur> findByEmailAndActiveTrue(String email);

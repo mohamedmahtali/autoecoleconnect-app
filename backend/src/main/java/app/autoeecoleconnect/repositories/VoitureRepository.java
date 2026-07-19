@@ -11,5 +11,7 @@ public interface VoitureRepository extends JpaRepository<Voiture, UUID> {
 
     List<Voiture> findByActiveTrue();
 
+    long countByActiveTrue();
+
     Optional<Voiture> findByIdAndActiveTrue(UUID id);
 }

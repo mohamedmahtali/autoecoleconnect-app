@@ -33,6 +33,22 @@ app:
     # Compte directeur créé au premier démarrage si la table est vide
     admin-email: ${ADMIN_EMAIL:admin@autoecoleconnect.local}
     admin-password: ${ADMIN_PASSWORD:changez-moi-en-production}
+  quotas:
+    # Plan et statut d'essai injectés par le chart Helm (portail-tenant).
+    # Défauts permissifs (groupe = illimité) pour le dev local et les tests.
+    plan: ${TENANT_PLAN:groupe}
+    trial: ${TENANT_TRIAL:false}
+    # Grille validée le 18/07/2026 (avec la tarification 59/99/149 € HT).
+    # -1 = illimité. Ne compte que les ressources actives (soft delete exclu).
+    essai:
+      eleves: 15
+      moniteurs: 2
+      vehicules: 2
+    plans:
+      solo: { eleves: 80, moniteurs: 3, vehicules: 3 }
+      pro: { eleves: 250, moniteurs: 10, vehicules: 10 }
+      groupe: { eleves: -1, moniteurs: -1, vehicules: -1 }
+      reseau: { eleves: -1, moniteurs: -1, vehicules: -1 }
 
 springdoc:
   swagger-ui:

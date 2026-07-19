@@ -110,18 +110,66 @@ public class GitHubServiceImpl implements GitHubService {
         }
     }
 
-    private String trouverShaExistant(String contentsUrl) {
+    @Override
+    public void marquerTrialTermine(String slug) {
+        if (properties.githubPat() == null || properties.githubPat().isBlank()) {
+            log.info("[GITHUB_PAT absent] Fin d'essai simulée pour tenants/{}/values.yaml", slug);
+            return;
+        }
+
+        String path = "tenants/" + slug + "/values.yaml";
+        String contentsUrl = "/repos/%s/%s/contents/%s".formatted(
+                properties.githubOwner(), properties.githubRepo(), path);
+
+        JsonNode fichier = lireFichier(contentsUrl);
+        if (fichier == null) {
+            log.warn("tenants/{}/values.yaml introuvable — flip trial ignoré", slug);
+            return;
+        }
+        // L'API Contents renvoie le contenu en base64 replié sur plusieurs
+        // lignes — le décodeur MIME tolère les sauts de ligne.
+        String contenu = new String(Base64.getMimeDecoder().decode(
+                fichier.get("content").asText()), StandardCharsets.UTF_8);
+        if (!contenu.contains("trial: true")) {
+            log.info("tenants/{}/values.yaml déjà hors essai — rien à faire", slug);
+            return;
+        }
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "chore: fin d'essai tenant " + slug + " (abonnement actif)");
+        body.put("content", Base64.getEncoder().encodeToString(
+                contenu.replace("trial: true", "trial: false")
+                        .getBytes(StandardCharsets.UTF_8)));
+        body.put("sha", fichier.get("sha").asText());
+        body.put("branch", "main");
+
         try {
-            JsonNode response = restClient.get()
+            restClient.put()
+                    .uri(contentsUrl)
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (RestClientResponseException e) {
+            throw new ProvisioningException(
+                    "Échec du flip trial pour " + slug + " : HTTP " + e.getStatusCode(), e);
+        }
+    }
+
+    private String trouverShaExistant(String contentsUrl) {
+        JsonNode fichier = lireFichier(contentsUrl);
+        return fichier != null && fichier.has("sha") ? fichier.get("sha").asText() : null;
+    }
+
+    private JsonNode lireFichier(String contentsUrl) {
+        try {
+            return restClient.get()
                     .uri(contentsUrl + "?ref=main")
                     .retrieve()
                     .body(JsonNode.class);
-            return response != null && response.has("sha") ? response.get("sha").asText() : null;
         } catch (HttpClientErrorException.NotFound e) {
             return null; // premier provisioning de ce tenant — pas de fichier existant
         } catch (RestClientResponseException e) {
-            log.warn("Impossible de vérifier l'existence de {} avant commit : HTTP {}",
-                    contentsUrl, e.getStatusCode());
+            log.warn("Impossible de lire {} : HTTP {}", contentsUrl, e.getStatusCode());
             return null;
         }
     }

@@ -19,10 +19,13 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
+    private final QuotaService quotaService;
 
-    public ClientService(ClientRepository clientRepository, PasswordEncoder passwordEncoder) {
+    public ClientService(ClientRepository clientRepository, PasswordEncoder passwordEncoder,
+                         QuotaService quotaService) {
         this.clientRepository = clientRepository;
         this.passwordEncoder = passwordEncoder;
+        this.quotaService = quotaService;
     }
 
     @Transactional(readOnly = true)
@@ -40,6 +43,7 @@ public class ClientService {
         if (clientRepository.existsByEmail(request.email())) {
             throw new EmailDejaUtiliseException(request.email());
         }
+        quotaService.verifierPeutAjouterEleve();
         Client client = new Client();
         client.setNom(request.nom());
         client.setPrenom(request.prenom());

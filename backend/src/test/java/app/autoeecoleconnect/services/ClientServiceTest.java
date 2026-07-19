@@ -31,6 +31,9 @@ class ClientServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private QuotaService quotaService;
+
     @InjectMocks
     private ClientService clientService;
 

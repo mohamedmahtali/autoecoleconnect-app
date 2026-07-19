@@ -43,19 +43,22 @@ public class ActivationService {
     private final ProvisioningLogRepository provisioningLogRepository;
     private final TenantScaleService tenantScaleService;
     private final EmailService emailService;
+    private final GitHubService gitHubService;
 
     public ActivationService(WebhookEventRepository webhookEventRepository,
                              OrganisationRepository organisationRepository,
                              TenantRepository tenantRepository,
                              ProvisioningLogRepository provisioningLogRepository,
                              TenantScaleService tenantScaleService,
-                             EmailService emailService) {
+                             EmailService emailService,
+                             GitHubService gitHubService) {
         this.webhookEventRepository = webhookEventRepository;
         this.organisationRepository = organisationRepository;
         this.tenantRepository = tenantRepository;
         this.provisioningLogRepository = provisioningLogRepository;
         this.tenantScaleService = tenantScaleService;
         this.emailService = emailService;
+        this.gitHubService = gitHubService;
     }
 
     @Transactional
@@ -89,10 +92,13 @@ public class ActivationService {
         organisationRepository.save(organisation);
 
         for (Tenant tenant : tenantRepository.findByOrganisationId(organisationId)) {
-            if (!"trial".equals(tenant.getStatut()) && !"suspended".equals(tenant.getStatut())) {
-                continue;
+            if ("trial".equals(tenant.getStatut()) || "suspended".equals(tenant.getStatut())) {
+                reactiverTenant(tenant);
             }
-            reactiverTenant(tenant);
+            // Débloque les quotas du plan (TENANT_TRIAL=false via GitOps).
+            // Une ProvisioningException annule la transaction comme un échec
+            // de scale : Stripe relivrera l'event et tout sera retenté.
+            gitHubService.marquerTrialTermine(tenant.getSlug());
         }
 
         envoyerSansBloquer(() -> emailService.envoyerConfirmationAbonnement(

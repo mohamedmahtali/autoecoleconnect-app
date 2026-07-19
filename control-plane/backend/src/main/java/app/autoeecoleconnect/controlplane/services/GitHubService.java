@@ -19,4 +19,13 @@ public interface GitHubService {
      * tenant, y compris sa base CNPG. Lève ProvisioningException en cas d'échec.
      */
     void deleteTenantValues(String slug);
+
+    /**
+     * Passe {@code trial: true} à {@code false} dans le values.yaml du tenant
+     * à l'activation de l'abonnement Stripe : le backend tenant redémarre avec
+     * TENANT_TRIAL=false et applique les quotas du plan au lieu de ceux de
+     * l'essai. Idempotent (no-op si déjà à false ou fichier absent). Lève
+     * ProvisioningException en cas d'échec.
+     */
+    void marquerTrialTermine(String slug);
 }

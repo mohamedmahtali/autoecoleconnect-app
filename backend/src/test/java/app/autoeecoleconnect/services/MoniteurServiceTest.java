@@ -29,6 +29,9 @@ class MoniteurServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private QuotaService quotaService;
+
     @InjectMocks
     private MoniteurService moniteurService;
 

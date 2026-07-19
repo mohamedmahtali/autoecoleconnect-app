@@ -15,9 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class VoitureService {
 
     private final VoitureRepository voitureRepository;
+    private final QuotaService quotaService;
 
-    public VoitureService(VoitureRepository voitureRepository) {
+    public VoitureService(VoitureRepository voitureRepository, QuotaService quotaService) {
         this.voitureRepository = voitureRepository;
+        this.quotaService = quotaService;
     }
 
     @Transactional(readOnly = true)
@@ -32,6 +34,7 @@ public class VoitureService {
     }
 
     public Voiture creer(VoitureRequest request) {
+        quotaService.verifierPeutAjouterVehicule();
         Voiture voiture = new Voiture();
         appliquer(voiture, request);
         return voitureRepository.save(voiture);

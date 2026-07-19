@@ -44,6 +44,8 @@ class ActivationServiceTest {
     private TenantScaleService tenantScaleService;
     @Mock
     private EmailService emailService;
+    @Mock
+    private GitHubService gitHubService;
 
     private ActivationService activationService;
 
@@ -54,7 +56,8 @@ class ActivationServiceTest {
     @BeforeEach
     void setUp() {
         activationService = new ActivationService(webhookEventRepository, organisationRepository,
-                tenantRepository, provisioningLogRepository, tenantScaleService, emailService);
+                tenantRepository, provisioningLogRepository, tenantScaleService, emailService,
+                gitHubService);
 
         organisation = new Organisation();
         organisation.setNom("Auto-École Test");
@@ -97,6 +100,7 @@ class ActivationServiceTest {
         assertThat(organisation.getStripeCustomerId()).isEqualTo("cus_test_1");
         assertThat(organisation.getStripeSubscriptionId()).isEqualTo("sub_test_1");
         verify(tenantScaleService).scalerA("auto-ecole-test", 1);
+        verify(gitHubService).marquerTrialTermine("auto-ecole-test");
         assertThat(tenant.getStatut()).isEqualTo("active");
         assertThat(tenant.getSuspendedAt()).isNull();
         verify(emailService).envoyerConfirmationAbonnement("gerant@test.fr", "Auto-École Test", "solo");
