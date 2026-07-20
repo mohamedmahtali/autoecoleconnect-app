@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/*.html", "/favicon.ico").permitAll()
+                        .requestMatchers("/", "/*.html", "/*.css", "/favicon.ico").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         // X-Invite-Token vérifié en temps constant dans ProvisioningController
                         .requestMatchers(HttpMethod.POST, "/api/inscription").permitAll()
