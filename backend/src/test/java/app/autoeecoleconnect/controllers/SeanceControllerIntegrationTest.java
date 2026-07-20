@@ -11,6 +11,8 @@ import app.autoeecoleconnect.controllers.dto.ClientCreationRequest;
 import app.autoeecoleconnect.controllers.dto.ClientResponse;
 import app.autoeecoleconnect.controllers.dto.ForfaitRequest;
 import app.autoeecoleconnect.controllers.dto.ForfaitResponse;
+import app.autoeecoleconnect.controllers.dto.LoginRequest;
+import app.autoeecoleconnect.controllers.dto.LoginResponse;
 import app.autoeecoleconnect.controllers.dto.MoniteurCreationRequest;
 import app.autoeecoleconnect.controllers.dto.MoniteurResponse;
 import app.autoeecoleconnect.controllers.dto.ReservationCreationRequest;
@@ -27,6 +29,7 @@ import app.autoeecoleconnect.models.Transmission;
 import app.autoeecoleconnect.models.UniteValidite;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,6 +70,21 @@ class SeanceControllerIntegrationTest extends AbstractIntegrationTest {
                 new VoitureRequest("Clio école", "Renault", Transmission.MANUELLE,
                         true, null, null, null, null, false, null),
                 VoitureResponse.class).getBody().id();
+    }
+
+    private HttpHeaders enTetesPour(String email, String motDePasse) {
+        LoginResponse login = restAnonyme.postForEntity(url("/api/auth/login"),
+                new LoginRequest(email, motDePasse), LoginResponse.class).getBody();
+        HttpHeaders enTetes = new HttpHeaders();
+        enTetes.setBearerAuth(login.token());
+        return enTetes;
+    }
+
+    private UUID creerSeance(UUID reservationId, UUID moniteurId, UUID voitureId,
+                             LocalDate date, LocalTime hDeb, LocalTime hFin) {
+        return rest.postForEntity("/api/seances",
+                new SeanceCreationRequest(reservationId, moniteurId, voitureId, date, hDeb, hFin, null),
+                SeanceResponse.class).getBody().id();
     }
 
     @Test
@@ -120,5 +138,71 @@ class SeanceControllerIntegrationTest extends AbstractIntegrationTest {
                 String.class);
         assertThat(reponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(reponse.getBody()).contains("pendant la réservation");
+    }
+
+    @Test
+    void un_moniteur_ne_voit_que_ses_propres_seances() {
+        UUID moniteurAId = creerMoniteurApprouve("moniteur.a@example.fr");
+        UUID moniteurBId = creerMoniteurApprouve("moniteur.b@example.fr");
+        UUID reservationId = creerReservation("eleve.scoping@example.fr");
+        UUID seanceAId = creerSeance(reservationId, moniteurAId, null,
+                LocalDate.of(2026, 8, 12), LocalTime.of(9, 0), LocalTime.of(10, 0));
+        UUID seanceBId = creerSeance(reservationId, moniteurBId, null,
+                LocalDate.of(2026, 8, 12), LocalTime.of(11, 0), LocalTime.of(12, 0));
+
+        HttpHeaders enTetesA = enTetesPour("moniteur.a@example.fr", "motdepasse-solide");
+
+        ResponseEntity<SeanceResponse[]> liste = restAnonyme.exchange(url("/api/seances"),
+                HttpMethod.GET, new HttpEntity<>(enTetesA), SeanceResponse[].class);
+        assertThat(liste.getBody()).extracting(SeanceResponse::id).containsExactly(seanceAId);
+
+        ResponseEntity<SeanceResponse> saPropre = restAnonyme.exchange(
+                url("/api/seances/" + seanceAId), HttpMethod.GET,
+                new HttpEntity<>(enTetesA), SeanceResponse.class);
+        assertThat(saPropre.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<String> celleDunAutre = restAnonyme.exchange(
+                url("/api/seances/" + seanceBId), HttpMethod.GET,
+                new HttpEntity<>(enTetesA), String.class);
+        assertThat(celleDunAutre.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void un_moniteur_confirme_sa_seance_mais_pas_celle_dun_autre() {
+        UUID moniteurAId = creerMoniteurApprouve("moniteur.c@example.fr");
+        UUID moniteurBId = creerMoniteurApprouve("moniteur.d@example.fr");
+        UUID reservationId = creerReservation("eleve.confirmation@example.fr");
+        UUID seanceAId = creerSeance(reservationId, moniteurAId, null,
+                LocalDate.of(2026, 8, 13), LocalTime.of(9, 0), LocalTime.of(10, 0));
+        UUID seanceBId = creerSeance(reservationId, moniteurBId, null,
+                LocalDate.of(2026, 8, 13), LocalTime.of(11, 0), LocalTime.of(12, 0));
+
+        HttpHeaders enTetesA = enTetesPour("moniteur.c@example.fr", "motdepasse-solide");
+
+        ResponseEntity<SeanceResponse> confirmation = restAnonyme.exchange(
+                url("/api/seances/" + seanceAId + "/validation-moniteur"), HttpMethod.PATCH,
+                new HttpEntity<>(enTetesA), SeanceResponse.class);
+        assertThat(confirmation.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(confirmation.getBody().validatedMoniteur()).isTrue();
+
+        ResponseEntity<String> confirmationDunAutre = restAnonyme.exchange(
+                url("/api/seances/" + seanceBId + "/validation-moniteur"), HttpMethod.PATCH,
+                new HttpEntity<>(enTetesA), String.class);
+        assertThat(confirmationDunAutre.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void un_directeur_ne_peut_pas_utiliser_lendpoint_de_confirmation_moniteur() {
+        UUID moniteurId = creerMoniteurApprouve("moniteur.e@example.fr");
+        UUID reservationId = creerReservation("eleve.role@example.fr");
+        UUID seanceId = creerSeance(reservationId, moniteurId, null,
+                LocalDate.of(2026, 8, 14), LocalTime.of(9, 0), LocalTime.of(10, 0));
+
+        // rest est authentifié DIRECTEUR (voir AbstractIntegrationTest) — cet
+        // endpoint est réservé à l'auto-confirmation par le moniteur lui-même.
+        ResponseEntity<String> reponse = rest.exchange(
+                "/api/seances/" + seanceId + "/validation-moniteur", HttpMethod.PATCH,
+                new HttpEntity<>(null, new HttpHeaders()), String.class);
+        assertThat(reponse.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 }

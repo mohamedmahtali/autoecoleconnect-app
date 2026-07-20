@@ -13,12 +13,16 @@ import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * API stateless sécurisée par JWT (voir docs/12-securite.md §12.5).
- * Matrice d'accès Phase 0 :
+ * Matrice d'accès :
  * - public : login, ping, catalogue forfaits en lecture, health, métriques
  *   Prometheus (scrapées en interne au cluster, jamais exposées via la
  *   Gateway publique), Swagger
- * - lecture (GET) : tout profil authentifié
- * - écriture : DIRECTEUR uniquement (affinage par espace prévu avec le frontend)
+ * - lecture (GET) : tout profil authentifié (contrat existant, testé —
+ *   voir AuthControllerIntegrationTest#un_client_peut_lire_mais_pas_ecrire).
+ *   Sur les séances, un MONITEUR ne voit que les siennes malgré tout —
+ *   filtrage fait dans SeanceController, pas ici.
+ * - écriture : DIRECTEUR, sauf la confirmation de sa propre séance
+ *   (PATCH .../validation-moniteur), réservée à MONITEUR
  */
 @Configuration
 @EnableWebSecurity
@@ -39,6 +43,10 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health/**", "/actuator/prometheus").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                         .permitAll()
+                        // Auto-confirmation par le moniteur de sa propre séance —
+                        // avant la règle générique PATCH ci-dessous (premier match gagne).
+                        .requestMatchers(HttpMethod.PATCH, "/api/seances/*/validation-moniteur")
+                        .hasRole("MONITEUR")
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.PATCH, "/api/**").hasRole("DIRECTEUR")

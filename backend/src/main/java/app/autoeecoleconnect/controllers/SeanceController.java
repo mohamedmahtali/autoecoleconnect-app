@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,16 +37,36 @@ public class SeanceController {
         this.seanceService = seanceService;
     }
 
-    @Operation(summary = "Lister les séances actives")
+    @Operation(summary = "Lister les séances actives (un moniteur ne voit que les siennes)")
     @GetMapping
-    public List<SeanceResponse> lister() {
-        return seanceService.lister().stream().map(SeanceResponse::depuis).toList();
+    public List<SeanceResponse> lister(@AuthenticationPrincipal Jwt jwt) {
+        List<Seance> seances = estMoniteur(jwt)
+                ? seanceService.listerPourMoniteur(idAuthentifie(jwt))
+                : seanceService.lister();
+        return seances.stream().map(SeanceResponse::depuis).toList();
     }
 
-    @Operation(summary = "Consulter une séance")
+    @Operation(summary = "Consulter une séance (un moniteur ne peut consulter que les siennes)")
     @GetMapping("/{id}")
-    public SeanceResponse trouver(@PathVariable UUID id) {
-        return SeanceResponse.depuis(seanceService.trouver(id));
+    public SeanceResponse trouver(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        Seance seance = estMoniteur(jwt)
+                ? seanceService.trouverPourMoniteur(id, idAuthentifie(jwt))
+                : seanceService.trouver(id);
+        return SeanceResponse.depuis(seance);
+    }
+
+    @Operation(summary = "Confirmer sa présence à une séance planifiée (moniteur)")
+    @PatchMapping("/{id}/validation-moniteur")
+    public SeanceResponse validerParMoniteur(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        return SeanceResponse.depuis(seanceService.validerParMoniteur(id, idAuthentifie(jwt)));
+    }
+
+    private boolean estMoniteur(Jwt jwt) {
+        return "MONITEUR".equals(jwt.getClaimAsString("role"));
+    }
+
+    private UUID idAuthentifie(Jwt jwt) {
+        return UUID.fromString(jwt.getSubject());
     }
 
     @Operation(summary = "Planifier une séance (moniteur approuvé, créneau libre)")
