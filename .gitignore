@@ -6,10 +6,9 @@ backend/target/
 control-plane/backend/target/
 *.class
 
-# Node / Next.js
+# Node / Vite
 node_modules/
-frontend/.next/
-frontend/out/
+frontend/dist/
 *.tsbuildinfo
 npm-debug.log*
 
