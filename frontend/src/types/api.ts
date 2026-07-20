@@ -78,3 +78,25 @@ export interface ForfaitDto {
 export interface Identifiable {
   id: string;
 }
+
+export type StatutSeance = "SCHEDULED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
+
+export interface SeanceDto {
+  id: string;
+  reservationId: string;
+  clientNomComplet: string;
+  moniteurId: string | null;
+  moniteurNomComplet: string | null;
+  voitureId: string | null;
+  voitureNom: string | null;
+  dateSeance: string;
+  hDeb: string;
+  hFin: string;
+  statut: StatutSeance;
+  validatedClient: boolean;
+  validatedMoniteur: boolean;
+  validatedAdmin: boolean;
+  notes: string | null;
+  active: boolean;
+  createdAt: string;
+}

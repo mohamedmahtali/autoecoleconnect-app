@@ -10,6 +10,8 @@ import ClientNouveau from "@/pages/admin/clients/ClientNouveau";
 import MoniteursListe from "@/pages/admin/moniteurs/MoniteursListe";
 import VoituresListe from "@/pages/admin/voitures/VoituresListe";
 import ForfaitsListe from "@/pages/admin/forfaits/ForfaitsListe";
+import MoniteurLayout from "@/pages/moniteur/MoniteurLayout";
+import Planning from "@/pages/moniteur/Planning";
 
 export default function App() {
   return (
@@ -31,6 +33,16 @@ export default function App() {
           <Route path="moniteurs" element={<MoniteursListe />} />
           <Route path="voitures" element={<VoituresListe />} />
           <Route path="forfaits" element={<ForfaitsListe />} />
+        </Route>
+        <Route
+          path="/moniteur"
+          element={
+            <RequireAuth role="MONITEUR">
+              <MoniteurLayout />
+            </RequireAuth>
+          }
+        >
+          <Route index element={<Planning />} />
         </Route>
       </Routes>
     </BrowserRouter>

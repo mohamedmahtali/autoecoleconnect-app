@@ -376,3 +376,89 @@ tbody tr:last-child td {
   border-color: var(--primary);
   color: var(--text-heading);
 }
+
+/* ---------- portail moniteur ---------- */
+
+.moniteur-entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.moniteur-entete .marque {
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.moniteur-entete .profil {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.moniteur-contenu {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.moniteur-contenu h1 {
+  font-size: 1.3rem;
+  margin-bottom: 1.25rem;
+  color: var(--text-heading);
+}
+
+.liste-seances {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.seance-carte {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+
+.seance-entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  gap: 1rem;
+}
+
+.seance-date {
+  font-weight: 600;
+  color: var(--text-heading);
+  text-transform: capitalize;
+}
+
+.seance-corps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  color: var(--text-body);
+  font-size: 0.9rem;
+}
+
+.seance-horaire {
+  font-family: ui-monospace, monospace;
+  color: var(--text-heading);
+}
+
+.seance-actions {
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border-default);
+}
+
+.seance-actions .bouton {
+  width: auto;
+  padding: 0.5rem 1rem;
+}
