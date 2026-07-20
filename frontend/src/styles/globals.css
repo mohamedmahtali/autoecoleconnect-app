@@ -4,27 +4,42 @@
   padding: 0;
 }
 
+/* Design system AutoEcoleConnect — mêmes tokens que le site vitrine et le
+   control-plane, exprimés en permanence dans leur variante sombre : cet
+   espace est l'outil de travail quotidien du gérant, pas une page d'accueil. */
 :root {
-  --fond: #0f172a;
-  --fond-carte: #1e293b;
-  --bordure: #334155;
-  --texte: #e2e8f0;
-  --texte-secondaire: #94a3b8;
-  --accent: #38bdf8;
+  --bg-page: #10151c;
+  --surface-card: #171e28;
+  --border-default: #29323e;
+  --text-heading: #e8eaed;
+  --text-body: #9aa5b4;
+  --text-muted: #7c8698;
+  --primary: #6f9bff;
+  --primary-hover: #9dbcff;
+  --badge-bg: #1b2637;
+  --badge-text: #a9c2ff;
   --ok: #4ade80;
   --ko: #f87171;
+  --radius-md: 10px;
+  --radius-pill: 999px;
+  --dur-fast: 120ms;
+  --ease-standard: cubic-bezier(.4, 0, .2, 1);
 }
 
 body {
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: var(--fond);
-  color: var(--texte);
+  background: var(--bg-page);
+  color: var(--text-body);
   min-height: 100vh;
 }
 
 a {
-  color: var(--accent);
+  color: var(--primary);
   text-decoration: none;
+}
+
+a:hover {
+  color: var(--primary-hover);
 }
 
 /* ---------- pages centrées (accueil, login) ---------- */
@@ -45,16 +60,17 @@ a {
 .accueil h1 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
+  color: var(--text-heading);
 }
 
 p.sous-titre {
-  color: var(--texte-secondaire);
+  color: var(--text-muted);
   margin-bottom: 2rem;
 }
 
 .statut {
-  border: 1px solid var(--bordure);
-  border-radius: 0.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   text-align: left;
 }
@@ -63,7 +79,7 @@ p.sous-titre {
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--texte-secondaire);
+  color: var(--text-muted);
   margin-bottom: 1rem;
 }
 
@@ -88,9 +104,9 @@ p.sous-titre {
 /* ---------- formulaires ---------- */
 
 .carte {
-  background: var(--fond-carte);
-  border: 1px solid var(--bordure);
-  border-radius: 0.75rem;
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
   padding: 2rem;
   width: 100%;
   max-width: 24rem;
@@ -99,6 +115,7 @@ p.sous-titre {
 .carte h1 {
   font-size: 1.4rem;
   margin-bottom: 0.25rem;
+  color: var(--text-heading);
 }
 
 .carte .sous-titre {
@@ -114,22 +131,22 @@ p.sous-titre {
 .champ span {
   display: block;
   font-size: 0.85rem;
-  color: var(--texte-secondaire);
+  color: var(--text-muted);
   margin-bottom: 0.3rem;
 }
 
 .champ input {
   width: 100%;
   padding: 0.6rem 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--bordure);
-  background: var(--fond);
-  color: var(--texte);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-page);
+  color: var(--text-heading);
   font-size: 0.95rem;
 }
 
 .champ input:focus {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--primary);
   outline-offset: -1px;
 }
 
@@ -137,12 +154,17 @@ p.sous-titre {
   width: 100%;
   padding: 0.65rem;
   border: none;
-  border-radius: 0.5rem;
-  background: var(--accent);
-  color: #082f49;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--bg-page);
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+
+.bouton:hover:not(:disabled) {
+  background: var(--primary-hover);
 }
 
 .bouton:disabled {
@@ -166,7 +188,7 @@ p.sous-titre {
 .admin-nav {
   width: 15rem;
   flex-shrink: 0;
-  border-right: 1px solid var(--bordure);
+  border-right: 1px solid var(--border-default);
   padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
@@ -177,17 +199,19 @@ p.sous-titre {
   font-weight: 700;
   margin-bottom: 1.5rem;
   padding: 0 0.75rem;
+  color: var(--text-heading);
 }
 
 .admin-nav a {
-  color: var(--texte);
+  color: var(--text-body);
   padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   font-size: 0.95rem;
 }
 
 .admin-nav a:hover {
-  background: var(--fond-carte);
+  background: var(--surface-card);
+  color: var(--text-heading);
 }
 
 .admin-contenu {
@@ -206,28 +230,30 @@ p.sous-titre {
 
 .admin-entete h1 {
   font-size: 1.5rem;
+  color: var(--text-heading);
 }
 
 .admin-entete .profil {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--texte-secondaire);
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
 .bouton-secondaire {
   padding: 0.45rem 0.9rem;
-  border: 1px solid var(--bordure);
-  border-radius: 0.5rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
   background: transparent;
-  color: var(--texte);
+  color: var(--text-body);
   font-size: 0.85rem;
   cursor: pointer;
 }
 
 .bouton-secondaire:hover {
-  background: var(--fond-carte);
+  background: var(--surface-card);
+  color: var(--text-heading);
 }
 
 .cartes-stats {
@@ -237,12 +263,12 @@ p.sous-titre {
 }
 
 .stat-carte {
-  background: var(--fond-carte);
-  border: 1px solid var(--bordure);
-  border-radius: 0.75rem;
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
   padding: 1.25rem;
   display: block;
-  color: var(--texte);
+  color: var(--text-heading);
 }
 
 .stat-carte .valeur {
@@ -251,14 +277,14 @@ p.sous-titre {
 }
 
 .stat-carte .libelle {
-  color: var(--texte-secondaire);
+  color: var(--text-muted);
   font-size: 0.85rem;
 }
 
 .tableau-conteneur {
   overflow-x: auto;
-  border: 1px solid var(--bordure);
-  border-radius: 0.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
 }
 
 table {
@@ -271,12 +297,13 @@ th,
 td {
   text-align: left;
   padding: 0.7rem 1rem;
-  border-bottom: 1px solid var(--bordure);
+  border-bottom: 1px solid var(--border-default);
   white-space: nowrap;
+  color: var(--text-body);
 }
 
 th {
-  color: var(--texte-secondaire);
+  color: var(--text-muted);
   font-weight: 600;
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -288,7 +315,7 @@ tbody tr:last-child td {
 }
 
 .vide {
-  color: var(--texte-secondaire);
+  color: var(--text-muted);
   padding: 2rem;
   text-align: center;
 }
@@ -304,29 +331,29 @@ tbody tr:last-child td {
 .badge {
   display: inline-block;
   padding: 0.15rem 0.6rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 0.75rem;
   font-weight: 600;
 }
 
 .badge-pending {
-  background: #78350f;
-  color: #fbbf24;
+  background: #3a2c05;
+  color: #facc15;
 }
 
 .badge-approved {
-  background: #14532d;
+  background: #12321f;
   color: #4ade80;
 }
 
 .badge-rejected {
-  background: #7f1d1d;
+  background: #3a1414;
   color: #f87171;
 }
 
 .badge-inactive {
-  background: #334155;
-  color: #94a3b8;
+  background: var(--badge-bg);
+  color: var(--text-muted);
 }
 
 .actions-ligne {
@@ -336,15 +363,16 @@ tbody tr:last-child td {
 
 .btn-ligne {
   padding: 0.3rem 0.7rem;
-  border: 1px solid var(--bordure);
+  border: 1px solid var(--border-default);
   border-radius: 0.4rem;
   background: transparent;
-  color: var(--texte);
+  color: var(--text-body);
   font-size: 0.8rem;
   cursor: pointer;
 }
 
 .btn-ligne:hover {
-  background: var(--fond);
-  border-color: var(--accent);
+  background: var(--bg-page);
+  border-color: var(--primary);
+  color: var(--text-heading);
 }

@@ -4,103 +4,146 @@
 <meta charset="utf-8">
 <title>Rejoindre AutoEcoleConnect</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
+<link rel="stylesheet" href="/tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 480px; margin: 4rem auto; padding: 0 1rem; color: #1a1a1a; }
-  h1 { font-size: 1.4rem; }
-  label { display: block; margin-top: 1rem; font-weight: 600; }
-  input, select { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
-  .aide { font-size: 0.85rem; color: #555; margin-top: 0.35rem; font-weight: 400; }
-  button { margin-top: 1.5rem; padding: 0.6rem 1.2rem; background: #1a1a1a; color: white; border: none; cursor: pointer; }
-  button:disabled { opacity: 0.5; cursor: default; }
-  #resultat { margin-top: 1.5rem; padding: 1rem; border-radius: 4px; display: none; }
-  #resultat.ok { background: #e6f4ea; color: #1e4620; display: block; }
-  #resultat.erreur { background: #fce8e6; color: #611a15; display: block; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font-sans); background: var(--bg-page-alt); color: var(--text-body); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  header { padding: 1.25rem 0; }
+  .conteneur { max-width: 480px; margin: 0 auto; padding: 0 1.25rem; }
+  .logo { font-weight: 800; font-size: 1.125rem; color: var(--text-heading); text-decoration: none; }
+  .logo span { color: var(--primary); }
+  main { padding: 1rem 0 4rem; }
+  .carte { background: var(--surface-card); border: 1px solid var(--border-default); border-radius: var(--radius-md); padding: 2rem; }
+  h1 { font-size: 1.4rem; color: var(--text-heading); letter-spacing: -.01em; }
+  .intro { color: var(--text-body); font-size: .95rem; margin-top: .4rem; }
+  label { display: block; margin-top: 1.25rem; font-weight: 600; font-size: .9rem; color: var(--text-heading); }
+  input, select {
+    width: 100%; padding: .6rem .75rem; margin-top: .35rem;
+    border: 1px solid var(--border-default); border-radius: var(--radius-md);
+    background: var(--bg-page); color: var(--text-heading); font-size: .95rem;
+    font-family: inherit; box-sizing: border-box;
+  }
+  input:focus, select:focus { outline: 2px solid var(--primary); outline-offset: -1px; }
+  .aide { font-size: .82rem; color: var(--text-muted); margin-top: .4rem; font-weight: 400; line-height: 1.5; }
+  .aide a { color: var(--primary); }
+  button {
+    width: 100%; margin-top: 1.75rem; padding: .7rem 1.2rem;
+    background: var(--primary); color: #fff; border: none; border-radius: var(--radius-md);
+    font-weight: 600; font-size: .95rem; cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-standard);
+  }
+  button:hover:not(:disabled) { background: var(--primary-hover); }
+  button:disabled { opacity: .55; cursor: default; }
+  #resultat { margin-top: 1.5rem; padding: 1rem; border-radius: var(--radius-md); display: none; font-size: .9rem; line-height: 1.5; }
+  #resultat.ok { background: var(--ok-bg); color: var(--ok-text); display: block; }
+  #resultat.erreur { background: var(--ko-bg); color: var(--ko-text); display: block; }
+  .lien-connexion { text-align: center; margin-top: 1.5rem; font-size: .9rem; color: var(--text-muted); }
+  .lien-connexion a { color: var(--primary); }
 </style>
 </head>
 <body>
-  <h1>Rejoindre AutoEcoleConnect</h1>
-  <p>Créez l'espace de votre auto-école — provisionné automatiquement en quelques minutes.</p>
 
-  <form id="inscriptionForm">
-    <label for="nomAutoEcole">Nom de l'auto-école</label>
-    <input id="nomAutoEcole" name="nomAutoEcole" required>
+<header>
+  <div class="conteneur">
+    <a class="logo" href="https://autoecoleconnect.fr/">AutoEcole<span>Connect</span></a>
+  </div>
+</header>
 
-    <label for="emailGerant">Email du gérant</label>
-    <input id="emailGerant" name="emailGerant" type="email" required>
+<main>
+  <div class="conteneur">
+    <div class="carte">
+      <h1>Rejoindre AutoEcoleConnect</h1>
+      <p class="intro">Créez l'espace de votre auto-école — provisionné automatiquement en quelques minutes.</p>
 
-    <label for="motDePasse">Mot de passe (accès gérant)</label>
-    <input id="motDePasse" name="motDePasse" type="password" minlength="8" maxlength="72" required>
+      <form id="inscriptionForm">
+        <label for="nomAutoEcole">Nom de l'auto-école</label>
+        <input id="nomAutoEcole" name="nomAutoEcole" required>
 
-    <label for="plan">Plan</label>
-    <select id="plan" name="plan">
-      <option value="solo">Solo — 59 € HT/mois</option>
-      <option value="pro">Pro — 99 € HT/mois</option>
-      <option value="groupe">Groupe — 149 € HT/mois</option>
-    </select>
+        <label for="emailGerant">Email du gérant</label>
+        <input id="emailGerant" name="emailGerant" type="email" required>
 
-    <div id="blocInvitation">
-      <label for="inviteToken">Code d'invitation</label>
-      <input id="inviteToken" name="inviteToken" required>
-      <p class="aide">AutoEcoleConnect est en cours de lancement : les inscriptions se font
-        sur invitation. Vous n'avez pas encore de code&nbsp;? Écrivez-nous à
-        <a href="mailto:contact@autoecoleconnect.fr?subject=Demande%20d%27invitation%20AutoEcoleConnect">contact@autoecoleconnect.fr</a>
-        — nous vous l'envoyons rapidement.</p>
+        <label for="motDePasse">Mot de passe (accès gérant)</label>
+        <input id="motDePasse" name="motDePasse" type="password" minlength="8" maxlength="72" required>
+
+        <label for="plan">Plan</label>
+        <select id="plan" name="plan">
+          <option value="solo">Solo — 59 € HT/mois</option>
+          <option value="pro">Pro — 99 € HT/mois</option>
+          <option value="groupe">Groupe — 149 € HT/mois</option>
+        </select>
+
+        <div id="blocInvitation">
+          <label for="inviteToken">Code d'invitation</label>
+          <input id="inviteToken" name="inviteToken" required>
+          <p class="aide">AutoEcoleConnect est en cours de lancement : les inscriptions se font
+            sur invitation. Vous n'avez pas encore de code&nbsp;? Écrivez-nous à
+            <a href="mailto:contact@autoecoleconnect.fr?subject=Demande%20d%27invitation%20AutoEcoleConnect">contact@autoecoleconnect.fr</a>
+            — nous vous l'envoyons rapidement.</p>
+        </div>
+
+        <button type="submit">Créer mon espace</button>
+      </form>
+
+      <div id="resultat"></div>
     </div>
 
-    <button type="submit">Créer mon espace</button>
-  </form>
+    <p class="lien-connexion">Déjà un compte ? <a href="/dashboard.html">Se connecter</a></p>
+  </div>
+</main>
 
-  <div id="resultat"></div>
+<script>
+  // Lien d'invitation (?invitation=XXX) : le code est pré-rempli et le champ
+  // masqué — l'invité ne voit qu'un formulaire classique.
+  const codeInvitation = new URLSearchParams(location.search).get('invitation');
+  if (codeInvitation) {
+    document.getElementById('inviteToken').value = codeInvitation;
+    document.getElementById('blocInvitation').style.display = 'none';
+  }
 
-  <script>
-    // Lien d'invitation (?invitation=XXX) : le code est pré-rempli et le champ
-    // masqué — l'invité ne voit qu'un formulaire classique.
-    const codeInvitation = new URLSearchParams(location.search).get('invitation');
-    if (codeInvitation) {
-      document.getElementById('inviteToken').value = codeInvitation;
-      document.getElementById('blocInvitation').style.display = 'none';
-    }
+  document.getElementById('inscriptionForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const bouton = e.target.querySelector('button');
+    const resultat = document.getElementById('resultat');
+    bouton.disabled = true;
+    resultat.className = '';
+    resultat.style.display = 'none';
 
-    document.getElementById('inscriptionForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const bouton = e.target.querySelector('button');
-      const resultat = document.getElementById('resultat');
-      bouton.disabled = true;
-      resultat.className = '';
-      resultat.style.display = 'none';
+    try {
+      const reponse = await fetch('/api/inscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Invite-Token': document.getElementById('inviteToken').value
+        },
+        body: JSON.stringify({
+          nomAutoEcole: document.getElementById('nomAutoEcole').value,
+          emailGerant: document.getElementById('emailGerant').value,
+          motDePasse: document.getElementById('motDePasse').value,
+          plan: document.getElementById('plan').value
+        })
+      });
 
-      try {
-        const reponse = await fetch('/api/inscription', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Invite-Token': document.getElementById('inviteToken').value
-          },
-          body: JSON.stringify({
-            nomAutoEcole: document.getElementById('nomAutoEcole').value,
-            emailGerant: document.getElementById('emailGerant').value,
-            motDePasse: document.getElementById('motDePasse').value,
-            plan: document.getElementById('plan').value
-          })
-        });
+      const corps = await reponse.json();
 
-        const corps = await reponse.json();
-
-        if (reponse.ok) {
-          resultat.className = 'ok';
-          resultat.textContent = `Votre espace "${corps.slug}" est en cours de création (statut : ${corps.statut}). `
-            + `Vous recevrez un email dès qu'il sera prêt : ${corps.url}`;
-        } else {
-          resultat.className = 'erreur';
-          resultat.textContent = corps.detail || 'Une erreur est survenue.';
-        }
-      } catch (err) {
+      if (reponse.ok) {
+        resultat.className = 'ok';
+        resultat.textContent = `Votre espace "${corps.slug}" est en cours de création (statut : ${corps.statut}). `
+          + `Vous recevrez un email dès qu'il sera prêt : ${corps.url}`;
+      } else {
         resultat.className = 'erreur';
-        resultat.textContent = 'Impossible de contacter le serveur.';
-      } finally {
-        bouton.disabled = false;
+        resultat.textContent = corps.detail || 'Une erreur est survenue.';
       }
-    });
-  </script>
+    } catch (err) {
+      resultat.className = 'erreur';
+      resultat.textContent = 'Impossible de contacter le serveur.';
+    } finally {
+      bouton.disabled = false;
+    }
+  });
+</script>
 </body>
 </html>

@@ -4,215 +4,270 @@
 <meta charset="utf-8">
 <title>Mon espace gérant — AutoEcoleConnect</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
+<link rel="stylesheet" href="/tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 640px; margin: 4rem auto; padding: 0 1rem; color: #1a1a1a; }
-  h1 { font-size: 1.4rem; }
-  label { display: block; margin-top: 1rem; font-weight: 600; }
-  input { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
-  button { margin-top: 1.5rem; padding: 0.6rem 1.2rem; background: #1a1a1a; color: white; border: none; cursor: pointer; }
-  button:disabled { opacity: 0.5; cursor: default; }
-  #erreur { margin-top: 1.5rem; padding: 1rem; border-radius: 4px; background: #fce8e6; color: #611a15; display: none; }
-  table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
-  th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #ddd; }
-  .statut { padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.85rem; }
-  .statut.trial { background: #e8f0fe; color: #174ea6; }
-  .statut.active { background: #e6f4ea; color: #1e4620; }
-  .statut.suspended { background: #fce8e6; color: #611a15; }
-  .statut.provisioning { background: #fef7e0; color: #7a5900; }
-  .statut.failed { background: #fce8e6; color: #611a15; }
-  #deconnexion { background: none; color: #611a15; border: 1px solid #ddd; float: right; margin: 0; padding: 0.3rem 0.8rem; }
-  #bandeau { margin-top: 1rem; color: #555; }
-  #abonnement { margin-top: 1rem; }
-  #boutonAbonnement { margin-top: 0; background: #174ea6; }
-  #infoCheckout { margin-top: 1rem; padding: 1rem; border-radius: 4px; display: none; }
-  #infoCheckout.ok { background: #e6f4ea; color: #1e4620; display: block; }
-  #infoCheckout.annule { background: #fef7e0; color: #7a5900; display: block; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font-sans); background: var(--bg-page-alt); color: var(--text-body); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  header { padding: 1.25rem 0; border-bottom: 1px solid var(--border-default); background: var(--surface-card); }
+  .conteneur { max-width: 760px; margin: 0 auto; padding: 0 1.25rem; }
+  .logo { font-weight: 800; font-size: 1.125rem; color: var(--text-heading); text-decoration: none; }
+  .logo span { color: var(--primary); }
+  main { padding: 2rem 0 4rem; }
+  h1 { font-size: 1.4rem; color: var(--text-heading); letter-spacing: -.01em; }
+  .carte {
+    background: var(--surface-card); border: 1px solid var(--border-default);
+    border-radius: var(--radius-md); padding: 2rem; margin-top: 1.5rem; max-width: 380px;
+  }
+  .carte .intro { color: var(--text-body); font-size: .9rem; }
+  label { display: block; margin-top: 1.25rem; font-weight: 600; font-size: .9rem; color: var(--text-heading); }
+  input {
+    width: 100%; padding: .6rem .75rem; margin-top: .35rem;
+    border: 1px solid var(--border-default); border-radius: var(--radius-md);
+    background: var(--bg-page); color: var(--text-heading); font-size: .95rem;
+    font-family: inherit; box-sizing: border-box;
+  }
+  input:focus { outline: 2px solid var(--primary); outline-offset: -1px; }
+  button {
+    padding: .65rem 1.2rem; background: var(--primary); color: #fff; border: none;
+    border-radius: var(--radius-md); font-weight: 600; font-size: .9rem; cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-standard);
+  }
+  button:hover:not(:disabled) { background: var(--primary-hover); }
+  button:disabled { opacity: .55; cursor: default; }
+  .carte button[type="submit"] { width: 100%; margin-top: 1.75rem; }
+  .barre-actions { display: flex; justify-content: flex-end; margin-top: 1rem; }
+  #deconnexion { background: transparent; color: var(--text-muted); border: 1px solid var(--border-default); font-weight: 500; }
+  #deconnexion:hover:not(:disabled) { background: var(--bg-page-alt); color: var(--text-heading); }
+  #bandeau { margin-top: .3rem; color: var(--text-body); font-size: .95rem; }
+  #abonnement { margin-top: 1.25rem; }
+  #boutonAbonnement { margin-top: 0; }
+  #infoCheckout { margin-top: 1.5rem; padding: 1rem; border-radius: var(--radius-md); display: none; font-size: .9rem; line-height: 1.5; }
+  #infoCheckout.ok { background: var(--ok-bg); color: var(--ok-text); display: block; }
+  #infoCheckout.annule { background: var(--warn-bg); color: var(--warn-text); display: block; }
+  #erreur { margin-top: 1.5rem; padding: 1rem; border-radius: var(--radius-md); background: var(--ko-bg); color: var(--ko-text); display: none; font-size: .9rem; }
+  .tableau-conteneur {
+    margin-top: 1.5rem; border: 1px solid var(--border-default); border-radius: var(--radius-md);
+    overflow: hidden; background: var(--surface-card);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: .7rem 1rem; border-bottom: 1px solid var(--border-default); font-size: .9rem; color: var(--text-body); }
+  th { color: var(--text-muted); font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; background: var(--bg-page-alt); }
+  tbody tr:last-child td { border-bottom: none; }
+  a { color: var(--primary); text-decoration: none; }
+  a:hover { color: var(--primary-hover); }
+  .statut { display: inline-block; padding: .2rem .65rem; border-radius: var(--radius-pill); font-size: .78rem; font-weight: 600; }
+  .statut.trial { background: var(--info-bg); color: var(--info-text); }
+  .statut.active { background: var(--ok-bg); color: var(--ok-text); }
+  .statut.suspended { background: var(--ko-bg); color: var(--ko-text); }
+  .statut.provisioning { background: var(--warn-bg); color: var(--warn-text); }
+  .statut.failed { background: var(--ko-bg); color: var(--ko-text); }
 </style>
 </head>
 <body>
-  <h1>Mon espace gérant</h1>
 
-  <section id="vueLogin">
-    <p>Connectez-vous avec l'email et le mot de passe choisis à l'inscription.</p>
-    <form id="loginForm">
-      <label for="email">Email</label>
-      <input id="email" type="email" required>
+<header>
+  <div class="conteneur">
+    <a class="logo" href="https://autoecoleconnect.fr/">AutoEcole<span>Connect</span></a>
+  </div>
+</header>
 
-      <label for="motDePasse">Mot de passe</label>
-      <input id="motDePasse" type="password" required>
+<main>
+  <div class="conteneur">
+    <h1>Mon espace gérant</h1>
 
-      <button type="submit">Se connecter</button>
-    </form>
-  </section>
+    <section id="vueLogin">
+      <div class="carte">
+        <p class="intro">Connectez-vous avec l'email et le mot de passe choisis à l'inscription.</p>
+        <form id="loginForm">
+          <label for="email">Email</label>
+          <input id="email" type="email" required>
 
-  <section id="vueDashboard" style="display:none">
-    <button id="deconnexion">Se déconnecter</button>
-    <div id="bandeau"></div>
-    <div id="infoCheckout"></div>
-    <div id="abonnement" style="display:none">
-      <button id="boutonAbonnement"></button>
-    </div>
-    <table>
-      <thead>
-        <tr><th>Auto-école</th><th>URL</th><th>Statut</th><th>Suspendu le</th></tr>
-      </thead>
-      <tbody id="lignesTenants"></tbody>
-    </table>
-  </section>
+          <label for="motDePasse">Mot de passe</label>
+          <input id="motDePasse" type="password" required>
 
-  <div id="erreur"></div>
+          <button type="submit">Se connecter</button>
+        </form>
+      </div>
+    </section>
 
-  <script>
-    const erreur = document.getElementById('erreur');
+    <section id="vueDashboard" style="display:none">
+      <div class="barre-actions">
+        <button id="deconnexion">Se déconnecter</button>
+      </div>
+      <div id="bandeau"></div>
+      <div id="infoCheckout"></div>
+      <div id="abonnement" style="display:none">
+        <button id="boutonAbonnement"></button>
+      </div>
+      <div class="tableau-conteneur">
+        <table>
+          <thead>
+            <tr><th>Auto-école</th><th>URL</th><th>Statut</th><th>Suspendu le</th></tr>
+          </thead>
+          <tbody id="lignesTenants"></tbody>
+        </table>
+      </div>
+    </section>
 
-    function afficherErreur(message) {
-      erreur.textContent = message;
-      erreur.style.display = 'block';
+    <div id="erreur"></div>
+  </div>
+</main>
+
+<script>
+  const erreur = document.getElementById('erreur');
+
+  function afficherErreur(message) {
+    erreur.textContent = message;
+    erreur.style.display = 'block';
+  }
+
+  function masquerErreur() {
+    erreur.style.display = 'none';
+  }
+
+  async function chargerDashboard() {
+    const token = localStorage.getItem('cpToken');
+    if (!token) return false;
+
+    const reponse = await fetch('/api/mes-tenants', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!reponse.ok) {
+      localStorage.removeItem('cpToken');
+      return false;
     }
 
-    function masquerErreur() {
-      erreur.style.display = 'none';
+    const corps = await reponse.json();
+    const finEssai = corps.trialEndsAt
+      ? new Date(corps.trialEndsAt).toLocaleDateString('fr-FR') : '—';
+    const bandeau = corps.statutOrganisation === 'active'
+      ? `${corps.organisation} — plan ${corps.plan} — abonnement actif ✓`
+      : `${corps.organisation} — plan ${corps.plan} — statut ${corps.statutOrganisation}`
+        + ` — fin d'essai : ${finEssai}`;
+    document.getElementById('bandeau').textContent = bandeau;
+
+    const prix = { solo: '59 € HT/mois', pro: '99 € HT/mois', groupe: '149 € HT/mois' };
+    const zoneAbo = document.getElementById('abonnement');
+    if (['trial', 'suspended'].includes(corps.statutOrganisation) && prix[corps.plan]) {
+      document.getElementById('boutonAbonnement').textContent =
+        `S'abonner — ${prix[corps.plan]}`;
+      zoneAbo.style.display = 'block';
+    } else {
+      zoneAbo.style.display = 'none';
     }
 
-    async function chargerDashboard() {
-      const token = localStorage.getItem('cpToken');
-      if (!token) return false;
+    const lignes = document.getElementById('lignesTenants');
+    lignes.innerHTML = '';
+    for (const t of corps.tenants) {
+      const tr = document.createElement('tr');
 
-      const reponse = await fetch('/api/mes-tenants', {
-        headers: { 'Authorization': 'Bearer ' + token }
+      const tdNom = document.createElement('td');
+      tdNom.textContent = t.nom;
+
+      const tdUrl = document.createElement('td');
+      const lien = document.createElement('a');
+      lien.href = 'https://' + t.url;
+      lien.textContent = t.slug;
+      tdUrl.appendChild(lien);
+
+      const tdStatut = document.createElement('td');
+      const badge = document.createElement('span');
+      badge.className = 'statut ' + t.statut;
+      badge.textContent = t.statut;
+      tdStatut.appendChild(badge);
+
+      const tdSuspendu = document.createElement('td');
+      tdSuspendu.textContent = t.suspendedAt
+        ? new Date(t.suspendedAt).toLocaleDateString('fr-FR') : '—';
+
+      tr.append(tdNom, tdUrl, tdStatut, tdSuspendu);
+      lignes.appendChild(tr);
+    }
+
+    document.getElementById('vueLogin').style.display = 'none';
+    document.getElementById('vueDashboard').style.display = 'block';
+    return true;
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    masquerErreur();
+    const bouton = e.target.querySelector('button');
+    bouton.disabled = true;
+
+    try {
+      const reponse = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.getElementById('email').value,
+          motDePasse: document.getElementById('motDePasse').value
+        })
       });
+
       if (!reponse.ok) {
-        localStorage.removeItem('cpToken');
-        return false;
+        const corps = await reponse.json().catch(() => ({}));
+        afficherErreur(corps.detail || 'Connexion impossible.');
+        return;
       }
 
       const corps = await reponse.json();
-      const finEssai = corps.trialEndsAt
-        ? new Date(corps.trialEndsAt).toLocaleDateString('fr-FR') : '—';
-      const bandeau = corps.statutOrganisation === 'active'
-        ? `${corps.organisation} — plan ${corps.plan} — abonnement actif ✓`
-        : `${corps.organisation} — plan ${corps.plan} — statut ${corps.statutOrganisation}`
-          + ` — fin d'essai : ${finEssai}`;
-      document.getElementById('bandeau').textContent = bandeau;
-
-      const prix = { solo: '59 € HT/mois', pro: '99 € HT/mois', groupe: '149 € HT/mois' };
-      const zoneAbo = document.getElementById('abonnement');
-      if (['trial', 'suspended'].includes(corps.statutOrganisation) && prix[corps.plan]) {
-        document.getElementById('boutonAbonnement').textContent =
-          `S'abonner — ${prix[corps.plan]}`;
-        zoneAbo.style.display = 'block';
-      } else {
-        zoneAbo.style.display = 'none';
-      }
-
-      const lignes = document.getElementById('lignesTenants');
-      lignes.innerHTML = '';
-      for (const t of corps.tenants) {
-        const tr = document.createElement('tr');
-
-        const tdNom = document.createElement('td');
-        tdNom.textContent = t.nom;
-
-        const tdUrl = document.createElement('td');
-        const lien = document.createElement('a');
-        lien.href = 'https://' + t.url;
-        lien.textContent = t.slug;
-        tdUrl.appendChild(lien);
-
-        const tdStatut = document.createElement('td');
-        const badge = document.createElement('span');
-        badge.className = 'statut ' + t.statut;
-        badge.textContent = t.statut;
-        tdStatut.appendChild(badge);
-
-        const tdSuspendu = document.createElement('td');
-        tdSuspendu.textContent = t.suspendedAt
-          ? new Date(t.suspendedAt).toLocaleDateString('fr-FR') : '—';
-
-        tr.append(tdNom, tdUrl, tdStatut, tdSuspendu);
-        lignes.appendChild(tr);
-      }
-
-      document.getElementById('vueLogin').style.display = 'none';
-      document.getElementById('vueDashboard').style.display = 'block';
-      return true;
+      localStorage.setItem('cpToken', corps.token);
+      await chargerDashboard();
+    } catch (err) {
+      afficherErreur('Impossible de contacter le serveur.');
+    } finally {
+      bouton.disabled = false;
     }
+  });
 
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      masquerErreur();
-      const bouton = e.target.querySelector('button');
-      bouton.disabled = true;
+  document.getElementById('deconnexion').addEventListener('click', () => {
+    localStorage.removeItem('cpToken');
+    document.getElementById('vueDashboard').style.display = 'none';
+    document.getElementById('vueLogin').style.display = 'block';
+  });
 
-      try {
-        const reponse = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: document.getElementById('email').value,
-            motDePasse: document.getElementById('motDePasse').value
-          })
-        });
-
-        if (!reponse.ok) {
-          const corps = await reponse.json().catch(() => ({}));
-          afficherErreur(corps.detail || 'Connexion impossible.');
-          return;
-        }
-
-        const corps = await reponse.json();
-        localStorage.setItem('cpToken', corps.token);
-        await chargerDashboard();
-      } catch (err) {
-        afficherErreur('Impossible de contacter le serveur.');
-      } finally {
-        bouton.disabled = false;
+  document.getElementById('boutonAbonnement').addEventListener('click', async () => {
+    masquerErreur();
+    const bouton = document.getElementById('boutonAbonnement');
+    bouton.disabled = true;
+    try {
+      const reponse = await fetch('/api/abonnement/checkout', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('cpToken') }
+      });
+      const corps = await reponse.json().catch(() => ({}));
+      if (!reponse.ok) {
+        afficherErreur(corps.detail || 'Abonnement impossible pour le moment.');
+        return;
       }
-    });
-
-    document.getElementById('deconnexion').addEventListener('click', () => {
-      localStorage.removeItem('cpToken');
-      document.getElementById('vueDashboard').style.display = 'none';
-      document.getElementById('vueLogin').style.display = 'block';
-    });
-
-    document.getElementById('boutonAbonnement').addEventListener('click', async () => {
-      masquerErreur();
-      const bouton = document.getElementById('boutonAbonnement');
-      bouton.disabled = true;
-      try {
-        const reponse = await fetch('/api/abonnement/checkout', {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + localStorage.getItem('cpToken') }
-        });
-        const corps = await reponse.json().catch(() => ({}));
-        if (!reponse.ok) {
-          afficherErreur(corps.detail || 'Abonnement impossible pour le moment.');
-          return;
-        }
-        window.location = corps.url; // page Stripe Checkout hébergée
-      } catch (err) {
-        afficherErreur('Impossible de contacter le serveur.');
-      } finally {
-        bouton.disabled = false;
-      }
-    });
-
-    // Bannière au retour de Stripe Checkout (?checkout=success|cancel)
-    const retourCheckout = new URLSearchParams(window.location.search).get('checkout');
-    if (retourCheckout) {
-      const info = document.getElementById('infoCheckout');
-      if (retourCheckout === 'success') {
-        info.className = 'ok';
-        info.textContent = 'Paiement confirmé — votre espace est en cours de (ré)activation, '
-          + 'rechargez la page dans quelques secondes.';
-      } else {
-        info.className = 'annule';
-        info.textContent = 'Paiement annulé — vous pouvez réessayer quand vous voulez.';
-      }
+      window.location = corps.url; // page Stripe Checkout hébergée
+    } catch (err) {
+      afficherErreur('Impossible de contacter le serveur.');
+    } finally {
+      bouton.disabled = false;
     }
+  });
 
-    chargerDashboard().catch(() => {});
-  </script>
+  // Bannière au retour de Stripe Checkout (?checkout=success|cancel)
+  const retourCheckout = new URLSearchParams(window.location.search).get('checkout');
+  if (retourCheckout) {
+    const info = document.getElementById('infoCheckout');
+    if (retourCheckout === 'success') {
+      info.className = 'ok';
+      info.textContent = 'Paiement confirmé — votre espace est en cours de (ré)activation, '
+        + 'rechargez la page dans quelques secondes.';
+    } else {
+      info.className = 'annule';
+      info.textContent = 'Paiement annulé — vous pouvez réessayer quand vous voulez.';
+    }
+  }
+
+  chargerDashboard().catch(() => {});
+</script>
 </body>
 </html>

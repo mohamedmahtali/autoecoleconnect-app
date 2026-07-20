@@ -1,0 +1,38 @@
+/* Design system AutoEcoleConnect — tokens partagés (control-plane) */
+:root {
+  --slate-50: #f8fafc; --slate-100: #f1f5f9; --slate-200: #e2e8f0; --slate-300: #cbd5e1;
+  --slate-500: #64748b; --slate-600: #475569; --slate-900: #0f172a;
+  --blue-700: #1d4ed8; --blue-800: #1e40af; --blue-900: #1e3a8a;
+  --indigo-50: #eef2ff; --bg-page-alt: #f4f7fc;
+
+  --text-heading: var(--slate-900); --text-body: var(--slate-600); --text-muted: var(--slate-500);
+  --border-default: var(--slate-200);
+  --primary: var(--blue-700); --primary-hover: var(--blue-800);
+  --badge-bg: var(--indigo-50); --badge-text: var(--blue-900);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --text-xs: .8125rem; --text-sm: .9375rem; --text-base: 1rem; --text-lg: 1.125rem; --text-2xl: 1.75rem;
+  --radius-md: 10px; --radius-pill: 999px;
+  --dur-fast: 120ms; --ease-standard: cubic-bezier(.4,0,.2,1);
+
+  --ok-bg: #e6f4ea; --ok-text: #1e4620;
+  --ko-bg: #fce8e6; --ko-text: #611a15;
+  --warn-bg: #fef7e0; --warn-text: #7a5900;
+  --info-bg: #e8f0fe; --info-text: #174ea6;
+
+  --bg-page: #fff; --surface-card: #fff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-heading: #e8eaed; --text-body: #9aa5b4; --text-muted: #7c8698;
+    --border-default: #29323e;
+    --primary: #6f9bff; --primary-hover: #9dbcff;
+    --badge-bg: #1b2637; --badge-text: #a9c2ff;
+    --bg-page: #10151c; --bg-page-alt: #161d27; --surface-card: #171e28;
+
+    --ok-bg: #12321f; --ok-text: #4ade80;
+    --ko-bg: #3a1414; --ko-text: #f87171;
+    --warn-bg: #3a2c05; --warn-text: #facc15;
+    --info-bg: #10233f; --info-text: #8ab4ff;
+  }
+}
