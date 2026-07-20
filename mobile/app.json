@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "AutoEcoleConnect Moniteur",
+    "slug": "autoecoleconnect-moniteur",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "fr.autoecoleconnect.moniteur"
+    },
+    "android": {
+      "package": "fr.autoecoleconnect.moniteur",
+      "adaptiveIcon": {
+        "backgroundColor": "#10151c",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
+  }
+}
