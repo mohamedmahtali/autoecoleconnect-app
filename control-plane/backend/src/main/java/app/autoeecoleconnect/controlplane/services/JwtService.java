@@ -43,4 +43,21 @@ public class JwtService {
                 JwsHeader.with(MacAlgorithm.HS256).build(), claims)).getTokenValue();
         return new TokenGenere(token, expiration);
     }
+
+    // Super-admin (docs/16-backlog.md §16.3 item 17) : pas d'organisation,
+    // sub = l'email lui-même (aucun endpoint /api/admin/** n'en fait un UUID).
+    public TokenGenere genererSuperAdmin(String email) {
+        Instant maintenant = Instant.now();
+        Instant expiration = maintenant.plus(dureeMinutes, ChronoUnit.MINUTES);
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .subject(email)
+                .issuedAt(maintenant)
+                .expiresAt(expiration)
+                .claim("email", email)
+                .claim("role", "SUPERADMIN")
+                .build();
+        String token = jwtEncoder.encode(JwtEncoderParameters.from(
+                JwsHeader.with(MacAlgorithm.HS256).build(), claims)).getTokenValue();
+        return new TokenGenere(token, expiration);
+    }
 }

@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import app.autoeecoleconnect.models.Seance;
+import app.autoeecoleconnect.models.StatutSeance;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,6 +32,8 @@ public interface SeanceRepository extends JpaRepository<Seance, UUID> {
 
     @EntityGraph(attributePaths = {"reservation", "reservation.client", "moniteur", "voiture"})
     Optional<Seance> findByIdAndActiveTrueAndReservationClientId(UUID id, UUID clientId);
+
+    long countByActiveTrueAndStatut(StatutSeance statut);
 
     // Deux créneaux se chevauchent si chacun commence avant la fin de l'autre.
     // Seules les séances planifiées bloquent un créneau.

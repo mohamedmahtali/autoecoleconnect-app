@@ -1,5 +1,6 @@
 package app.autoeecoleconnect.controlplane.controllers;
 
+import app.autoeecoleconnect.controlplane.controllers.dto.ConsolideResponse;
 import app.autoeecoleconnect.controlplane.controllers.dto.MesTenantsResponse;
 import app.autoeecoleconnect.controlplane.services.GerantService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,5 +28,11 @@ public class GerantController {
     public MesTenantsResponse mesTenants(@AuthenticationPrincipal Jwt jwt) {
         // sub = id de l'organisation (voir JwtService.generer)
         return gerantService.mesTenants(UUID.fromString(jwt.getSubject()));
+    }
+
+    @Operation(summary = "Résumé consolidé (CA + élèves actifs) sur tous les tenants de l'organisation")
+    @GetMapping("/mes-tenants/consolide")
+    public ConsolideResponse consolide(@AuthenticationPrincipal Jwt jwt) {
+        return gerantService.consolidePour(UUID.fromString(jwt.getSubject()));
     }
 }

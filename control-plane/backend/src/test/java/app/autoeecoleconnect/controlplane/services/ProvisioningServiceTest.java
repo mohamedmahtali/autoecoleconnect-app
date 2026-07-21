@@ -47,7 +47,7 @@ class ProvisioningServiceTest {
     void setUp() {
         ProvisioningProperties properties = new ProvisioningProperties(
                 "167.233.170.196.sslip.io", "mohamedmahtali", "autoecoleconnect-infra",
-                "", "", "", "invite-token", 15000L, 15L, 30L, "argocd");
+                "", "", "", "invite-token", "", 15000L, 15L, 30L, "argocd");
         provisioningService = new ProvisioningService(organisationRepository, tenantRepository,
                 provisioningLogRepository, slugService, gitHubService, properties, new ObjectMapper(),
                 new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder());

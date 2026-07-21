@@ -281,6 +281,40 @@ p.sous-titre {
   font-size: 0.85rem;
 }
 
+.inscriptions-mensuelles {
+  margin-top: 1.5rem;
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+
+.inscriptions-mensuelles h2 {
+  font-size: 0.95rem;
+  color: var(--text-heading);
+  margin-bottom: 0.75rem;
+}
+
+.inscriptions-mensuelles ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  list-style: none;
+}
+
+.inscriptions-mensuelles li {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-body);
+}
+
+.inscriptions-mensuelles li span:last-child {
+  font-weight: 700;
+  color: var(--text-heading);
+  font-variant-numeric: tabular-nums;
+}
+
 .tableau-conteneur {
   overflow-x: auto;
   border: 1px solid var(--border-default);

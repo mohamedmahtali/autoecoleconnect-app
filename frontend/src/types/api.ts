@@ -100,3 +100,17 @@ export interface SeanceDto {
   active: boolean;
   createdAt: string;
 }
+
+export interface InscriptionMensuelleDto {
+  mois: string;
+  nombre: number;
+}
+
+export interface StatsDto {
+  caTotal: number;
+  elevesActifs: number;
+  seancesTerminees: number;
+  seancesNoShow: number;
+  tauxNoShow: number;
+  inscriptionsParMois: InscriptionMensuelleDto[];
+}

@@ -35,7 +35,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(organisationRepository, passwordEncoder, jwtService);
+        authService = new AuthService(organisationRepository, passwordEncoder, jwtService, "", "");
 
         organisation = new Organisation();
         organisation.setNom("Auto-École Test");
@@ -84,5 +84,43 @@ class AuthServiceTest {
 
         assertThrows(IdentifiantsInvalidesException.class,
                 () -> authService.login(new LoginRequest("gerant@test.fr", "Secret123!")));
+    }
+
+    @Test
+    void loginSuperadminAvecBonsIdentifiantsRetourneUnTokenSuperadmin() {
+        AuthService avecSuperadmin = new AuthService(organisationRepository, passwordEncoder, jwtService,
+                "admin@autoecoleconnect.fr", passwordEncoder.encode("SuperSecret1!"));
+        when(jwtService.genererSuperAdmin("admin@autoecoleconnect.fr"))
+                .thenReturn(new JwtService.TokenGenere("jwt-superadmin", Instant.now()));
+
+        LoginResponse reponse = avecSuperadmin.login(
+                new LoginRequest("admin@autoecoleconnect.fr", "SuperSecret1!"));
+
+        assertThat(reponse.token()).isEqualTo("jwt-superadmin");
+        assertThat(reponse.nomOrganisation()).isEqualTo("Super Admin");
+    }
+
+    @Test
+    void loginSuperadminAvecMauvaisMotDePasseEstRejete() {
+        AuthService avecSuperadmin = new AuthService(organisationRepository, passwordEncoder, jwtService,
+                "admin@autoecoleconnect.fr", passwordEncoder.encode("SuperSecret1!"));
+
+        assertThrows(IdentifiantsInvalidesException.class,
+                () -> avecSuperadmin.login(new LoginRequest("admin@autoecoleconnect.fr", "mauvais")));
+    }
+
+    @Test
+    void superadminNonConfigureNeCourtCircuitePasLeLoginGerant() {
+        // Config vide (cas par défaut, authService du @BeforeEach) : un email
+        // qui ressemblerait à un superadmin retombe normalement sur la
+        // recherche d'organisation, sans jamais planter sur une chaîne vide.
+        when(organisationRepository.findByEmailGerant("gerant@test.fr"))
+                .thenReturn(Optional.of(organisation));
+        when(jwtService.generer(organisation.getId(), "gerant@test.fr", "Auto-École Test"))
+                .thenReturn(new JwtService.TokenGenere("jwt-token", Instant.now()));
+
+        LoginResponse reponse = authService.login(new LoginRequest("gerant@test.fr", "Secret123!"));
+
+        assertThat(reponse.nomOrganisation()).isEqualTo("Auto-École Test");
     }
 }

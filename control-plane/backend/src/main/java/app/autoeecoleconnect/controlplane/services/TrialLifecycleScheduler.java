@@ -87,6 +87,44 @@ public class TrialLifecycleScheduler {
                 organisation.getEmailGerant(), joursRestants);
     }
 
+    // Rappel précoce J-25 (docs/16-backlog.md §16.3 item 16) — même
+    // déclencheur horaire que le rappel J-5, fenêtre et flag distincts pour
+    // ne pas interférer avec lui.
+    @Scheduled(cron = "${app.lifecycle.reminder-cron}")
+    public void envoyerRappelsPrecoceFinEssai() {
+        LocalDateTime maintenant = LocalDateTime.now();
+        List<Organisation> aRappeler = organisationRepository
+                .findByStatutAndReminderPrecoceSentFalseAndTrialEndsAtBetween(
+                        "trial", maintenant, maintenant.plusDays(properties.reminderPrecoceJoursAvant()));
+
+        for (Organisation organisation : aRappeler) {
+            try {
+                rappelerPrecoce(organisation, maintenant);
+            } catch (Exception e) {
+                log.error("Échec du rappel précoce de fin d'essai pour {}", organisation.getNom(), e);
+            }
+        }
+    }
+
+    private void rappelerPrecoce(Organisation organisation, LocalDateTime maintenant) {
+        long joursRestants = Math.max(0,
+                ChronoUnit.DAYS.between(maintenant, organisation.getTrialEndsAt()));
+
+        emailService.envoyerRappelEssai(
+                organisation.getEmailGerant(), organisation.getNom(), joursRestants);
+
+        organisation.setReminderPrecoceSent(true);
+        organisationRepository.save(organisation);
+
+        for (Tenant tenant : tenantRepository.findByOrganisationId(organisation.getId())) {
+            provisioningLogRepository.save(new ProvisioningLog(tenant, "reminder-precoce", "success",
+                    "Rappel précoce fin d'essai envoyé (" + joursRestants + " jour(s) restant(s))"));
+        }
+
+        log.info("Rappel précoce de fin d'essai envoyé à {} ({} jour(s) restant(s))",
+                organisation.getEmailGerant(), joursRestants);
+    }
+
     @Scheduled(cron = "${app.lifecycle.suspend-cron}")
     public void suspendreEssaisExpires() {
         List<Organisation> expirees = organisationRepository

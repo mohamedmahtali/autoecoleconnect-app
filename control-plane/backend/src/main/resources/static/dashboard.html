@@ -46,6 +46,10 @@
   #abonnement { margin-top: 1.25rem; }
   #boutonAbonnement { margin-top: 0; }
   #gestionAbonnement { margin-top: 1.25rem; }
+  #vueConsolidee { margin-top: 1.5rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 1rem; }
+  #vueConsolidee .stat-carte { background: var(--surface-card); border: 1px solid var(--border-default); border-radius: var(--radius-md); padding: 1.25rem; }
+  #vueConsolidee .valeur { font-size: 1.6rem; font-weight: 700; color: var(--text-heading); }
+  #vueConsolidee .libelle { color: var(--text-muted); font-size: .85rem; margin-top: .2rem; }
   #infoCheckout { margin-top: 1.5rem; padding: 1rem; border-radius: var(--radius-md); display: none; font-size: .9rem; line-height: 1.5; }
   #infoCheckout.ok { background: var(--ok-bg); color: var(--ok-text); display: block; }
   #infoCheckout.annule { background: var(--warn-bg); color: var(--warn-text); display: block; }
@@ -106,6 +110,16 @@
       </div>
       <div id="gestionAbonnement" style="display:none">
         <button id="boutonPortail" class="bouton-secondaire">Gérer mon abonnement</button>
+      </div>
+      <div id="vueConsolidee" class="cartes-stats" style="display:none">
+        <div class="stat-carte">
+          <div class="valeur" id="consolideCa"></div>
+          <div class="libelle">Chiffre d'affaires cumulé</div>
+        </div>
+        <div class="stat-carte">
+          <div class="valeur" id="consolideEleves"></div>
+          <div class="libelle">Élèves actifs cumulés</div>
+        </div>
       </div>
       <div class="tableau-conteneur">
         <table>
@@ -193,6 +207,23 @@
 
       tr.append(tdNom, tdUrl, tdStatut, tdSuspendu);
       lignes.appendChild(tr);
+    }
+
+    const zoneConsolidee = document.getElementById('vueConsolidee');
+    if (corps.tenants.length > 1) {
+      const token = localStorage.getItem('cpToken');
+      const reponseConsolide = await fetch('/api/mes-tenants/consolide', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (reponseConsolide.ok) {
+        const consolide = await reponseConsolide.json();
+        document.getElementById('consolideCa').textContent =
+          consolide.caTotal.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+        document.getElementById('consolideEleves').textContent = consolide.elevesActifs;
+        zoneConsolidee.style.display = 'grid';
+      }
+    } else {
+      zoneConsolidee.style.display = 'none';
     }
 
     document.getElementById('vueLogin').style.display = 'none';

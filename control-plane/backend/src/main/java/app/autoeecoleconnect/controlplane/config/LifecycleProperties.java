@@ -8,5 +8,6 @@ public record LifecycleProperties(
         String suspendCron,
         long reminderJoursAvant,
         String deleteCron,
-        long suppressionJoursApres) {
+        long suppressionJoursApres,
+        long reminderPrecoceJoursAvant) {
 }

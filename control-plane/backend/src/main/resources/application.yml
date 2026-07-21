@@ -30,6 +30,9 @@ app:
     resend-from: ${RESEND_FROM:onboarding@resend.dev}
     # Header X-Invite-Token exigé sur /api/inscription
     invite-token: ${INVITE_TOKEN:dev-invite-token}
+    # Même valeur que app.internal-stats-api-key côté tenant (docs/16-backlog.md
+    # §16.3.A) — appelé par TenantStatsClient pour GET /api/stats/resume.
+    internal-stats-api-key: ${INTERNAL_STATS_API_KEY:}
     poll-interval-ms: ${PROVISIONING_POLL_INTERVAL_MS:15000}
     timeout-minutes: ${PROVISIONING_TIMEOUT_MINUTES:15}
     trial-days: ${PROVISIONING_TRIAL_DAYS:30}
@@ -40,6 +43,14 @@ app:
     jwt-secret: ${JWT_SECRET:dev-jwt-secret-control-plane-a-remplacer-en-prod}
     jwt-duree-minutes: ${JWT_DUREE_MINUTES:120}
 
+  # Vides par défaut = désactivé (docs/16-backlog.md §16.3 item 17). Pas de
+  # compte en base — un mot de passe en clair ne doit jamais transiter,
+  # fournir directement le hash BCrypt (ex. via `htpasswd -bnBC 12 "" motdepasse`
+  # en ne gardant que la partie après les ":" , ou un utilitaire BCrypt).
+  superadmin:
+    email: ${SUPERADMIN_EMAIL:}
+    password-hash: ${SUPERADMIN_PASSWORD_HASH:}
+
   lifecycle:
     # Cron Spring (6 champs) — rappel à 8h, suspension à 9h, suppression à 10h
     reminder-cron: ${LIFECYCLE_REMINDER_CRON:0 0 8 * * *}
@@ -47,6 +58,9 @@ app:
     reminder-jours-avant: ${LIFECYCLE_REMINDER_JOURS_AVANT:5}
     delete-cron: ${LIFECYCLE_DELETE_CRON:0 0 10 * * *}
     suppression-jours-apres: ${LIFECYCLE_SUPPRESSION_JOURS_APRES:60}
+    # Rappel précoce (docs/16-backlog.md §16.3 item 16) — même déclencheur
+    # cron que reminder-cron, fenêtre plus large.
+    reminder-precoce-jours-avant: ${LIFECYCLE_REMINDER_PRECOCE_JOURS_AVANT:25}
 
 stripe:
   # Vide en dev local / CI → checkouts refusés proprement (409), webhooks

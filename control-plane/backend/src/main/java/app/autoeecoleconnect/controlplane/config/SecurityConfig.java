@@ -16,7 +16,9 @@ import org.springframework.security.web.SecurityFilterChain;
  * (SecurityConfig du module backend). Matrice d'accès Slice B :
  * - public : pages statiques (signup/dashboard), inscription (protégée par
  *   X-Invite-Token dans le contrôleur), login, health/metrics, Swagger
- * - GERANT : /api/mes-tenants (lecture seule sur sa propre organisation)
+ * - GERANT : /api/mes-tenants[/**] (lecture seule sur sa propre organisation)
+ * - SUPERADMIN : /api/admin/** (vue plateforme, toutes organisations —
+ *   docs/16-backlog.md §16.3 item 17, aucun rôle au-dessus de GERANT avant)
  */
 @Configuration
 @EnableWebSecurity
@@ -38,7 +40,8 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health/**", "/actuator/prometheus").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                         .permitAll()
-                        .requestMatchers("/api/mes-tenants").hasRole("GERANT")
+                        .requestMatchers("/api/mes-tenants", "/api/mes-tenants/**").hasRole("GERANT")
+                        .requestMatchers("/api/admin/**").hasRole("SUPERADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt ->
                         jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))

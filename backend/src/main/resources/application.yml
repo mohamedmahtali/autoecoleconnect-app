@@ -33,6 +33,10 @@ app:
     # Compte directeur créé au premier démarrage si la table est vide
     admin-email: ${ADMIN_EMAIL:admin@autoecoleconnect.local}
     admin-password: ${ADMIN_PASSWORD:changez-moi-en-production}
+  # Secret partagé control-plane ↔ tenants (docs/16-backlog.md §16.3 item 14) :
+  # permet à GET /api/stats/resume de répondre au control-plane sans JWT
+  # tenant (il n'en a pas). Vide en dev local → l'en-tête interne est refusé.
+  internal-stats-api-key: ${INTERNAL_STATS_API_KEY:}
   quotas:
     # Plan et statut d'essai injectés par le chart Helm (portail-tenant).
     # Défauts permissifs (groupe = illimité) pour le dev local et les tests.

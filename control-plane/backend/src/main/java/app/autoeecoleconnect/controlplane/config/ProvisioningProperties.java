@@ -11,6 +11,7 @@ public record ProvisioningProperties(
         String resendApiKey,
         String resendFrom,
         String inviteToken,
+        String internalStatsApiKey,
         long pollIntervalMs,
         long timeoutMinutes,
         long trialDays,

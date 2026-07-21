@@ -36,6 +36,12 @@ public class Organisation {
     @Column(name = "reminder_sent", nullable = false)
     private boolean reminderSent = false;
 
+    // Rappel précoce J-25 (docs/16-backlog.md §16.3 item 16) — distinct de
+    // reminderSent (J-5) : réutiliser ce dernier empêcherait le rappel J-5
+    // de partir une fois le rappel précoce déjà envoyé.
+    @Column(name = "reminder_precoce_sent", nullable = false)
+    private boolean reminderPrecoceSent = false;
+
     // Nullable : organisations créées avant la Slice B — login refusé tant
     // qu'aucun hash n'est défini (voir AuthService).
     @Column(name = "mot_de_passe_hash")
@@ -104,6 +110,14 @@ public class Organisation {
 
     public void setReminderSent(boolean reminderSent) {
         this.reminderSent = reminderSent;
+    }
+
+    public boolean isReminderPrecoceSent() {
+        return reminderPrecoceSent;
+    }
+
+    public void setReminderPrecoceSent(boolean reminderPrecoceSent) {
+        this.reminderPrecoceSent = reminderPrecoceSent;
     }
 
     public String getMotDePasseHash() {

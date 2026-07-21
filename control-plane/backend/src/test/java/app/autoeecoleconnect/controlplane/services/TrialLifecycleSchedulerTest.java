@@ -49,7 +49,7 @@ class TrialLifecycleSchedulerTest {
     @BeforeEach
     void setUp() {
         LifecycleProperties properties =
-                new LifecycleProperties("0 0 8 * * *", "0 0 9 * * *", 5L, "0 0 10 * * *", 60L);
+                new LifecycleProperties("0 0 8 * * *", "0 0 9 * * *", 5L, "0 0 10 * * *", 60L, 25L);
         scheduler = new TrialLifecycleScheduler(organisationRepository, tenantRepository,
                 provisioningLogRepository, tenantScaleService, emailService, gitHubService,
                 properties);
@@ -84,6 +84,21 @@ class TrialLifecycleSchedulerTest {
         verify(provisioningLogRepository).save(logCapture.capture());
         assertThat(logCapture.getValue().getAction()).isEqualTo("reminder");
         assertThat(logCapture.getValue().getStatut()).isEqualTo("success");
+    }
+
+    @Test
+    void rappelPrecoceEnvoieEmailEtMarqueReminderPrecoceSent() {
+        when(organisationRepository.findByStatutAndReminderPrecoceSentFalseAndTrialEndsAtBetween(
+                anyString(), any(), any())).thenReturn(List.of(organisation));
+        when(tenantRepository.findByOrganisationId(any())).thenReturn(List.of(tenant));
+
+        scheduler.envoyerRappelsPrecoceFinEssai();
+
+        verify(emailService).envoyerRappelEssai("gerant@test.fr", "Auto-École Test", 2L);
+        assertThat(organisation.isReminderPrecoceSent()).isTrue();
+        // Le rappel précoce ne doit jamais marquer le flag J-5 comme envoyé
+        assertThat(organisation.isReminderSent()).isFalse();
+        verify(organisationRepository).save(organisation);
     }
 
     @Test

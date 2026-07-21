@@ -13,3 +13,5 @@ databaseChangeLog:
       file: db/changelog/v1.2/006-organisations-stripe.sql
   - include:
       file: db/changelog/v1.2/007-webhook-events.sql
+  - include:
+      file: db/changelog/v1.3/008-organisations-reminder-precoce-sent.sql

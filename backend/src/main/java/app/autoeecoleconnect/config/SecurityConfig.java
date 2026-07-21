@@ -21,6 +21,9 @@ import org.springframework.security.web.SecurityFilterChain;
  *   voir AuthControllerIntegrationTest#un_client_peut_lire_mais_pas_ecrire).
  *   Sur les séances et réservations, un MONITEUR/CLIENT ne voit malgré tout
  *   que les siennes — filtrage fait dans les contrôleurs, pas ici.
+ *   Exception : GET /api/stats/resume est réservé à DIRECTEUR (données de
+ *   chiffre d'affaires) ou au control-plane via une clé interne partagée —
+ *   permitAll ici, autorisation faite à la main dans StatsController.
  * - écriture : DIRECTEUR, sauf la confirmation de sa propre séance
  *   (PATCH .../validation-moniteur réservée à MONITEUR,
  *   PATCH .../validation-client réservée à CLIENT)
@@ -44,6 +47,10 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health/**", "/actuator/prometheus").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                         .permitAll()
+                        // Autorisation faite à la main dans StatsController (DIRECTEUR
+                        // via JWT, ou control-plane via clé interne — qui n'a pas de
+                        // JWT tenant à présenter, docs/16-backlog.md §16.3.A).
+                        .requestMatchers(HttpMethod.GET, "/api/stats/resume").permitAll()
                         // Auto-confirmation par le moniteur/élève de sa propre séance —
                         // avant la règle générique PATCH ci-dessous (premier match gagne).
                         .requestMatchers(HttpMethod.PATCH, "/api/seances/*/validation-moniteur")
