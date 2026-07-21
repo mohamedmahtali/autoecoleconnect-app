@@ -28,12 +28,18 @@ class GerantServiceTest {
 
     private GerantService service;
 
-    private Tenant tenantAvecUrl(String url) {
+    /**
+     * L'URL publique est renseignée mais volontairement différente du
+     * namespace : TenantStatsClient appelle le Service cluster-interne
+     * (namespace), pas l'URL publique — un stub posé sur l'URL passerait
+     * inaperçu si le service se remettait à utiliser getUrl().
+     */
+    private Tenant tenantNomme(String slug) {
         Tenant t = new Tenant();
-        t.setSlug(url.split("\\.")[0]);
-        t.setNamespace(t.getSlug());
-        t.setNom(t.getSlug());
-        t.setUrl(url);
+        t.setSlug(slug);
+        t.setNamespace(slug);
+        t.setNom(slug);
+        t.setUrl(slug + ".autoecoleconnect.fr");
         return t;
     }
 
@@ -41,12 +47,12 @@ class GerantServiceTest {
     void consolideSommeLesTenantsJoignables() {
         service = new GerantService(organisationRepository, tenantRepository, tenantStatsClient);
         UUID orgId = UUID.randomUUID();
-        Tenant a = tenantAvecUrl("agence-a.autoecoleconnect.fr");
-        Tenant b = tenantAvecUrl("agence-b.autoecoleconnect.fr");
+        Tenant a = tenantNomme("agence-a");
+        Tenant b = tenantNomme("agence-b");
         when(tenantRepository.findByOrganisationId(orgId)).thenReturn(List.of(a, b));
-        when(tenantStatsClient.resumePour("agence-a.autoecoleconnect.fr"))
+        when(tenantStatsClient.resumePour("agence-a"))
                 .thenReturn(Optional.of(new TenantStatsClient.ResumeTenant(new BigDecimal("500.00"), 3)));
-        when(tenantStatsClient.resumePour("agence-b.autoecoleconnect.fr"))
+        when(tenantStatsClient.resumePour("agence-b"))
                 .thenReturn(Optional.of(new TenantStatsClient.ResumeTenant(new BigDecimal("300.00"), 2)));
 
         ConsolideResponse consolide = service.consolidePour(orgId);
@@ -61,12 +67,12 @@ class GerantServiceTest {
     void consolideToleresUnTenantInjoignableSansFaireEchouerLeReste() {
         service = new GerantService(organisationRepository, tenantRepository, tenantStatsClient);
         UUID orgId = UUID.randomUUID();
-        Tenant ok = tenantAvecUrl("agence-ok.autoecoleconnect.fr");
-        Tenant enPanne = tenantAvecUrl("agence-panne.autoecoleconnect.fr");
+        Tenant ok = tenantNomme("agence-ok");
+        Tenant enPanne = tenantNomme("agence-panne");
         when(tenantRepository.findByOrganisationId(orgId)).thenReturn(List.of(ok, enPanne));
-        when(tenantStatsClient.resumePour("agence-ok.autoecoleconnect.fr"))
+        when(tenantStatsClient.resumePour("agence-ok"))
                 .thenReturn(Optional.of(new TenantStatsClient.ResumeTenant(new BigDecimal("100.00"), 1)));
-        when(tenantStatsClient.resumePour("agence-panne.autoecoleconnect.fr"))
+        when(tenantStatsClient.resumePour("agence-panne"))
                 .thenReturn(Optional.empty());
 
         ConsolideResponse consolide = service.consolidePour(orgId);

@@ -58,7 +58,7 @@ public class GerantService {
         long elevesActifs = 0;
         int enErreur = 0;
         for (Tenant tenant : tenants) {
-            var resume = tenantStatsClient.resumePour(tenant.getUrl());
+            var resume = tenantStatsClient.resumePour(tenant.getNamespace());
             if (resume.isPresent()) {
                 caTotal = caTotal.add(resume.get().caTotal());
                 elevesActifs += resume.get().elevesActifs();
