@@ -7,7 +7,7 @@ import type { LoginBackendResponse } from "@/types/api";
 const DESTINATIONS: Record<string, string> = {
   DIRECTEUR: "/admin",
   MONITEUR: "/moniteur",
-  CLIENT: "/",
+  CLIENT: "/eleve",
 };
 
 export default function Login() {

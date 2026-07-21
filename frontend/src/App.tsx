@@ -12,6 +12,8 @@ import VoituresListe from "@/pages/admin/voitures/VoituresListe";
 import ForfaitsListe from "@/pages/admin/forfaits/ForfaitsListe";
 import MoniteurLayout from "@/pages/moniteur/MoniteurLayout";
 import Planning from "@/pages/moniteur/Planning";
+import EleveLayout from "@/pages/eleve/EleveLayout";
+import ElevePlanning from "@/pages/eleve/Planning";
 
 export default function App() {
   return (
@@ -43,6 +45,16 @@ export default function App() {
           }
         >
           <Route index element={<Planning />} />
+        </Route>
+        <Route
+          path="/eleve"
+          element={
+            <RequireAuth role="CLIENT">
+              <EleveLayout />
+            </RequireAuth>
+          }
+        >
+          <Route index element={<ElevePlanning />} />
         </Route>
       </Routes>
     </BrowserRouter>

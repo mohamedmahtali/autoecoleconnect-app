@@ -39,8 +39,8 @@ export default function LoginScreen({ navigation }: Props) {
     setChargement(true);
     try {
       const reponse = await login(ecole.trim(), email.trim(), motDePasse);
-      if (reponse.role !== "MONITEUR") {
-        setErreur("Cette application est réservée aux moniteurs.");
+      if (reponse.role !== "MONITEUR" && reponse.role !== "CLIENT") {
+        setErreur("Cette application est réservée aux moniteurs et aux élèves.");
         return;
       }
       await setSession(ecole.trim(), reponse.token);
@@ -59,7 +59,7 @@ export default function LoginScreen({ navigation }: Props) {
         style={styles.centre}
       >
         <Text style={styles.titre}>AutoEcoleConnect</Text>
-        <Text style={styles.sousTitre}>Espace moniteur</Text>
+        <Text style={styles.sousTitre}>Espace moniteur et élève</Text>
 
         {erreur && <Text style={styles.erreur}>{erreur}</Text>}
 

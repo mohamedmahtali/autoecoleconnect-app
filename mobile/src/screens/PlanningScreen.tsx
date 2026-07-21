@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { fetchBackend, mutateBackend } from "../lib/api";
-import { clearToken } from "../lib/session";
+import { clearToken, getSession } from "../lib/session";
 import { SeanceCard } from "../components/SeanceCard";
 import { couleurs, espacements } from "../theme";
 import type { RootStackParamList } from "../navigation";
@@ -16,6 +16,7 @@ export default function PlanningScreen({ navigation }: Props) {
   const [seances, setSeances] = useState<SeanceDto[] | null>(null);
   const [rafraichit, setRafraichit] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
+  const [role, setRole] = useState<"MONITEUR" | "CLIENT" | null>(null);
 
   const charger = useCallback(async () => {
     try {
@@ -28,6 +29,11 @@ export default function PlanningScreen({ navigation }: Props) {
   }, []);
 
   useEffect(() => {
+    getSession().then((session) => {
+      if (session?.role === "MONITEUR" || session?.role === "CLIENT") {
+        setRole(session.role);
+      }
+    });
     charger();
   }, [charger]);
 
@@ -38,7 +44,8 @@ export default function PlanningScreen({ navigation }: Props) {
   }
 
   async function confirmer(id: string) {
-    await mutateBackend(`/api/seances/${id}/validation-moniteur`, "PATCH");
+    const suffixe = role === "CLIENT" ? "validation-client" : "validation-moniteur";
+    await mutateBackend(`/api/seances/${id}/${suffixe}`, "PATCH");
     charger();
   }
 
@@ -66,7 +73,9 @@ export default function PlanningScreen({ navigation }: Props) {
         data={triees}
         keyExtractor={(seance) => seance.id}
         contentContainerStyle={styles.liste}
-        renderItem={({ item }) => <SeanceCard seance={item} surConfirmer={confirmer} />}
+        renderItem={({ item }) => (
+          <SeanceCard seance={item} role={role ?? "MONITEUR"} surConfirmer={confirmer} />
+        )}
         refreshControl={
           <RefreshControl refreshing={rafraichit} onRefresh={rafraichir} tintColor={couleurs.primaire} />
         }

@@ -21,7 +21,8 @@ export default function App() {
 
   useEffect(() => {
     getSession().then((session) => {
-      setRouteDepart(session?.role === "MONITEUR" ? "Planning" : "Connexion");
+      const roleValide = session?.role === "MONITEUR" || session?.role === "CLIENT";
+      setRouteDepart(roleValide ? "Planning" : "Connexion");
     });
   }, []);
 

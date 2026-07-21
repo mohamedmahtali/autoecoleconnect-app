@@ -34,12 +34,16 @@ function formaterDate(date: string) {
 
 export function SeanceCard({
   seance,
+  role,
   surConfirmer,
 }: {
   seance: SeanceDto;
+  role: "MONITEUR" | "CLIENT";
   surConfirmer: (id: string) => void;
 }) {
   const badge = BADGE[seance.statut];
+  const autrePartie = role === "CLIENT" ? seance.moniteurNomComplet : seance.clientNomComplet;
+  const validee = role === "CLIENT" ? seance.validatedClient : seance.validatedMoniteur;
 
   return (
     <View style={styles.carte}>
@@ -55,12 +59,12 @@ export function SeanceCard({
       <Text style={styles.horaire}>
         {formaterHeure(seance.hDeb)} – {formaterHeure(seance.hFin)}
       </Text>
-      <Text style={styles.detail}>{seance.clientNomComplet}</Text>
+      {autrePartie && <Text style={styles.detail}>{autrePartie}</Text>}
       {seance.voitureNom && <Text style={styles.detail}>{seance.voitureNom}</Text>}
 
       {seance.statut === "SCHEDULED" && (
         <View style={styles.actions}>
-          {seance.validatedMoniteur ? (
+          {validee ? (
             <Text style={styles.confirme}>✓ Présence confirmée</Text>
           ) : (
             <Text style={styles.lienConfirmer} onPress={() => surConfirmer(seance.id)}>
