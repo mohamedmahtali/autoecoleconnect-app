@@ -9,14 +9,19 @@ import app.autoeecoleconnect.controllers.dto.ClientCreationRequest;
 import app.autoeecoleconnect.controllers.dto.ClientResponse;
 import app.autoeecoleconnect.controllers.dto.ForfaitRequest;
 import app.autoeecoleconnect.controllers.dto.ForfaitResponse;
+import app.autoeecoleconnect.controllers.dto.PaiementManuelRequest;
 import app.autoeecoleconnect.controllers.dto.ReservationCreationRequest;
 import app.autoeecoleconnect.controllers.dto.ReservationResponse;
 import app.autoeecoleconnect.models.CarburantForfait;
 import app.autoeecoleconnect.models.CategorieForfait;
 import app.autoeecoleconnect.models.Kilometrage;
+import app.autoeecoleconnect.models.PaiementStatut;
+import app.autoeecoleconnect.models.PaiementType;
 import app.autoeecoleconnect.models.StatutReservation;
 import app.autoeecoleconnect.models.UniteValidite;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -71,6 +76,50 @@ class ReservationControllerIntegrationTest extends AbstractIntegrationTest {
         ResponseEntity<String> refus = rest.postForEntity(
                 "/api/reservations/" + reservation.id() + "/annulation", null, String.class);
         assertThat(refus.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void enregistrer_un_paiement_manuel_marque_la_reservation_payee() {
+        UUID clientId = creerClient("paiement.manuel@example.fr");
+        UUID forfaitId = creerForfait();
+        ResponseEntity<ReservationResponse> cree = rest.postForEntity("/api/reservations",
+                new ReservationCreationRequest(clientId, forfaitId,
+                        LocalDate.of(2026, 8, 1), null, null, null),
+                ReservationResponse.class);
+        UUID reservationId = cree.getBody().id();
+
+        ResponseEntity<ReservationResponse> payee = rest.exchange(
+                "/api/reservations/" + reservationId + "/paiement", HttpMethod.PATCH,
+                new HttpEntity<>(new PaiementManuelRequest(PaiementType.CHEQUE, "n°1234")),
+                ReservationResponse.class);
+        assertThat(payee.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(payee.getBody().paiementStatut()).isEqualTo(PaiementStatut.PAID);
+        assertThat(payee.getBody().paiementType()).isEqualTo(PaiementType.CHEQUE);
+
+        // Déjà payée : un second enregistrement est refusé
+        ResponseEntity<String> refus = rest.exchange(
+                "/api/reservations/" + reservationId + "/paiement", HttpMethod.PATCH,
+                new HttpEntity<>(new PaiementManuelRequest(PaiementType.ESPECE, null)),
+                String.class);
+        assertThat(refus.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(refus.getBody()).contains("déjà marquée comme payée");
+    }
+
+    @Test
+    void stripe_ne_peut_pas_etre_saisi_comme_paiement_manuel() {
+        UUID clientId = creerClient("paiement.stripe@example.fr");
+        UUID forfaitId = creerForfait();
+        ResponseEntity<ReservationResponse> cree = rest.postForEntity("/api/reservations",
+                new ReservationCreationRequest(clientId, forfaitId,
+                        LocalDate.of(2026, 8, 1), null, null, null),
+                ReservationResponse.class);
+
+        ResponseEntity<String> refus = rest.exchange(
+                "/api/reservations/" + cree.getBody().id() + "/paiement", HttpMethod.PATCH,
+                new HttpEntity<>(new PaiementManuelRequest(PaiementType.STRIPE, null)),
+                String.class);
+        assertThat(refus.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(refus.getBody()).contains("ne peut pas être saisi manuellement");
     }
 
     @Test

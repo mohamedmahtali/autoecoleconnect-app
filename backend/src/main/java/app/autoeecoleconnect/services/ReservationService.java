@@ -9,8 +9,11 @@ import app.autoeecoleconnect.exceptions.RessourceIntrouvableException;
 import app.autoeecoleconnect.exceptions.ValidationMetierException;
 import app.autoeecoleconnect.models.Client;
 import app.autoeecoleconnect.models.Forfait;
+import app.autoeecoleconnect.models.PaiementStatut;
+import app.autoeecoleconnect.models.PaiementType;
 import app.autoeecoleconnect.models.Reservation;
 import app.autoeecoleconnect.models.StatutReservation;
+import java.util.Set;
 import app.autoeecoleconnect.repositories.ClientRepository;
 import app.autoeecoleconnect.repositories.ForfaitRepository;
 import app.autoeecoleconnect.repositories.ReservationRepository;
@@ -20,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ReservationService {
+
+    private static final Set<PaiementType> TYPES_PAIEMENT_MANUEL =
+            Set.of(PaiementType.ESPECE, PaiementType.CHEQUE, PaiementType.VIREMENT, PaiementType.CPF);
 
     private final ReservationRepository reservationRepository;
     private final ClientRepository clientRepository;
@@ -71,6 +77,30 @@ public class ReservationService {
                             .formatted(reservation.getStatut()));
         }
         reservation.setStatut(StatutReservation.CANCELLED);
+        return reservationRepository.save(reservation);
+    }
+
+    public Reservation enregistrerPaiementManuel(UUID id, PaiementType type, String reference) {
+        if (!TYPES_PAIEMENT_MANUEL.contains(type)) {
+            throw new ValidationMetierException(
+                    "Le type de paiement « %s » ne peut pas être saisi manuellement (espèces, chèque, virement ou CPF uniquement)"
+                            .formatted(type));
+        }
+
+        Reservation reservation = trouver(id);
+        if (reservation.getPaiementStatut() == PaiementStatut.PAID) {
+            throw new ValidationMetierException("Cette réservation est déjà marquée comme payée");
+        }
+
+        reservation.setPaiementType(type);
+        reservation.setPaiementStatut(PaiementStatut.PAID);
+        if (reference != null && !reference.isBlank()) {
+            String notesExistantes = reservation.getNotes();
+            String ligne = "Paiement %s enregistré manuellement — réf. %s".formatted(type, reference);
+            reservation.setNotes(notesExistantes == null || notesExistantes.isBlank()
+                    ? ligne
+                    : notesExistantes + "\n" + ligne);
+        }
         return reservationRepository.save(reservation);
     }
 

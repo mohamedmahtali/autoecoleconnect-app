@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+import app.autoeecoleconnect.controllers.dto.PaiementManuelRequest;
 import app.autoeecoleconnect.controllers.dto.ReservationCreationRequest;
 import app.autoeecoleconnect.controllers.dto.ReservationResponse;
 import app.autoeecoleconnect.models.Reservation;
@@ -14,6 +15,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,6 +53,14 @@ public class ReservationController {
         return ResponseEntity
                 .created(URI.create("/api/reservations/" + reservation.getId()))
                 .body(ReservationResponse.depuis(reservation));
+    }
+
+    @Operation(summary = "Enregistrer un paiement manuel (espèces, chèque, virement ou CPF)")
+    @PatchMapping("/{id}/paiement")
+    public ReservationResponse enregistrerPaiement(
+            @PathVariable UUID id, @Valid @RequestBody PaiementManuelRequest request) {
+        return ReservationResponse.depuis(
+                reservationService.enregistrerPaiementManuel(id, request.paiementType(), request.reference()));
     }
 
     @Operation(summary = "Annuler une réservation (PENDING ou ACTIVE uniquement)")
