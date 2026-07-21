@@ -192,6 +192,55 @@ class SeanceControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void un_client_ne_voit_que_ses_propres_seances() {
+        UUID reservationAId = creerReservation("eleve.a.scoping@example.fr");
+        UUID reservationBId = creerReservation("eleve.b.scoping@example.fr");
+        UUID seanceAId = creerSeance(reservationAId, null, null,
+                LocalDate.of(2026, 8, 15), LocalTime.of(9, 0), LocalTime.of(10, 0));
+        UUID seanceBId = creerSeance(reservationBId, null, null,
+                LocalDate.of(2026, 8, 15), LocalTime.of(11, 0), LocalTime.of(12, 0));
+
+        HttpHeaders enTetesA = enTetesPour("eleve.a.scoping@example.fr", "motdepasse-solide");
+
+        ResponseEntity<SeanceResponse[]> liste = restAnonyme.exchange(url("/api/seances"),
+                HttpMethod.GET, new HttpEntity<>(enTetesA), SeanceResponse[].class);
+        assertThat(liste.getBody()).extracting(SeanceResponse::id).containsExactly(seanceAId);
+
+        ResponseEntity<SeanceResponse> saPropre = restAnonyme.exchange(
+                url("/api/seances/" + seanceAId), HttpMethod.GET,
+                new HttpEntity<>(enTetesA), SeanceResponse.class);
+        assertThat(saPropre.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<String> celleDunAutre = restAnonyme.exchange(
+                url("/api/seances/" + seanceBId), HttpMethod.GET,
+                new HttpEntity<>(enTetesA), String.class);
+        assertThat(celleDunAutre.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void un_client_confirme_sa_seance_mais_pas_celle_dun_autre() {
+        UUID reservationAId = creerReservation("eleve.a.confirmation@example.fr");
+        UUID reservationBId = creerReservation("eleve.b.confirmation@example.fr");
+        UUID seanceAId = creerSeance(reservationAId, null, null,
+                LocalDate.of(2026, 8, 16), LocalTime.of(9, 0), LocalTime.of(10, 0));
+        UUID seanceBId = creerSeance(reservationBId, null, null,
+                LocalDate.of(2026, 8, 16), LocalTime.of(11, 0), LocalTime.of(12, 0));
+
+        HttpHeaders enTetesA = enTetesPour("eleve.a.confirmation@example.fr", "motdepasse-solide");
+
+        ResponseEntity<SeanceResponse> confirmation = restAnonyme.exchange(
+                url("/api/seances/" + seanceAId + "/validation-client"), HttpMethod.PATCH,
+                new HttpEntity<>(enTetesA), SeanceResponse.class);
+        assertThat(confirmation.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(confirmation.getBody().validatedClient()).isTrue();
+
+        ResponseEntity<String> confirmationDunAutre = restAnonyme.exchange(
+                url("/api/seances/" + seanceBId + "/validation-client"), HttpMethod.PATCH,
+                new HttpEntity<>(enTetesA), String.class);
+        assertThat(confirmationDunAutre.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     void un_directeur_ne_peut_pas_utiliser_lendpoint_de_confirmation_moniteur() {
         UUID moniteurId = creerMoniteurApprouve("moniteur.e@example.fr");
         UUID reservationId = creerReservation("eleve.role@example.fr");

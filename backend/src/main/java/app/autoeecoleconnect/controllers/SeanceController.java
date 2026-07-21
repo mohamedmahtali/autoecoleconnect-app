@@ -37,21 +37,31 @@ public class SeanceController {
         this.seanceService = seanceService;
     }
 
-    @Operation(summary = "Lister les séances actives (un moniteur ne voit que les siennes)")
+    @Operation(summary = "Lister les séances actives (un moniteur/élève ne voit que les siennes)")
     @GetMapping
     public List<SeanceResponse> lister(@AuthenticationPrincipal Jwt jwt) {
-        List<Seance> seances = estMoniteur(jwt)
-                ? seanceService.listerPourMoniteur(idAuthentifie(jwt))
-                : seanceService.lister();
+        List<Seance> seances;
+        if (estMoniteur(jwt)) {
+            seances = seanceService.listerPourMoniteur(idAuthentifie(jwt));
+        } else if (estClient(jwt)) {
+            seances = seanceService.listerPourClient(idAuthentifie(jwt));
+        } else {
+            seances = seanceService.lister();
+        }
         return seances.stream().map(SeanceResponse::depuis).toList();
     }
 
-    @Operation(summary = "Consulter une séance (un moniteur ne peut consulter que les siennes)")
+    @Operation(summary = "Consulter une séance (un moniteur/élève ne peut consulter que les siennes)")
     @GetMapping("/{id}")
     public SeanceResponse trouver(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
-        Seance seance = estMoniteur(jwt)
-                ? seanceService.trouverPourMoniteur(id, idAuthentifie(jwt))
-                : seanceService.trouver(id);
+        Seance seance;
+        if (estMoniteur(jwt)) {
+            seance = seanceService.trouverPourMoniteur(id, idAuthentifie(jwt));
+        } else if (estClient(jwt)) {
+            seance = seanceService.trouverPourClient(id, idAuthentifie(jwt));
+        } else {
+            seance = seanceService.trouver(id);
+        }
         return SeanceResponse.depuis(seance);
     }
 
@@ -61,8 +71,18 @@ public class SeanceController {
         return SeanceResponse.depuis(seanceService.validerParMoniteur(id, idAuthentifie(jwt)));
     }
 
+    @Operation(summary = "Confirmer sa présence à une séance planifiée (élève)")
+    @PatchMapping("/{id}/validation-client")
+    public SeanceResponse validerParClient(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        return SeanceResponse.depuis(seanceService.validerParClient(id, idAuthentifie(jwt)));
+    }
+
     private boolean estMoniteur(Jwt jwt) {
         return "MONITEUR".equals(jwt.getClaimAsString("role"));
+    }
+
+    private boolean estClient(Jwt jwt) {
+        return "CLIENT".equals(jwt.getClaimAsString("role"));
     }
 
     private UUID idAuthentifie(Jwt jwt) {

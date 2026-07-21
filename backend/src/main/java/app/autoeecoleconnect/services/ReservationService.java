@@ -50,6 +50,19 @@ public class ReservationService {
                 .orElseThrow(() -> new RessourceIntrouvableException("Reservation", id));
     }
 
+    @Transactional(readOnly = true)
+    public List<Reservation> listerPourClient(UUID clientId) {
+        return reservationRepository.findByActiveTrueAndClientId(clientId);
+    }
+
+    @Transactional(readOnly = true)
+    public Reservation trouverPourClient(UUID id, UUID clientId) {
+        // 404 plutôt que 403 : ne révèle pas qu'une réservation appartenant à
+        // un autre élève existe (même raisonnement que pour le moniteur).
+        return reservationRepository.findByIdAndActiveTrueAndClientId(id, clientId)
+                .orElseThrow(() -> new RessourceIntrouvableException("Reservation", id));
+    }
+
     public Reservation creer(ReservationCreationRequest request) {
         Client client = clientRepository.findByIdAndActiveTrue(request.clientId())
                 .orElseThrow(() -> new RessourceIntrouvableException("Client", request.clientId()));

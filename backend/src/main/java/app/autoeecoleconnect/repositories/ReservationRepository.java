@@ -17,4 +17,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
 
     @EntityGraph(attributePaths = {"client", "forfait"})
     Optional<Reservation> findByIdAndActiveTrue(UUID id);
+
+    @EntityGraph(attributePaths = {"client", "forfait"})
+    List<Reservation> findByActiveTrueAndClientId(UUID clientId);
+
+    @EntityGraph(attributePaths = {"client", "forfait"})
+    Optional<Reservation> findByIdAndActiveTrueAndClientId(UUID id, UUID clientId);
 }

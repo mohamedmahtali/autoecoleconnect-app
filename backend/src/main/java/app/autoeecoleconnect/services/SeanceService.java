@@ -75,6 +75,30 @@ public class SeanceService {
         return seanceRepository.save(seance);
     }
 
+    @Transactional(readOnly = true)
+    public List<Seance> listerPourClient(UUID clientId) {
+        return seanceRepository.findByActiveTrueAndReservationClientId(clientId);
+    }
+
+    @Transactional(readOnly = true)
+    public Seance trouverPourClient(UUID id, UUID clientId) {
+        // 404 plutôt que 403 : ne révèle pas qu'une séance appartenant à un
+        // autre élève existe (même raisonnement que pour le moniteur).
+        return seanceRepository.findByIdAndActiveTrueAndReservationClientId(id, clientId)
+                .orElseThrow(() -> new RessourceIntrouvableException("Seance", id));
+    }
+
+    public Seance validerParClient(UUID id, UUID clientId) {
+        Seance seance = trouverPourClient(id, clientId);
+        if (seance.getStatut() != StatutSeance.SCHEDULED) {
+            throw new ValidationMetierException(
+                    "Seule une séance planifiée peut être confirmée (statut actuel : %s)"
+                            .formatted(seance.getStatut()));
+        }
+        seance.setValidatedClient(true);
+        return seanceRepository.save(seance);
+    }
+
     public Seance creer(SeanceCreationRequest request) {
         Reservation reservation = reservationRepository
                 .findByIdAndActiveTrue(request.reservationId())

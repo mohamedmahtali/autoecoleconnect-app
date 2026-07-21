@@ -13,6 +13,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,16 +35,30 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @Operation(summary = "Lister les réservations actives")
+    @Operation(summary = "Lister les réservations actives (un élève ne voit que les siennes)")
     @GetMapping
-    public List<ReservationResponse> lister() {
-        return reservationService.lister().stream().map(ReservationResponse::depuis).toList();
+    public List<ReservationResponse> lister(@AuthenticationPrincipal Jwt jwt) {
+        List<Reservation> reservations = estClient(jwt)
+                ? reservationService.listerPourClient(idAuthentifie(jwt))
+                : reservationService.lister();
+        return reservations.stream().map(ReservationResponse::depuis).toList();
     }
 
-    @Operation(summary = "Consulter une réservation")
+    @Operation(summary = "Consulter une réservation (un élève ne peut consulter que les siennes)")
     @GetMapping("/{id}")
-    public ReservationResponse trouver(@PathVariable UUID id) {
-        return ReservationResponse.depuis(reservationService.trouver(id));
+    public ReservationResponse trouver(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        Reservation reservation = estClient(jwt)
+                ? reservationService.trouverPourClient(id, idAuthentifie(jwt))
+                : reservationService.trouver(id);
+        return ReservationResponse.depuis(reservation);
+    }
+
+    private boolean estClient(Jwt jwt) {
+        return "CLIENT".equals(jwt.getClaimAsString("role"));
+    }
+
+    private UUID idAuthentifie(Jwt jwt) {
+        return UUID.fromString(jwt.getSubject());
     }
 
     @Operation(summary = "Créer une réservation (dateFin et montant déduits du forfait)")

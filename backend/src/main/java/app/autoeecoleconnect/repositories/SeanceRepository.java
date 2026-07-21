@@ -26,6 +26,12 @@ public interface SeanceRepository extends JpaRepository<Seance, UUID> {
     @EntityGraph(attributePaths = {"reservation", "reservation.client", "moniteur", "voiture"})
     Optional<Seance> findByIdAndActiveTrueAndMoniteurId(UUID id, UUID moniteurId);
 
+    @EntityGraph(attributePaths = {"reservation", "reservation.client", "moniteur", "voiture"})
+    List<Seance> findByActiveTrueAndReservationClientId(UUID clientId);
+
+    @EntityGraph(attributePaths = {"reservation", "reservation.client", "moniteur", "voiture"})
+    Optional<Seance> findByIdAndActiveTrueAndReservationClientId(UUID id, UUID clientId);
+
     // Deux créneaux se chevauchent si chacun commence avant la fin de l'autre.
     // Seules les séances planifiées bloquent un créneau.
     @Query("""

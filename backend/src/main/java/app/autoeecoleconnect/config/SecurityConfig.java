@@ -19,10 +19,11 @@ import org.springframework.security.web.SecurityFilterChain;
  *   Gateway publique), Swagger
  * - lecture (GET) : tout profil authentifié (contrat existant, testé —
  *   voir AuthControllerIntegrationTest#un_client_peut_lire_mais_pas_ecrire).
- *   Sur les séances, un MONITEUR ne voit que les siennes malgré tout —
- *   filtrage fait dans SeanceController, pas ici.
+ *   Sur les séances et réservations, un MONITEUR/CLIENT ne voit malgré tout
+ *   que les siennes — filtrage fait dans les contrôleurs, pas ici.
  * - écriture : DIRECTEUR, sauf la confirmation de sa propre séance
- *   (PATCH .../validation-moniteur), réservée à MONITEUR
+ *   (PATCH .../validation-moniteur réservée à MONITEUR,
+ *   PATCH .../validation-client réservée à CLIENT)
  */
 @Configuration
 @EnableWebSecurity
@@ -43,10 +44,12 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health/**", "/actuator/prometheus").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                         .permitAll()
-                        // Auto-confirmation par le moniteur de sa propre séance —
+                        // Auto-confirmation par le moniteur/élève de sa propre séance —
                         // avant la règle générique PATCH ci-dessous (premier match gagne).
                         .requestMatchers(HttpMethod.PATCH, "/api/seances/*/validation-moniteur")
                         .hasRole("MONITEUR")
+                        .requestMatchers(HttpMethod.PATCH, "/api/seances/*/validation-client")
+                        .hasRole("CLIENT")
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.PATCH, "/api/**").hasRole("DIRECTEUR")

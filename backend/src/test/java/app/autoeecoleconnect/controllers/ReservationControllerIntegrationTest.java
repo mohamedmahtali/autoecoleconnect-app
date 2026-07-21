@@ -9,6 +9,8 @@ import app.autoeecoleconnect.controllers.dto.ClientCreationRequest;
 import app.autoeecoleconnect.controllers.dto.ClientResponse;
 import app.autoeecoleconnect.controllers.dto.ForfaitRequest;
 import app.autoeecoleconnect.controllers.dto.ForfaitResponse;
+import app.autoeecoleconnect.controllers.dto.LoginRequest;
+import app.autoeecoleconnect.controllers.dto.LoginResponse;
 import app.autoeecoleconnect.controllers.dto.PaiementManuelRequest;
 import app.autoeecoleconnect.controllers.dto.ReservationCreationRequest;
 import app.autoeecoleconnect.controllers.dto.ReservationResponse;
@@ -21,6 +23,7 @@ import app.autoeecoleconnect.models.StatutReservation;
 import app.autoeecoleconnect.models.UniteValidite;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -120,6 +123,38 @@ class ReservationControllerIntegrationTest extends AbstractIntegrationTest {
                 String.class);
         assertThat(refus.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(refus.getBody()).contains("ne peut pas être saisi manuellement");
+    }
+
+    @Test
+    void un_client_ne_voit_que_ses_propres_reservations() {
+        UUID clientAId = creerClient("eleve.a.reservations@example.fr");
+        UUID clientBId = creerClient("eleve.b.reservations@example.fr");
+        UUID forfaitId = creerForfait();
+
+        ResponseEntity<ReservationResponse> reservationA = rest.postForEntity("/api/reservations",
+                new ReservationCreationRequest(clientAId, forfaitId,
+                        LocalDate.of(2026, 8, 1), null, null, null),
+                ReservationResponse.class);
+        ResponseEntity<ReservationResponse> reservationB = rest.postForEntity("/api/reservations",
+                new ReservationCreationRequest(clientBId, forfaitId,
+                        LocalDate.of(2026, 8, 1), null, null, null),
+                ReservationResponse.class);
+
+        LoginResponse login = restAnonyme.postForEntity(url("/api/auth/login"),
+                new LoginRequest("eleve.a.reservations@example.fr", "motdepasse-solide"),
+                LoginResponse.class).getBody();
+        HttpHeaders enTetesA = new HttpHeaders();
+        enTetesA.setBearerAuth(login.token());
+
+        ResponseEntity<ReservationResponse[]> liste = restAnonyme.exchange(url("/api/reservations"),
+                HttpMethod.GET, new HttpEntity<>(enTetesA), ReservationResponse[].class);
+        assertThat(liste.getBody()).extracting(ReservationResponse::id)
+                .containsExactly(reservationA.getBody().id());
+
+        ResponseEntity<String> celleDunAutre = restAnonyme.exchange(
+                url("/api/reservations/" + reservationB.getBody().id()), HttpMethod.GET,
+                new HttpEntity<>(enTetesA), String.class);
+        assertThat(celleDunAutre.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
