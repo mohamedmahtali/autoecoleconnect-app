@@ -40,11 +40,12 @@
   button:disabled { opacity: .55; cursor: default; }
   .carte button[type="submit"] { width: 100%; margin-top: 1.75rem; }
   .barre-actions { display: flex; justify-content: flex-end; margin-top: 1rem; }
-  #deconnexion { background: transparent; color: var(--text-muted); border: 1px solid var(--border-default); font-weight: 500; }
-  #deconnexion:hover:not(:disabled) { background: var(--bg-page-alt); color: var(--text-heading); }
+  #deconnexion, .bouton-secondaire { background: transparent; color: var(--text-muted); border: 1px solid var(--border-default); font-weight: 500; }
+  #deconnexion:hover:not(:disabled), .bouton-secondaire:hover:not(:disabled) { background: var(--bg-page-alt); color: var(--text-heading); }
   #bandeau { margin-top: .3rem; color: var(--text-body); font-size: .95rem; }
   #abonnement { margin-top: 1.25rem; }
   #boutonAbonnement { margin-top: 0; }
+  #gestionAbonnement { margin-top: 1.25rem; }
   #infoCheckout { margin-top: 1.5rem; padding: 1rem; border-radius: var(--radius-md); display: none; font-size: .9rem; line-height: 1.5; }
   #infoCheckout.ok { background: var(--ok-bg); color: var(--ok-text); display: block; }
   #infoCheckout.annule { background: var(--warn-bg); color: var(--warn-text); display: block; }
@@ -103,6 +104,9 @@
       <div id="abonnement" style="display:none">
         <button id="boutonAbonnement"></button>
       </div>
+      <div id="gestionAbonnement" style="display:none">
+        <button id="boutonPortail" class="bouton-secondaire">Gérer mon abonnement</button>
+      </div>
       <div class="tableau-conteneur">
         <table>
           <thead>
@@ -159,6 +163,9 @@
     } else {
       zoneAbo.style.display = 'none';
     }
+
+    document.getElementById('gestionAbonnement').style.display =
+      corps.statutOrganisation === 'active' ? 'block' : 'none';
 
     const lignes = document.getElementById('lignesTenants');
     lignes.innerHTML = '';
@@ -246,6 +253,28 @@
         return;
       }
       window.location = corps.url; // page Stripe Checkout hébergée
+    } catch (err) {
+      afficherErreur('Impossible de contacter le serveur.');
+    } finally {
+      bouton.disabled = false;
+    }
+  });
+
+  document.getElementById('boutonPortail').addEventListener('click', async () => {
+    masquerErreur();
+    const bouton = document.getElementById('boutonPortail');
+    bouton.disabled = true;
+    try {
+      const reponse = await fetch('/api/abonnement/portail', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('cpToken') }
+      });
+      const corps = await reponse.json().catch(() => ({}));
+      if (!reponse.ok) {
+        afficherErreur(corps.detail || 'Gestion de l\'abonnement impossible pour le moment.');
+        return;
+      }
+      window.location = corps.url; // page Stripe Billing Portal hébergée
     } catch (err) {
       afficherErreur('Impossible de contacter le serveur.');
     } finally {

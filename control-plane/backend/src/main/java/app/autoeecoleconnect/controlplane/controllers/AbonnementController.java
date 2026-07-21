@@ -28,4 +28,11 @@ public class AbonnementController {
         String url = checkoutService.creerSessionCheckout(UUID.fromString(jwt.getSubject()));
         return Map.of("url", url);
     }
+
+    @Operation(summary = "Créer une session Stripe Billing Portal (self-service abonnement)")
+    @PostMapping("/portail")
+    public Map<String, String> portail(@AuthenticationPrincipal Jwt jwt) {
+        String url = checkoutService.creerSessionPortail(UUID.fromString(jwt.getSubject()));
+        return Map.of("url", url);
+    }
 }

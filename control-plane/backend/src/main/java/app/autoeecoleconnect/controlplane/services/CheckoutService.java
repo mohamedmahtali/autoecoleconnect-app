@@ -77,6 +77,41 @@ public class CheckoutService {
         }
     }
 
+    /**
+     * Session Stripe Billing Portal (self-service : factures, moyen de
+     * paiement, résiliation) — docs/16-backlog.md §16.2 item 7. Nécessite un
+     * Customer Stripe existant, donc un premier Checkout déjà passé.
+     */
+    public String creerSessionPortail(UUID organisationId) {
+        if (!properties.estConfigure()) {
+            throw new AbonnementImpossibleException(
+                    "Le paiement n'est pas encore configuré sur cette instance");
+        }
+
+        Organisation organisation = organisationRepository.findById(organisationId)
+                .orElseThrow(OrganisationIntrouvableException::new);
+
+        if (organisation.getStripeCustomerId() == null) {
+            throw new AbonnementImpossibleException(
+                    "Aucun abonnement à gérer pour le moment — souscrivez d'abord un plan");
+        }
+
+        com.stripe.param.billingportal.SessionCreateParams params =
+                com.stripe.param.billingportal.SessionCreateParams.builder()
+                        .setCustomer(organisation.getStripeCustomerId())
+                        .setReturnUrl(properties.baseUrl() + "/dashboard.html")
+                        .build();
+
+        try {
+            String url = stripeClient.v1().billingPortal().sessions().create(params).getUrl();
+            log.info("Session Billing Portal créée pour l'organisation {}", organisation.getNom());
+            return url;
+        } catch (StripeException e) {
+            log.error("Échec de création de la session Billing Portal pour {}", organisation.getNom(), e);
+            throw new AbonnementImpossibleException("Impossible d'ouvrir la gestion de l'abonnement, réessayez");
+        }
+    }
+
     private String priceIdPour(String plan) {
         return switch (plan) {
             case "solo" -> properties.priceSolo();
