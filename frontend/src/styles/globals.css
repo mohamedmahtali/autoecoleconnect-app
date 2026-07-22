@@ -150,6 +150,29 @@ p.sous-titre {
   outline-offset: -1px;
 }
 
+/* Même habillage que .champ input pour les listes déroulantes (élève,
+   forfait, moyen de paiement de la page Réservations). */
+.champ select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-page);
+  color: var(--text-heading);
+  font-size: 0.95rem;
+}
+
+.champ select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+}
+
+/* Encaissement en ligne, déplié sous une réservation dans le tableau. */
+.paiement-form {
+  max-width: 22rem;
+  padding: 0.25rem 0;
+}
+
 .bouton {
   width: 100%;
   padding: 0.65rem;

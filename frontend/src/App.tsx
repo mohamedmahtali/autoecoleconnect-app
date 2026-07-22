@@ -10,6 +10,8 @@ import ClientNouveau from "@/pages/admin/clients/ClientNouveau";
 import MoniteursListe from "@/pages/admin/moniteurs/MoniteursListe";
 import VoituresListe from "@/pages/admin/voitures/VoituresListe";
 import ForfaitsListe from "@/pages/admin/forfaits/ForfaitsListe";
+import ReservationsListe from "@/pages/admin/reservations/ReservationsListe";
+import ReservationNouvelle from "@/pages/admin/reservations/ReservationNouvelle";
 import MoniteurLayout from "@/pages/moniteur/MoniteurLayout";
 import Planning from "@/pages/moniteur/Planning";
 import EleveLayout from "@/pages/eleve/EleveLayout";
@@ -35,6 +37,8 @@ export default function App() {
           <Route path="moniteurs" element={<MoniteursListe />} />
           <Route path="voitures" element={<VoituresListe />} />
           <Route path="forfaits" element={<ForfaitsListe />} />
+          <Route path="reservations" element={<ReservationsListe />} />
+          <Route path="reservations/nouvelle" element={<ReservationNouvelle />} />
         </Route>
         <Route
           path="/moniteur"

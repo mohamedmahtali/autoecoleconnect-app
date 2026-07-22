@@ -101,6 +101,37 @@ export interface SeanceDto {
   createdAt: string;
 }
 
+export type PaiementType =
+  | "STRIPE"
+  | "PAYPLUG"
+  | "ALMA"
+  | "ESPECE"
+  | "CHEQUE"
+  | "VIREMENT"
+  | "CPF"
+  | "PERMIS1EURO";
+
+export type PaiementStatut = "PENDING" | "PAID" | "REFUNDED" | "FAILED";
+
+export type StatutReservation = "PENDING" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "EXPIRED";
+
+export interface ReservationDto {
+  id: string;
+  clientId: string;
+  clientNomComplet: string;
+  forfaitId: string;
+  forfaitNom: string;
+  dateDebut: string;
+  dateFin: string;
+  dateReservation: string;
+  montant: number;
+  paiementType: PaiementType | null;
+  paiementStatut: PaiementStatut;
+  statut: StatutReservation;
+  notes: string | null;
+  active: boolean;
+}
+
 export interface InscriptionMensuelleDto {
   mois: string;
   nombre: number;
