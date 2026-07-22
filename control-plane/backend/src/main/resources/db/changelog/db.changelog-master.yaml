@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/v1.2/007-webhook-events.sql
   - include:
       file: db/changelog/v1.3/008-organisations-reminder-precoce-sent.sql
+  - include:
+      file: db/changelog/v1.3/009-create-auto-ecoles.sql

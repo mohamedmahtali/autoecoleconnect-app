@@ -28,4 +28,17 @@ public interface GitHubService {
      * ProvisioningException en cas d'échec.
      */
     void marquerTrialTermine(String slug);
+
+    /**
+     * Réécrit {@code tenant.autoEcoles} dans le values.yaml du tenant avec la
+     * liste complète des slugs d'agences — la HTTPRoute expose alors un
+     * sous-domaine par agence (docs/18 §18.3 lot 4).
+     *
+     * <p>La liste entière est passée plutôt qu'un ajout incrémental : l'appel
+     * devient idempotent et ne peut pas produire de doublon si le
+     * control-plane le rejoue après un échec réseau. Le YAML est reparsé puis
+     * re-sérialisé, jamais modifié par substitution de texte, pour ne pas
+     * dépendre de sa mise en forme.
+     */
+    void mettreAJourAutoEcoles(String slug, java.util.List<String> slugsAgences);
 }

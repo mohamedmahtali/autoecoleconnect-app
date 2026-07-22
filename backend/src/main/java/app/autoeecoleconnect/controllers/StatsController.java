@@ -1,12 +1,10 @@
 package app.autoeecoleconnect.controllers;
 
 import app.autoeecoleconnect.controllers.dto.StatsResponse;
+import app.autoeecoleconnect.services.AuthentificationInterne;
 import app.autoeecoleconnect.services.StatsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,30 +25,22 @@ import org.springframework.http.HttpStatus;
 public class StatsController {
 
     private final StatsService statsService;
-    private final String cleInterne;
+    private final AuthentificationInterne authentificationInterne;
 
     public StatsController(StatsService statsService,
-                           @Value("${app.internal-stats-api-key}") String cleInterne) {
+                           AuthentificationInterne authentificationInterne) {
         this.statsService = statsService;
-        this.cleInterne = cleInterne;
+        this.authentificationInterne = authentificationInterne;
     }
 
     @Operation(summary = "Résumé chiffré de l'activité (DIRECTEUR, ou control-plane via clé interne)")
     @GetMapping("/resume")
     public StatsResponse resume(@AuthenticationPrincipal Jwt jwt,
                                 @RequestHeader(value = "X-Internal-Api-Key", required = false) String cleAppelant) {
-        if (!appelInterneValide(cleAppelant) && !estDirecteur(jwt)) {
+        if (!authentificationInterne.estValide(cleAppelant) && !estDirecteur(jwt)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         return statsService.resume();
-    }
-
-    private boolean appelInterneValide(String cleAppelant) {
-        if (cleInterne.isBlank() || cleAppelant == null) {
-            return false;
-        }
-        return MessageDigest.isEqual(
-                cleInterne.getBytes(StandardCharsets.UTF_8), cleAppelant.getBytes(StandardCharsets.UTF_8));
     }
 
     private boolean estDirecteur(Jwt jwt) {

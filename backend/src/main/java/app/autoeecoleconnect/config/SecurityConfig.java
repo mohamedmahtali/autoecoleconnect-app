@@ -51,6 +51,10 @@ public class SecurityConfig {
                         // via JWT, ou control-plane via clé interne — qui n'a pas de
                         // JWT tenant à présenter, docs/16-backlog.md §16.3.A).
                         .requestMatchers(HttpMethod.GET, "/api/stats/resume").permitAll()
+                        // Même raisonnement pour les routes internes : le
+                        // control-plane n'a pas de JWT tenant, l'autorisation
+                        // se fait dans InternalController sur le secret partagé.
+                        .requestMatchers("/api/internal/**").permitAll()
                         // Auto-confirmation par le moniteur/élève de sa propre séance —
                         // avant la règle générique PATCH ci-dessous (premier match gagne).
                         .requestMatchers(HttpMethod.PATCH, "/api/seances/*/validation-moniteur")

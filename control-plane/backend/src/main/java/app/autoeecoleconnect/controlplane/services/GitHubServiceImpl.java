@@ -155,6 +155,54 @@ public class GitHubServiceImpl implements GitHubService {
         }
     }
 
+    @Override
+    public void mettreAJourAutoEcoles(String slug, java.util.List<String> slugsAgences) {
+        if (properties.githubPat() == null || properties.githubPat().isBlank()) {
+            log.info("[GITHUB_PAT absent] Mise a jour des agences simulee pour tenants/{}/values.yaml", slug);
+            return;
+        }
+
+        String path = "tenants/" + slug + "/values.yaml";
+        String contentsUrl = "/repos/%s/%s/contents/%s".formatted(
+                properties.githubOwner(), properties.githubRepo(), path);
+
+        JsonNode fichier = lireFichier(contentsUrl);
+        if (fichier == null) {
+            log.warn("tenants/{}/values.yaml introuvable — agences non publiees", slug);
+            return;
+        }
+        String contenu = new String(Base64.getMimeDecoder().decode(
+                fichier.get("content").asText()), StandardCharsets.UTF_8);
+
+        // Reparser puis re-serialiser plutot que substituer du texte : le
+        // fichier a pu etre edite a la main, et une regex sur du YAML casse
+        // des qu'une indentation change.
+        org.yaml.snakeyaml.Yaml yaml = new org.yaml.snakeyaml.Yaml();
+        Map<String, Object> valeurs = yaml.load(contenu);
+        if (valeurs == null) {
+            log.warn("tenants/{}/values.yaml vide ou illisible — agences non publiees", slug);
+            return;
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, Object> tenantSection =
+                (Map<String, Object>) valeurs.computeIfAbsent("tenant", cle -> new java.util.LinkedHashMap<>());
+        tenantSection.put("autoEcoles", slugsAgences);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "chore: agences du tenant " + slug + " (" + slugsAgences.size() + ")");
+        body.put("content", Base64.getEncoder().encodeToString(
+                yaml.dump(valeurs).getBytes(StandardCharsets.UTF_8)));
+        body.put("sha", fichier.get("sha").asText());
+        body.put("branch", "main");
+
+        try {
+            restClient.put().uri(contentsUrl).body(body).retrieve().toBodilessEntity();
+        } catch (RestClientResponseException e) {
+            throw new ProvisioningException(
+                    "Echec de la mise a jour des agences pour " + slug + " : HTTP " + e.getStatusCode(), e);
+        }
+    }
+
     private String trouverShaExistant(String contentsUrl) {
         JsonNode fichier = lireFichier(contentsUrl);
         return fichier != null && fichier.has("sha") ? fichier.get("sha").asText() : null;

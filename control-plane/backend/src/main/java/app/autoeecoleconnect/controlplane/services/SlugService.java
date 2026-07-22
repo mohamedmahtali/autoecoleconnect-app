@@ -1,5 +1,6 @@
 package app.autoeecoleconnect.controlplane.services;
 
+import app.autoeecoleconnect.controlplane.repositories.AutoEcoleRepository;
 import app.autoeecoleconnect.controlplane.repositories.TenantRepository;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
@@ -13,9 +14,11 @@ public class SlugService {
     private static final Pattern DASH_EDGES = Pattern.compile("^-+|-+$");
 
     private final TenantRepository tenantRepository;
+    private final AutoEcoleRepository autoEcoleRepository;
 
-    public SlugService(TenantRepository tenantRepository) {
+    public SlugService(TenantRepository tenantRepository, AutoEcoleRepository autoEcoleRepository) {
         this.tenantRepository = tenantRepository;
+        this.autoEcoleRepository = autoEcoleRepository;
     }
 
     /**
@@ -26,11 +29,21 @@ public class SlugService {
         String base = slugifier(nom);
         String candidat = base;
         int suffixe = 2;
-        while (tenantRepository.existsBySlug(candidat)) {
+        while (dejaPris(candidat)) {
             candidat = base + "-" + suffixe;
             suffixe++;
         }
         return candidat;
+    }
+
+    /**
+     * Un slug est un sous-domaine public : il doit être unique sur l'ensemble
+     * du domaine, donc face aux tenants <b>et</b> aux agences (docs/18 §18.3
+     * lot 4). Vérifier les seuls tenants laisserait deux agences de deux
+     * organisations différentes revendiquer la même URL.
+     */
+    private boolean dejaPris(String candidat) {
+        return tenantRepository.existsBySlug(candidat) || autoEcoleRepository.existsBySlug(candidat);
     }
 
     private String slugifier(String nom) {
