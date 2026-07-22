@@ -39,7 +39,7 @@ public class GerantService {
         List<MesTenantsResponse.TenantResume> tenants =
                 tenantRepository.findByOrganisationId(organisationId).stream()
                         .map(t -> new MesTenantsResponse.TenantResume(
-                                t.getSlug(), t.getNom(), t.getUrl(), t.getStatut(),
+                                t.getId(), t.getSlug(), t.getNom(), t.getUrl(), t.getStatut(),
                                 t.getCreatedAt(), t.getSuspendedAt()))
                         .toList();
 

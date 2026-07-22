@@ -50,6 +50,25 @@
   #vueConsolidee .stat-carte { background: var(--surface-card); border: 1px solid var(--border-default); border-radius: var(--radius-md); padding: 1.25rem; }
   #vueConsolidee .valeur { font-size: 1.6rem; font-weight: 700; color: var(--text-heading); }
   #vueConsolidee .libelle { color: var(--text-muted); font-size: .85rem; margin-top: .2rem; }
+  /* Agences d'un tenant (docs/17) : une organisation peut en avoir plusieurs,
+     chacune avec son sous-domaine, toutes servies par la même base. */
+  #zoneAgences { margin-top: 1.5rem; }
+  #zoneAgences h2 { font-size: 1.05rem; color: var(--text-heading); margin: 0 0 .75rem; }
+  .bloc-tenant {
+    background: var(--surface-card); border: 1px solid var(--border-default);
+    border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: .85rem;
+  }
+  .bloc-tenant .entete { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .bloc-tenant .titre { font-weight: 600; color: var(--text-heading); }
+  .liste-agences { list-style: none; margin: .75rem 0 0; padding: 0; display: grid; gap: .5rem; }
+  .liste-agences li {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: .55rem .75rem; border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm, .4rem); flex-wrap: wrap;
+  }
+  .liste-agences .nom-agence { font-weight: 500; color: var(--text-heading); }
+  .liste-agences .url-agence { color: var(--text-muted); font-size: .85rem; }
+  .liste-agences button { padding: .35rem .8rem; font-size: .85rem; }
   #infoCheckout { margin-top: 1.5rem; padding: 1rem; border-radius: var(--radius-md); display: none; font-size: .9rem; line-height: 1.5; }
   #infoCheckout.ok { background: var(--ok-bg); color: var(--ok-text); display: block; }
   #infoCheckout.annule { background: var(--warn-bg); color: var(--warn-text); display: block; }
@@ -129,6 +148,11 @@
           <tbody id="lignesTenants"></tbody>
         </table>
       </div>
+
+      <section id="zoneAgences">
+        <h2>Mes agences</h2>
+        <div id="listeTenantsAgences"></div>
+      </section>
     </section>
 
     <div id="erreur"></div>
@@ -209,6 +233,8 @@
       lignes.appendChild(tr);
     }
 
+    await chargerAgences(corps.tenants);
+
     const zoneConsolidee = document.getElementById('vueConsolidee');
     if (corps.tenants.length > 1) {
       const token = localStorage.getItem('cpToken');
@@ -229,6 +255,128 @@
     document.getElementById('vueLogin').style.display = 'none';
     document.getElementById('vueDashboard').style.display = 'block';
     return true;
+  }
+
+  // --- Agences (docs/17) : une organisation peut en avoir plusieurs, chacune
+  // --- avec son sous-domaine, toutes sur les mêmes pods et la même base.
+
+  function entete() {
+    return { 'Authorization': 'Bearer ' + localStorage.getItem('cpToken') };
+  }
+
+  async function chargerAgences(tenants) {
+    const conteneur = document.getElementById('listeTenantsAgences');
+    conteneur.innerHTML = '';
+
+    for (const t of tenants) {
+      const bloc = document.createElement('div');
+      bloc.className = 'bloc-tenant';
+
+      const entete_ = document.createElement('div');
+      entete_.className = 'entete';
+      const titre = document.createElement('span');
+      titre.className = 'titre';
+      titre.textContent = t.nom;
+      const ajouter = document.createElement('button');
+      ajouter.className = 'bouton-secondaire';
+      ajouter.textContent = '+ Ajouter une agence';
+      ajouter.addEventListener('click', () => creerAgence(t.id, ajouter));
+      entete_.append(titre, ajouter);
+      bloc.appendChild(entete_);
+
+      const liste = document.createElement('ul');
+      liste.className = 'liste-agences';
+      bloc.appendChild(liste);
+      conteneur.appendChild(bloc);
+
+      const reponse = await fetch('/api/mes-tenants/' + t.id + '/auto-ecoles', { headers: entete() });
+      if (!reponse.ok) {
+        const vide = document.createElement('li');
+        vide.textContent = 'Agences indisponibles pour le moment.';
+        liste.appendChild(vide);
+        continue;
+      }
+      for (const agence of await reponse.json()) {
+        liste.appendChild(ligneAgence(agence));
+      }
+    }
+  }
+
+  function ligneAgence(agence) {
+    const li = document.createElement('li');
+
+    const infos = document.createElement('div');
+    const nom = document.createElement('div');
+    nom.className = 'nom-agence';
+    nom.textContent = agence.nom;
+    const url = document.createElement('div');
+    url.className = 'url-agence';
+    url.textContent = agence.url;
+    infos.append(nom, url);
+
+    const ouvrir = document.createElement('button');
+    ouvrir.textContent = 'Ouvrir';
+    ouvrir.addEventListener('click', () => ouvrirAgence(agence, ouvrir));
+
+    li.append(infos, ouvrir);
+    return li;
+  }
+
+  async function creerAgence(tenantId, bouton) {
+    const nom = prompt("Nom de la nouvelle agence (ex. « Auto-École Bron ») :");
+    if (!nom || !nom.trim()) return;
+
+    bouton.disabled = true;
+    masquerErreur();
+    try {
+      const reponse = await fetch('/api/mes-tenants/auto-ecoles', {
+        method: 'POST',
+        headers: { ...entete(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenantId, nom: nom.trim(), adresse: null })
+      });
+      if (!reponse.ok) {
+        afficherErreur("La création de l'agence a échoué. Réessayez dans un instant.");
+        return;
+      }
+      // Le sous-domaine passe par un commit GitOps : il n'est joignable
+      // qu'une fois ArgoCD passé, d'où l'avertissement plutôt qu'un lien
+      // immédiat qui renverrait une erreur.
+      const creee = await reponse.json();
+      alert("Agence « " + creee.nom + " » créée.\n\nSon adresse " + creee.url
+        + " sera joignable d'ici quelques minutes, le temps que la configuration se déploie.");
+      await chargerDashboard();
+    } finally {
+      bouton.disabled = false;
+    }
+  }
+
+  /**
+   * Ouvre une session sur l'agence sans redemander de mot de passe. Le jeton
+   * est émis par le tenant lui-même, à la demande du control-plane.
+   *
+   * Il est transmis dans le FRAGMENT de l'URL (#acces=…), jamais dans la
+   * query string : un fragment n'est pas envoyé au serveur, donc n'apparaît
+   * ni dans les logs d'accès ni dans le Referer. La SPA le lit au démarrage
+   * puis nettoie immédiatement l'adresse. Le compromis restant est l'historique
+   * local du navigateur — acceptable pour un jeton de courte durée, et sans
+   * meilleure option entre deux domaines différents.
+   */
+  async function ouvrirAgence(agence, bouton) {
+    bouton.disabled = true;
+    masquerErreur();
+    try {
+      const reponse = await fetch('/api/mes-tenants/auto-ecoles/' + agence.id + '/acces', {
+        method: 'POST', headers: entete()
+      });
+      if (!reponse.ok) {
+        afficherErreur("Impossible d'ouvrir cette agence pour le moment.");
+        return;
+      }
+      const acces = await reponse.json();
+      window.open('https://' + acces.url + '/#acces=' + encodeURIComponent(acces.token), '_blank');
+    } finally {
+      bouton.disabled = false;
+    }
   }
 
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
