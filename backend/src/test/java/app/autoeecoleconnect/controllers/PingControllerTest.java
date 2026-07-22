@@ -1,6 +1,7 @@
 package app.autoeecoleconnect.controllers;
 
 import app.autoeecoleconnect.services.ContexteAutoEcole;
+import app.autoeecoleconnect.services.ResolveurAutoEcoleParHote;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,11 +24,17 @@ class PingControllerTest {
 
     /**
      * {@code FiltrePerimetreAutoEcole} est un filtre web : @WebMvcTest le
-     * charge, et il tire {@link ContexteAutoEcole} donc le repository derrière.
-     * Un mock suffit — cette tranche ne teste pas le périmètre.
+     * charge, et il tire ses dépendances, donc les repositories derrière.
+     * Des mocks suffisent — cette tranche ne teste pas le périmètre.
+     *
+     * <p>⚠️ Toute nouvelle dépendance de ce filtre devra être mockée ici,
+     * sinon le contexte de ce test ne se charge plus.
      */
     @MockitoBean
     private ContexteAutoEcole contexteAutoEcole;
+
+    @MockitoBean
+    private ResolveurAutoEcoleParHote resolveurAutoEcoleParHote;
 
     @Test
     void ping_repond_ok() throws Exception {
