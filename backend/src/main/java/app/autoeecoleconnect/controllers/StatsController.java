@@ -33,11 +33,24 @@ public class StatsController {
         this.authentificationInterne = authentificationInterne;
     }
 
-    @Operation(summary = "Résumé chiffré de l'activité (DIRECTEUR, ou control-plane via clé interne)")
+    /**
+     * Deux appelants, deux périmètres — c'est délibéré (docs/18 §18.3 lot 7) :
+     * <ul>
+     *   <li>un <b>DIRECTEUR</b> obtient les chiffres de <b>son agence</b>,
+     *       c'est ce que montre son tableau de bord ;</li>
+     *   <li>le <b>control-plane</b> obtient le total de <b>l'organisation</b>,
+     *       toutes agences confondues, pour le consolidé du gérant.</li>
+     * </ul>
+     * Tant qu'une organisation n'a qu'une agence, les deux coïncident.
+     */
+    @Operation(summary = "Résumé chiffré — agence courante (DIRECTEUR) ou organisation entière (control-plane)")
     @GetMapping("/resume")
     public StatsResponse resume(@AuthenticationPrincipal Jwt jwt,
                                 @RequestHeader(value = "X-Internal-Api-Key", required = false) String cleAppelant) {
-        if (!authentificationInterne.estValide(cleAppelant) && !estDirecteur(jwt)) {
+        if (authentificationInterne.estValide(cleAppelant)) {
+            return statsService.resumeOrganisation();
+        }
+        if (!estDirecteur(jwt)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         return statsService.resume();

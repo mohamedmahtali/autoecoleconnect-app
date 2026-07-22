@@ -29,13 +29,7 @@ public class StatsService {
         this.contexteAutoEcole = contexteAutoEcole;
     }
 
-    /**
-     * Chiffres de l'agence courante. 🔜 Le control-plane, lui, interroge cette
-     * même route pour obtenir le total de l'organisation : tant qu'une base ne
-     * contient qu'une école, les deux coïncident. La distinction devra être
-     * traitée quand une organisation en aura plusieurs (docs/18 §18.3 lot 7,
-     * remplacement de TenantStatsClient par un GROUP BY).
-     */
+    /** Chiffres de l'agence courante — ce que voit un directeur. */
     public StatsResponse resume() {
         long terminees = seanceRepository.countByActiveTrueAndAutoEcoleIdAndStatut(contexteAutoEcole.courante(), StatutSeance.COMPLETED);
         long noShow = seanceRepository.countByActiveTrueAndAutoEcoleIdAndStatut(contexteAutoEcole.courante(), StatutSeance.NO_SHOW);
@@ -56,5 +50,34 @@ public class StatsService {
                 noShow,
                 tauxNoShow,
                 inscriptions);
+    }
+
+    /**
+     * Chiffres de <b>toute l'organisation</b>, agences confondues — ce que le
+     * control-plane demande pour le tableau consolidé du gérant (docs/18
+     * §18.3 lot 7).
+     *
+     * <p>Depuis la refonte du grain de tenancy, une organisation vit dans une
+     * seule base : le consolidé n'est donc plus une somme d'appels HTTP à
+     * plusieurs tenants, mais une simple agrégation locale. Le control-plane
+     * continue d'appeler le tenant — il est dans un autre namespace et une
+     * autre base — mais une seule fois par organisation au lieu d'une fois
+     * par agence.
+     */
+    public StatsResponse resumeOrganisation() {
+        long terminees = seanceRepository.countByActiveTrueAndStatut(StatutSeance.COMPLETED);
+        long noShow = seanceRepository.countByActiveTrueAndStatut(StatutSeance.NO_SHOW);
+        long cloturees = terminees + noShow;
+        double tauxNoShow = cloturees == 0 ? 0.0 : (double) noShow / cloturees;
+
+        return new StatsResponse(
+                reservationRepository.sumMontantPayeToutesEcoles(),
+                clientRepository.compterActifsToutesEcoles(),
+                terminees,
+                noShow,
+                tauxNoShow,
+                // Les inscriptions mensuelles servent le dashboard d'une agence,
+                // pas le consolide : inutile de les agreger ici.
+                List.of());
     }
 }

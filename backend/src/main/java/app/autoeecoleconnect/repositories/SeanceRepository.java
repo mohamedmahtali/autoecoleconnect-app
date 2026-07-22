@@ -35,6 +35,9 @@ public interface SeanceRepository extends JpaRepository<Seance, UUID> {
 
     long countByActiveTrueAndAutoEcoleIdAndStatut(UUID autoEcoleId, StatutSeance statut);
 
+    /** Toutes agences confondues — consolide du gerant (docs/18 §18.3 lot 7). */
+    long countByActiveTrueAndStatut(StatutSeance statut);
+
     // Deux créneaux se chevauchent si chacun commence avant la fin de l'autre.
     // Seules les séances planifiées bloquent un créneau.
     // ⚠️ Ces deux requêtes de conflit sont volontairement NON filtrées par

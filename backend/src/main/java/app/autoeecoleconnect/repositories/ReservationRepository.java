@@ -33,4 +33,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
             + "WHERE r.active = true AND r.autoEcoleId = :autoEcoleId "
             + "AND r.paiementStatut = app.autoeecoleconnect.models.PaiementStatut.PAID")
     BigDecimal sumMontantPaye(@Param("autoEcoleId") UUID autoEcoleId);
+
+    /**
+     * Somme <b>toutes agences confondues</b> : c'est ce que le control-plane
+     * demande pour le tableau consolide du gerant, une organisation vivant
+     * desormais dans une seule base (docs/18 §18.3 lot 7). Nommee
+     * explicitement, comme les comptages de quota, pour qu'un appel hors de
+     * ce cadre saute aux yeux en revue.
+     */
+    @Query("SELECT COALESCE(SUM(r.montant), 0) FROM Reservation r "
+            + "WHERE r.active = true "
+            + "AND r.paiementStatut = app.autoeecoleconnect.models.PaiementStatut.PAID")
+    BigDecimal sumMontantPayeToutesEcoles();
 }
