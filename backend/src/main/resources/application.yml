@@ -14,6 +14,10 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+    parameters:
+      # Nom et slug de l'auto-école par défaut créée par le backfill v1.1
+      # (docs/18 §18.3 lot 1) : avant la refonte, le tenant EST l'école.
+      tenantSlug: ${TENANT_SLUG:auto-ecole}
 
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}

@@ -32,8 +32,12 @@ public class QuotaService {
         this.voitureRepository = voitureRepository;
     }
 
+    // ⚠️ Comptages volontairement NON filtrés par agence : depuis la refonte
+    // du grain de tenancy, le plan est vendu à l'organisation et les quotas
+    // s'appliquent à l'ensemble de ses écoles — « Pro = 250 élèves toutes
+    // écoles confondues » (docs/17 §17.6 décision 2).
     public void verifierPeutAjouterEleve() {
-        verifier(clientRepository.countByActiveTrue(), limites().eleves(), "élèves actifs");
+        verifier(clientRepository.compterActifsToutesEcoles(), limites().eleves(), "élèves actifs");
     }
 
     public void verifierPeutAjouterMoniteur() {

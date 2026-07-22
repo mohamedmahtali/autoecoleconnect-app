@@ -29,15 +29,18 @@ public class SeanceService {
     private final ReservationRepository reservationRepository;
     private final MoniteurRepository moniteurRepository;
     private final VoitureRepository voitureRepository;
+    private final ContexteAutoEcole contexteAutoEcole;
 
     public SeanceService(SeanceRepository seanceRepository,
                          ReservationRepository reservationRepository,
                          MoniteurRepository moniteurRepository,
-                         VoitureRepository voitureRepository) {
+                         VoitureRepository voitureRepository,
+                         ContexteAutoEcole contexteAutoEcole) {
         this.seanceRepository = seanceRepository;
         this.reservationRepository = reservationRepository;
         this.moniteurRepository = moniteurRepository;
         this.voitureRepository = voitureRepository;
+        this.contexteAutoEcole = contexteAutoEcole;
     }
 
     @Transactional(readOnly = true)
@@ -116,6 +119,7 @@ public class SeanceService {
         appliquerCreneau(seance, request.moniteurId(), request.voitureId(),
                 new Creneau(request.dateSeance(), request.hDeb(), request.hFin()),
                 request.notes());
+        seance.setAutoEcoleId(contexteAutoEcole.courante());
         return seanceRepository.save(seance);
     }
 

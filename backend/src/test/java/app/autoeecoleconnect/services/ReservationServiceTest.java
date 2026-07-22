@@ -39,9 +39,13 @@ class ReservationServiceTest {
     @Mock
     private ForfaitRepository forfaitRepository;
 
+    @Mock
+    private ContexteAutoEcole contexteAutoEcole;
+
     @InjectMocks
     private ReservationService reservationService;
 
+    private static final UUID AUTO_ECOLE = UUID.randomUUID();
     private final UUID clientId = UUID.randomUUID();
     private final UUID forfaitId = UUID.randomUUID();
 
@@ -54,7 +58,8 @@ class ReservationServiceTest {
     }
 
     private void preparerReferences(Forfait forfait) {
-        when(clientRepository.findByIdAndActiveTrue(clientId))
+        when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
+        when(clientRepository.findByIdAndActiveTrueAndAutoEcoleId(clientId, AUTO_ECOLE))
                 .thenReturn(Optional.of(new Client()));
         when(forfaitRepository.findByIdAndActiveTrue(forfaitId))
                 .thenReturn(Optional.of(forfait));
@@ -106,7 +111,9 @@ class ReservationServiceTest {
 
     @Test
     void creer_avec_un_client_inconnu_echoue() {
-        when(clientRepository.findByIdAndActiveTrue(clientId)).thenReturn(Optional.empty());
+        when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
+        when(clientRepository.findByIdAndActiveTrueAndAutoEcoleId(clientId, AUTO_ECOLE))
+                .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> reservationService.creer(new ReservationCreationRequest(
                 clientId, forfaitId, LocalDate.of(2026, 7, 15), null, null, null)))

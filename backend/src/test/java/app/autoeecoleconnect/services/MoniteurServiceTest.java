@@ -32,6 +32,9 @@ class MoniteurServiceTest {
     @Mock
     private QuotaService quotaService;
 
+    @Mock
+    private ContexteAutoEcole contexteAutoEcole;
+
     @InjectMocks
     private MoniteurService moniteurService;
 

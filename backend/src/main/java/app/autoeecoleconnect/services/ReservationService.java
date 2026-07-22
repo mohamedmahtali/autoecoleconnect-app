@@ -31,12 +31,16 @@ public class ReservationService {
     private final ClientRepository clientRepository;
     private final ForfaitRepository forfaitRepository;
 
+    private final ContexteAutoEcole contexteAutoEcole;
+
     public ReservationService(ReservationRepository reservationRepository,
                               ClientRepository clientRepository,
-                              ForfaitRepository forfaitRepository) {
+                              ForfaitRepository forfaitRepository,
+                              ContexteAutoEcole contexteAutoEcole) {
         this.reservationRepository = reservationRepository;
         this.clientRepository = clientRepository;
         this.forfaitRepository = forfaitRepository;
+        this.contexteAutoEcole = contexteAutoEcole;
     }
 
     @Transactional(readOnly = true)
@@ -64,7 +68,10 @@ public class ReservationService {
     }
 
     public Reservation creer(ReservationCreationRequest request) {
-        Client client = clientRepository.findByIdAndActiveTrue(request.clientId())
+        // Filtré par agence : on ne peut pas réserver pour l'élève d'une autre
+        // école, et l'erreur reste un 404 (ne révèle pas son existence).
+        Client client = clientRepository
+                .findByIdAndActiveTrueAndAutoEcoleId(request.clientId(), contexteAutoEcole.courante())
                 .orElseThrow(() -> new RessourceIntrouvableException("Client", request.clientId()));
         Forfait forfait = forfaitRepository.findByIdAndActiveTrue(request.forfaitId())
                 .orElseThrow(() -> new RessourceIntrouvableException("Forfait", request.forfaitId()));
@@ -78,6 +85,7 @@ public class ReservationService {
         reservation.setMontant(request.montant() != null ? request.montant() : forfait.getPrix());
         reservation.setPaiementType(request.paiementType());
         reservation.setNotes(request.notes());
+        reservation.setAutoEcoleId(contexteAutoEcole.courante());
         return reservationRepository.save(reservation);
     }
 

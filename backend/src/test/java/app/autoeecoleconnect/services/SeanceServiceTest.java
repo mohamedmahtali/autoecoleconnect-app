@@ -45,6 +45,9 @@ class SeanceServiceTest {
     @Mock
     private VoitureRepository voitureRepository;
 
+    @Mock
+    private ContexteAutoEcole contexteAutoEcole;
+
     @InjectMocks
     private SeanceService seanceService;
 

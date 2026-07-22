@@ -22,12 +22,14 @@ public class MoniteurService {
     private final MoniteurRepository moniteurRepository;
     private final PasswordEncoder passwordEncoder;
     private final QuotaService quotaService;
+    private final ContexteAutoEcole contexteAutoEcole;
 
     public MoniteurService(MoniteurRepository moniteurRepository, PasswordEncoder passwordEncoder,
-                           QuotaService quotaService) {
+                           QuotaService quotaService, ContexteAutoEcole contexteAutoEcole) {
         this.moniteurRepository = moniteurRepository;
         this.passwordEncoder = passwordEncoder;
         this.quotaService = quotaService;
+        this.contexteAutoEcole = contexteAutoEcole;
     }
 
     @Transactional(readOnly = true)
@@ -53,6 +55,7 @@ public class MoniteurService {
         moniteur.setPasswordHash(passwordEncoder.encode(request.motDePasse()));
         moniteur.setTelephone(request.telephone());
         moniteur.setNotes(request.notes());
+        moniteur.setAutoEcoleId(contexteAutoEcole.courante());
         return moniteurRepository.save(moniteur);
     }
 

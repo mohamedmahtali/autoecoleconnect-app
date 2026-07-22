@@ -17,9 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class ForfaitService {
 
     private final ForfaitRepository forfaitRepository;
+    private final ContexteAutoEcole contexteAutoEcole;
 
-    public ForfaitService(ForfaitRepository forfaitRepository) {
+    public ForfaitService(ForfaitRepository forfaitRepository,
+                          ContexteAutoEcole contexteAutoEcole) {
         this.forfaitRepository = forfaitRepository;
+        this.contexteAutoEcole = contexteAutoEcole;
     }
 
     @Transactional(readOnly = true)
@@ -36,6 +39,7 @@ public class ForfaitService {
     public Forfait creer(ForfaitRequest request) {
         Forfait forfait = new Forfait();
         appliquer(forfait, request);
+        forfait.setAutoEcoleId(contexteAutoEcole.courante());
         return forfaitRepository.save(forfait);
     }
 

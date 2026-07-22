@@ -47,8 +47,22 @@ public class Client {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    // Rattachement à l'agence (docs/17). Simple UUID plutôt qu'un @ManyToOne :
+    // le seul usage est le filtrage, une association ajouterait une jointure
+    // et un chargement paresseux sans rien apporter ici.
+    @Column(name = "auto_ecole_id", nullable = false)
+    private UUID autoEcoleId;
+
     public UUID getId() {
         return id;
+    }
+
+    public UUID getAutoEcoleId() {
+        return autoEcoleId;
+    }
+
+    public void setAutoEcoleId(UUID autoEcoleId) {
+        this.autoEcoleId = autoEcoleId;
     }
 
     public String getNom() {

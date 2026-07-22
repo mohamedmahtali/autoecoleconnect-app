@@ -58,7 +58,7 @@ class QuotaServiceTest {
 
     @Test
     void plan_solo_bloque_le_81e_eleve_apres_abonnement() {
-        when(clientRepository.countByActiveTrue()).thenReturn(80L);
+        when(clientRepository.compterActifsToutesEcoles()).thenReturn(80L);
 
         assertThatThrownBy(() -> service("solo", false).verifierPeutAjouterEleve())
                 .isInstanceOf(QuotaAtteintException.class)
@@ -79,7 +79,7 @@ class QuotaServiceTest {
 
     @Test
     void plan_groupe_est_illimite() {
-        when(clientRepository.countByActiveTrue()).thenReturn(100_000L);
+        when(clientRepository.compterActifsToutesEcoles()).thenReturn(100_000L);
 
         assertThatCode(() -> service("groupe", false).verifierPeutAjouterEleve())
                 .doesNotThrowAnyException();
@@ -87,7 +87,7 @@ class QuotaServiceTest {
 
     @Test
     void plan_absent_de_la_grille_ne_bloque_jamais() {
-        when(clientRepository.countByActiveTrue()).thenReturn(100_000L);
+        when(clientRepository.compterActifsToutesEcoles()).thenReturn(100_000L);
 
         assertThatCode(() -> service("reseau", false).verifierPeutAjouterEleve())
                 .doesNotThrowAnyException();

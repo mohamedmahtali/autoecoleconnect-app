@@ -17,3 +17,14 @@ databaseChangeLog:
       file: db/changelog/v1.0/008-create-seances.sql
   - include:
       file: db/changelog/v1.0/009-create-directeurs.sql
+  # v1.1 — refonte du grain de tenancy (docs/17, docs/18). L'ordre des quatre
+  # fichiers est impératif : les bases contiennent des données, donc NOT NULL
+  # ne peut être posé qu'après le backfill.
+  - include:
+      file: db/changelog/v1.1/010-create-auto-ecoles.sql
+  - include:
+      file: db/changelog/v1.1/011-add-auto-ecole-id.sql
+  - include:
+      file: db/changelog/v1.1/012-backfill-auto-ecole.sql
+  - include:
+      file: db/changelog/v1.1/013-contraintes-auto-ecole.sql

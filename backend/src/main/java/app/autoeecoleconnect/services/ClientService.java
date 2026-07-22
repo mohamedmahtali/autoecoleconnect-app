@@ -20,22 +20,30 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
     private final QuotaService quotaService;
+    private final ContexteAutoEcole contexteAutoEcole;
 
     public ClientService(ClientRepository clientRepository, PasswordEncoder passwordEncoder,
-                         QuotaService quotaService) {
+                         QuotaService quotaService, ContexteAutoEcole contexteAutoEcole) {
         this.clientRepository = clientRepository;
         this.passwordEncoder = passwordEncoder;
         this.quotaService = quotaService;
+        this.contexteAutoEcole = contexteAutoEcole;
     }
 
     @Transactional(readOnly = true)
     public List<Client> lister() {
-        return clientRepository.findByActiveTrue();
+        return clientRepository.findByActiveTrueAndAutoEcoleId(contexteAutoEcole.courante());
     }
 
+    /**
+     * 404 et non 403 sur un client d'une autre agence : ne pas révéler
+     * l'existence d'une ressource à qui n'y a pas droit, même par la
+     * différence entre les deux erreurs (même règle que pour les rôles
+     * MONITEUR et CLIENT, docs/12 §12.5).
+     */
     @Transactional(readOnly = true)
     public Client trouver(UUID id) {
-        return clientRepository.findByIdAndActiveTrue(id)
+        return clientRepository.findByIdAndActiveTrueAndAutoEcoleId(id, contexteAutoEcole.courante())
                 .orElseThrow(() -> new RessourceIntrouvableException("Client", id));
     }
 
@@ -52,6 +60,7 @@ public class ClientService {
         client.setTelephone(request.telephone());
         client.setAdresse(request.adresse());
         client.setNotes(request.notes());
+        client.setAutoEcoleId(contexteAutoEcole.courante());
         return clientRepository.save(client);
     }
 

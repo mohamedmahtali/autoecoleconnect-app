@@ -34,8 +34,13 @@ class ClientServiceTest {
     @Mock
     private QuotaService quotaService;
 
+    @Mock
+    private ContexteAutoEcole contexteAutoEcole;
+
     @InjectMocks
     private ClientService clientService;
+
+    private static final UUID AUTO_ECOLE = UUID.randomUUID();
 
     private ClientCreationRequest requeteValide() {
         return new ClientCreationRequest("Dupont", "Marie", "marie.dupont@example.fr",
@@ -68,7 +73,8 @@ class ClientServiceTest {
     @Test
     void trouver_leve_une_exception_si_le_client_est_introuvable() {
         UUID id = UUID.randomUUID();
-        when(clientRepository.findByIdAndActiveTrue(id)).thenReturn(Optional.empty());
+        when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
+        when(clientRepository.findByIdAndActiveTrueAndAutoEcoleId(id, AUTO_ECOLE)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> clientService.trouver(id))
                 .isInstanceOf(RessourceIntrouvableException.class)
@@ -80,7 +86,8 @@ class ClientServiceTest {
         UUID id = UUID.randomUUID();
         Client client = new Client();
         client.setActive(true);
-        when(clientRepository.findByIdAndActiveTrue(id)).thenReturn(Optional.of(client));
+        when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
+        when(clientRepository.findByIdAndActiveTrueAndAutoEcoleId(id, AUTO_ECOLE)).thenReturn(Optional.of(client));
         when(clientRepository.save(any(Client.class))).thenAnswer(inv -> inv.getArgument(0));
 
         clientService.supprimer(id);

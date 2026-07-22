@@ -30,6 +30,9 @@ class ForfaitServiceTest {
     @Mock
     private ForfaitRepository forfaitRepository;
 
+    @Mock
+    private ContexteAutoEcole contexteAutoEcole;
+
     @InjectMocks
     private ForfaitService forfaitService;
 

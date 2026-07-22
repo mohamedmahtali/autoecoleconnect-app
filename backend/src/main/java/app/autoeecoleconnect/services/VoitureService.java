@@ -16,10 +16,13 @@ public class VoitureService {
 
     private final VoitureRepository voitureRepository;
     private final QuotaService quotaService;
+    private final ContexteAutoEcole contexteAutoEcole;
 
-    public VoitureService(VoitureRepository voitureRepository, QuotaService quotaService) {
+    public VoitureService(VoitureRepository voitureRepository, QuotaService quotaService,
+                          ContexteAutoEcole contexteAutoEcole) {
         this.voitureRepository = voitureRepository;
         this.quotaService = quotaService;
+        this.contexteAutoEcole = contexteAutoEcole;
     }
 
     @Transactional(readOnly = true)
@@ -37,6 +40,7 @@ public class VoitureService {
         quotaService.verifierPeutAjouterVehicule();
         Voiture voiture = new Voiture();
         appliquer(voiture, request);
+        voiture.setAutoEcoleId(contexteAutoEcole.courante());
         return voitureRepository.save(voiture);
     }
 
