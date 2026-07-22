@@ -8,6 +8,7 @@ import app.autoeecoleconnect.exceptions.EmailDejaUtiliseException;
 import app.autoeecoleconnect.exceptions.RessourceIntrouvableException;
 import app.autoeecoleconnect.models.Client;
 import app.autoeecoleconnect.repositories.ClientRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +41,13 @@ class ClientServiceTest {
 
     @InjectMocks
     private ClientService clientService;
+
+    @BeforeEach
+    void perimetreParDefaut() {
+        // lenient : toutes les methodes testees ne lisent pas le perimetre
+        // (validations pures), et Mockito strict rejetterait un stub inutilise.
+        lenient().when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
+    }
 
     private static final UUID AUTO_ECOLE = UUID.randomUUID();
 
@@ -73,7 +82,6 @@ class ClientServiceTest {
     @Test
     void trouver_leve_une_exception_si_le_client_est_introuvable() {
         UUID id = UUID.randomUUID();
-        when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
         when(clientRepository.findByIdAndActiveTrueAndAutoEcoleId(id, AUTO_ECOLE)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> clientService.trouver(id))
@@ -86,7 +94,6 @@ class ClientServiceTest {
         UUID id = UUID.randomUUID();
         Client client = new Client();
         client.setActive(true);
-        when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
         when(clientRepository.findByIdAndActiveTrueAndAutoEcoleId(id, AUTO_ECOLE)).thenReturn(Optional.of(client));
         when(clientRepository.save(any(Client.class))).thenAnswer(inv -> inv.getArgument(0));
 

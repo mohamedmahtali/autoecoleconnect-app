@@ -18,6 +18,7 @@ import app.autoeecoleconnect.repositories.MoniteurRepository;
 import app.autoeecoleconnect.repositories.ReservationRepository;
 import app.autoeecoleconnect.repositories.SeanceRepository;
 import app.autoeecoleconnect.repositories.VoitureRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,8 +50,17 @@ class SeanceServiceTest {
     @Mock
     private ContexteAutoEcole contexteAutoEcole;
 
+    private static final UUID AUTO_ECOLE = UUID.randomUUID();
+
     @InjectMocks
     private SeanceService seanceService;
+
+    @BeforeEach
+    void perimetreParDefaut() {
+        // lenient : toutes les methodes testees ne lisent pas le perimetre
+        // (validations pures), et Mockito strict rejetterait un stub inutilise.
+        lenient().when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
+    }
 
     private final UUID reservationId = UUID.randomUUID();
     private final UUID moniteurId = UUID.randomUUID();
@@ -59,14 +70,14 @@ class SeanceServiceTest {
         reservation.setDateDebut(LocalDate.of(2026, 8, 1));
         reservation.setDateFin(LocalDate.of(2027, 2, 1));
         reservation.setStatut(statut);
-        when(reservationRepository.findByIdAndActiveTrue(reservationId))
+        when(reservationRepository.findByIdAndActiveTrueAndAutoEcoleId(reservationId, AUTO_ECOLE))
                 .thenReturn(Optional.of(reservation));
     }
 
     private Moniteur preparerMoniteur(StatutMoniteur statut) {
         Moniteur moniteur = new Moniteur();
         moniteur.setStatut(statut);
-        when(moniteurRepository.findByIdAndActiveTrue(moniteurId))
+        when(moniteurRepository.findByIdAndActiveTrueAndAutoEcoleId(moniteurId, AUTO_ECOLE))
                 .thenReturn(Optional.of(moniteur));
         return moniteur;
     }

@@ -16,6 +16,7 @@ import app.autoeecoleconnect.models.UniteValidite;
 import app.autoeecoleconnect.repositories.ClientRepository;
 import app.autoeecoleconnect.repositories.ForfaitRepository;
 import app.autoeecoleconnect.repositories.ReservationRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +47,13 @@ class ReservationServiceTest {
     @InjectMocks
     private ReservationService reservationService;
 
+    @BeforeEach
+    void perimetreParDefaut() {
+        // lenient : toutes les methodes testees ne lisent pas le perimetre
+        // (validations pures), et Mockito strict rejetterait un stub inutilise.
+        lenient().when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
+    }
+
     private static final UUID AUTO_ECOLE = UUID.randomUUID();
     private final UUID clientId = UUID.randomUUID();
     private final UUID forfaitId = UUID.randomUUID();
@@ -58,10 +67,9 @@ class ReservationServiceTest {
     }
 
     private void preparerReferences(Forfait forfait) {
-        when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
         when(clientRepository.findByIdAndActiveTrueAndAutoEcoleId(clientId, AUTO_ECOLE))
                 .thenReturn(Optional.of(new Client()));
-        when(forfaitRepository.findByIdAndActiveTrue(forfaitId))
+        when(forfaitRepository.findByIdAndActiveTrueAndAutoEcoleId(forfaitId, AUTO_ECOLE))
                 .thenReturn(Optional.of(forfait));
         when(reservationRepository.save(any(Reservation.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
@@ -111,7 +119,6 @@ class ReservationServiceTest {
 
     @Test
     void creer_avec_un_client_inconnu_echoue() {
-        when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
         when(clientRepository.findByIdAndActiveTrueAndAutoEcoleId(clientId, AUTO_ECOLE))
                 .thenReturn(Optional.empty());
 
@@ -126,7 +133,7 @@ class ReservationServiceTest {
         UUID id = UUID.randomUUID();
         Reservation reservation = new Reservation();
         reservation.setStatut(StatutReservation.COMPLETED);
-        when(reservationRepository.findByIdAndActiveTrue(id))
+        when(reservationRepository.findByIdAndActiveTrueAndAutoEcoleId(id, AUTO_ECOLE))
                 .thenReturn(Optional.of(reservation));
 
         assertThatThrownBy(() -> reservationService.annuler(id))

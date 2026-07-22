@@ -1,5 +1,6 @@
 package app.autoeecoleconnect.services;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -7,8 +8,19 @@ import app.autoeecoleconnect.AbstractIntegrationTest;
 import app.autoeecoleconnect.controllers.dto.ClientCreationRequest;
 import app.autoeecoleconnect.exceptions.RessourceIntrouvableException;
 import app.autoeecoleconnect.models.AutoEcole;
+import app.autoeecoleconnect.models.CarburantForfait;
+import app.autoeecoleconnect.models.CategorieForfait;
 import app.autoeecoleconnect.models.Client;
+import app.autoeecoleconnect.models.Forfait;
+import app.autoeecoleconnect.models.Kilometrage;
+import app.autoeecoleconnect.models.Moniteur;
+import app.autoeecoleconnect.models.Transmission;
+import app.autoeecoleconnect.models.UniteValidite;
+import app.autoeecoleconnect.models.Voiture;
 import app.autoeecoleconnect.repositories.AutoEcoleRepository;
+import app.autoeecoleconnect.repositories.ForfaitRepository;
+import app.autoeecoleconnect.repositories.MoniteurRepository;
+import app.autoeecoleconnect.repositories.VoitureRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +48,24 @@ class AutoEcoleIsolationIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private ContexteAutoEcole contexteAutoEcole;
+
+    @Autowired
+    private MoniteurService moniteurService;
+
+    @Autowired
+    private MoniteurRepository moniteurRepository;
+
+    @Autowired
+    private VoitureService voitureService;
+
+    @Autowired
+    private VoitureRepository voitureRepository;
+
+    @Autowired
+    private ForfaitService forfaitService;
+
+    @Autowired
+    private ForfaitRepository forfaitRepository;
 
     @AfterEach
     void nettoyerLeContexte() {
@@ -110,5 +140,75 @@ class AutoEcoleIsolationIntegrationTest extends AbstractIntegrationTest {
 
         assertThat(clientService.lister().stream().map(Client::getId).toList())
                 .doesNotContain(eleveAutre);
+    }
+
+    // --- Les autres entités : créées directement en base avec leur agence,
+    // --- puis lues via le service, qui est le seul à filtrer. ---
+
+    @Test
+    void une_agence_ne_voit_pas_les_moniteurs_dune_autre() {
+        AutoEcole lyon = creerEcole("mon-lyon-" + UUID.randomUUID());
+        AutoEcole bron = creerEcole("mon-bron-" + UUID.randomUUID());
+
+        Moniteur chezBron = new Moniteur();
+        chezBron.setNom("Nom");
+        chezBron.setPrenom("Prenom");
+        chezBron.setEmail("moniteur-" + UUID.randomUUID() + "@example.fr");
+        chezBron.setPasswordHash("hash");
+        chezBron.setAutoEcoleId(bron.getId());
+        UUID idChezBron = moniteurRepository.save(chezBron).getId();
+
+        contexteAutoEcole.definir(lyon.getId());
+
+        assertThat(moniteurService.lister().stream().map(Moniteur::getId).toList())
+                .doesNotContain(idChezBron);
+        assertThatThrownBy(() -> moniteurService.trouver(idChezBron))
+                .isInstanceOf(RessourceIntrouvableException.class);
+    }
+
+    @Test
+    void une_agence_ne_voit_pas_les_vehicules_dune_autre() {
+        AutoEcole lyon = creerEcole("voi-lyon-" + UUID.randomUUID());
+        AutoEcole bron = creerEcole("voi-bron-" + UUID.randomUUID());
+
+        Voiture chezBron = new Voiture();
+        chezBron.setNom("Clio");
+        chezBron.setMarque("Renault");
+        chezBron.setTransmission(Transmission.MANUELLE);
+        chezBron.setAutoEcoleId(bron.getId());
+        UUID idChezBron = voitureRepository.save(chezBron).getId();
+
+        contexteAutoEcole.definir(lyon.getId());
+
+        assertThat(voitureService.lister().stream().map(Voiture::getId).toList())
+                .doesNotContain(idChezBron);
+        assertThatThrownBy(() -> voitureService.trouver(idChezBron))
+                .isInstanceOf(RessourceIntrouvableException.class);
+    }
+
+    @Test
+    void une_agence_ne_voit_pas_les_forfaits_dune_autre() {
+        AutoEcole lyon = creerEcole("for-lyon-" + UUID.randomUUID());
+        AutoEcole bron = creerEcole("for-bron-" + UUID.randomUUID());
+
+        Forfait chezBron = new Forfait();
+        chezBron.setNom("Forfait 20h");
+        chezBron.setNombreHeure(20);
+        chezBron.setValidite(6);
+        chezBron.setUnite(UniteValidite.MOIS);
+        chezBron.setPrix(new BigDecimal("1200.00"));
+        chezBron.setCategorie(CategorieForfait.CONDUITE);
+        chezBron.setTransmission(Transmission.MANUELLE);
+        chezBron.setKilometrage(Kilometrage.ILLIMITE);
+        chezBron.setCarburant(CarburantForfait.INCLUS);
+        chezBron.setAutoEcoleId(bron.getId());
+        UUID idChezBron = forfaitRepository.save(chezBron).getId();
+
+        contexteAutoEcole.definir(lyon.getId());
+
+        assertThat(forfaitService.lister().stream().map(Forfait::getId).toList())
+                .doesNotContain(idChezBron);
+        assertThatThrownBy(() -> forfaitService.trouver(idChezBron))
+                .isInstanceOf(RessourceIntrouvableException.class);
     }
 }

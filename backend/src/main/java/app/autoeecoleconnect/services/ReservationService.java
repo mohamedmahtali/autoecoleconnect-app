@@ -45,25 +45,25 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<Reservation> lister() {
-        return reservationRepository.findByActiveTrue();
+        return reservationRepository.findByActiveTrueAndAutoEcoleId(contexteAutoEcole.courante());
     }
 
     @Transactional(readOnly = true)
     public Reservation trouver(UUID id) {
-        return reservationRepository.findByIdAndActiveTrue(id)
+        return reservationRepository.findByIdAndActiveTrueAndAutoEcoleId(id, contexteAutoEcole.courante())
                 .orElseThrow(() -> new RessourceIntrouvableException("Reservation", id));
     }
 
     @Transactional(readOnly = true)
     public List<Reservation> listerPourClient(UUID clientId) {
-        return reservationRepository.findByActiveTrueAndClientId(clientId);
+        return reservationRepository.findByActiveTrueAndAutoEcoleIdAndClientId(contexteAutoEcole.courante(), clientId);
     }
 
     @Transactional(readOnly = true)
     public Reservation trouverPourClient(UUID id, UUID clientId) {
         // 404 plutôt que 403 : ne révèle pas qu'une réservation appartenant à
         // un autre élève existe (même raisonnement que pour le moniteur).
-        return reservationRepository.findByIdAndActiveTrueAndClientId(id, clientId)
+        return reservationRepository.findByIdAndActiveTrueAndAutoEcoleIdAndClientId(id, contexteAutoEcole.courante(), clientId)
                 .orElseThrow(() -> new RessourceIntrouvableException("Reservation", id));
     }
 
@@ -73,7 +73,7 @@ public class ReservationService {
         Client client = clientRepository
                 .findByIdAndActiveTrueAndAutoEcoleId(request.clientId(), contexteAutoEcole.courante())
                 .orElseThrow(() -> new RessourceIntrouvableException("Client", request.clientId()));
-        Forfait forfait = forfaitRepository.findByIdAndActiveTrue(request.forfaitId())
+        Forfait forfait = forfaitRepository.findByIdAndActiveTrueAndAutoEcoleId(request.forfaitId(), contexteAutoEcole.courante())
                 .orElseThrow(() -> new RessourceIntrouvableException("Forfait", request.forfaitId()));
 
         Reservation reservation = new Reservation();

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ForfaitRepository extends JpaRepository<Forfait, UUID> {
 
-    List<Forfait> findByActiveTrue();
+    List<Forfait> findByActiveTrueAndAutoEcoleId(UUID autoEcoleId);
 
-    Optional<Forfait> findByIdAndActiveTrue(UUID id);
+    Optional<Forfait> findByIdAndActiveTrueAndAutoEcoleId(UUID id, UUID autoEcoleId);
 }

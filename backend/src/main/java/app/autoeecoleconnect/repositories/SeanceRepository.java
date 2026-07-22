@@ -16,27 +16,33 @@ import org.springframework.data.repository.query.Param;
 public interface SeanceRepository extends JpaRepository<Seance, UUID> {
 
     @EntityGraph(attributePaths = {"reservation", "reservation.client", "moniteur", "voiture"})
-    List<Seance> findByActiveTrue();
+    List<Seance> findByActiveTrueAndAutoEcoleId(UUID autoEcoleId);
 
     @EntityGraph(attributePaths = {"reservation", "reservation.client", "moniteur", "voiture"})
-    Optional<Seance> findByIdAndActiveTrue(UUID id);
+    Optional<Seance> findByIdAndActiveTrueAndAutoEcoleId(UUID id, UUID autoEcoleId);
 
     @EntityGraph(attributePaths = {"reservation", "reservation.client", "moniteur", "voiture"})
-    List<Seance> findByActiveTrueAndMoniteurId(UUID moniteurId);
+    List<Seance> findByActiveTrueAndAutoEcoleIdAndMoniteurId(UUID autoEcoleId, UUID moniteurId);
 
     @EntityGraph(attributePaths = {"reservation", "reservation.client", "moniteur", "voiture"})
-    Optional<Seance> findByIdAndActiveTrueAndMoniteurId(UUID id, UUID moniteurId);
+    Optional<Seance> findByIdAndActiveTrueAndAutoEcoleIdAndMoniteurId(UUID id, UUID autoEcoleId, UUID moniteurId);
 
     @EntityGraph(attributePaths = {"reservation", "reservation.client", "moniteur", "voiture"})
-    List<Seance> findByActiveTrueAndReservationClientId(UUID clientId);
+    List<Seance> findByActiveTrueAndAutoEcoleIdAndReservationClientId(UUID autoEcoleId, UUID clientId);
 
     @EntityGraph(attributePaths = {"reservation", "reservation.client", "moniteur", "voiture"})
-    Optional<Seance> findByIdAndActiveTrueAndReservationClientId(UUID id, UUID clientId);
+    Optional<Seance> findByIdAndActiveTrueAndAutoEcoleIdAndReservationClientId(UUID id, UUID autoEcoleId, UUID clientId);
 
-    long countByActiveTrueAndStatut(StatutSeance statut);
+    long countByActiveTrueAndAutoEcoleIdAndStatut(UUID autoEcoleId, StatutSeance statut);
 
     // Deux créneaux se chevauchent si chacun commence avant la fin de l'autre.
     // Seules les séances planifiées bloquent un créneau.
+    // ⚠️ Ces deux requêtes de conflit sont volontairement NON filtrées par
+    // agence, à la différence de toutes les autres lectures : un moniteur ou
+    // un véhicule partagé entre deux agences de la même organisation ne peut
+    // pas être réservé deux fois à la même heure. Filtrer par agence ici
+    // laisserait passer une double réservation — le seul cas où le
+    // cloisonnement serait un défaut et non une garantie.
     @Query("""
             SELECT s FROM Seance s
             WHERE s.moniteur.id = :moniteurId

@@ -40,7 +40,7 @@ class QuotaServiceTest {
 
     @Test
     void essai_bloque_le_troisieme_moniteur() {
-        when(moniteurRepository.countByActiveTrue()).thenReturn(2L);
+        when(moniteurRepository.compterActifsToutesEcoles()).thenReturn(2L);
 
         assertThatThrownBy(() -> service("solo", true).verifierPeutAjouterMoniteur())
                 .isInstanceOf(QuotaAtteintException.class)
@@ -50,7 +50,7 @@ class QuotaServiceTest {
 
     @Test
     void essai_laisse_passer_sous_la_limite() {
-        when(moniteurRepository.countByActiveTrue()).thenReturn(1L);
+        when(moniteurRepository.compterActifsToutesEcoles()).thenReturn(1L);
 
         assertThatCode(() -> service("solo", true).verifierPeutAjouterMoniteur())
                 .doesNotThrowAnyException();
@@ -69,7 +69,7 @@ class QuotaServiceTest {
     @Test
     void abonnement_debloque_les_quotas_du_plan() {
         // 2 véhicules existants : plafond de l'essai (2) mais pas du plan solo (3)
-        when(voitureRepository.countByActiveTrue()).thenReturn(2L);
+        when(voitureRepository.compterActifsToutesEcoles()).thenReturn(2L);
 
         assertThatCode(() -> service("solo", false).verifierPeutAjouterVehicule())
                 .doesNotThrowAnyException();

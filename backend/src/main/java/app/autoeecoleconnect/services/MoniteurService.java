@@ -34,12 +34,12 @@ public class MoniteurService {
 
     @Transactional(readOnly = true)
     public List<Moniteur> lister() {
-        return moniteurRepository.findByActiveTrue();
+        return moniteurRepository.findByActiveTrueAndAutoEcoleId(contexteAutoEcole.courante());
     }
 
     @Transactional(readOnly = true)
     public Moniteur trouver(UUID id) {
-        return moniteurRepository.findByIdAndActiveTrue(id)
+        return moniteurRepository.findByIdAndActiveTrueAndAutoEcoleId(id, contexteAutoEcole.courante())
                 .orElseThrow(() -> new RessourceIntrouvableException("Moniteur", id));
     }
 

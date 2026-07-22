@@ -27,12 +27,12 @@ public class ForfaitService {
 
     @Transactional(readOnly = true)
     public List<Forfait> lister() {
-        return forfaitRepository.findByActiveTrue();
+        return forfaitRepository.findByActiveTrueAndAutoEcoleId(contexteAutoEcole.courante());
     }
 
     @Transactional(readOnly = true)
     public Forfait trouver(UUID id) {
-        return forfaitRepository.findByIdAndActiveTrue(id)
+        return forfaitRepository.findByIdAndActiveTrueAndAutoEcoleId(id, contexteAutoEcole.courante())
                 .orElseThrow(() -> new RessourceIntrouvableException("Forfait", id));
     }
 

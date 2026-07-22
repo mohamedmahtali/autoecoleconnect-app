@@ -9,26 +9,28 @@ import app.autoeecoleconnect.models.Reservation;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
 
     // client et forfait sont LAZY et open-in-view est désactivé : on les charge
     // dans la même requête, sinon LazyInitializationException au mapping DTO.
     @EntityGraph(attributePaths = {"client", "forfait"})
-    List<Reservation> findByActiveTrue();
+    List<Reservation> findByActiveTrueAndAutoEcoleId(UUID autoEcoleId);
 
     @EntityGraph(attributePaths = {"client", "forfait"})
-    Optional<Reservation> findByIdAndActiveTrue(UUID id);
+    Optional<Reservation> findByIdAndActiveTrueAndAutoEcoleId(UUID id, UUID autoEcoleId);
 
     @EntityGraph(attributePaths = {"client", "forfait"})
-    List<Reservation> findByActiveTrueAndClientId(UUID clientId);
+    List<Reservation> findByActiveTrueAndAutoEcoleIdAndClientId(UUID autoEcoleId, UUID clientId);
 
     @EntityGraph(attributePaths = {"client", "forfait"})
-    Optional<Reservation> findByIdAndActiveTrueAndClientId(UUID id, UUID clientId);
+    Optional<Reservation> findByIdAndActiveTrueAndAutoEcoleIdAndClientId(UUID id, UUID autoEcoleId, UUID clientId);
 
     // Premier agrégat SUM/COUNT de ce codebase (docs/16-backlog.md §16.3
     // item 15) — CA réellement encaissé, pas simplement facturé.
     @Query("SELECT COALESCE(SUM(r.montant), 0) FROM Reservation r "
-            + "WHERE r.active = true AND r.paiementStatut = app.autoeecoleconnect.models.PaiementStatut.PAID")
-    BigDecimal sumMontantPaye();
+            + "WHERE r.active = true AND r.autoEcoleId = :autoEcoleId "
+            + "AND r.paiementStatut = app.autoeecoleconnect.models.PaiementStatut.PAID")
+    BigDecimal sumMontantPaye(@Param("autoEcoleId") UUID autoEcoleId);
 }

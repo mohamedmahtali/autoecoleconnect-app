@@ -37,8 +37,8 @@ public class StatsService {
      * remplacement de TenantStatsClient par un GROUP BY).
      */
     public StatsResponse resume() {
-        long terminees = seanceRepository.countByActiveTrueAndStatut(StatutSeance.COMPLETED);
-        long noShow = seanceRepository.countByActiveTrueAndStatut(StatutSeance.NO_SHOW);
+        long terminees = seanceRepository.countByActiveTrueAndAutoEcoleIdAndStatut(contexteAutoEcole.courante(), StatutSeance.COMPLETED);
+        long noShow = seanceRepository.countByActiveTrueAndAutoEcoleIdAndStatut(contexteAutoEcole.courante(), StatutSeance.NO_SHOW);
         long seancesCloturees = terminees + noShow;
         double tauxNoShow = seancesCloturees == 0 ? 0.0 : (double) noShow / seancesCloturees;
 
@@ -50,7 +50,7 @@ public class StatsService {
                 .toList();
 
         return new StatsResponse(
-                reservationRepository.sumMontantPaye(),
+                reservationRepository.sumMontantPaye(contexteAutoEcole.courante()),
                 clientRepository.countByActiveTrueAndAutoEcoleId(contexteAutoEcole.courante()),
                 terminees,
                 noShow,

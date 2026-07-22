@@ -41,11 +41,11 @@ public class QuotaService {
     }
 
     public void verifierPeutAjouterMoniteur() {
-        verifier(moniteurRepository.countByActiveTrue(), limites().moniteurs(), "moniteurs");
+        verifier(moniteurRepository.compterActifsToutesEcoles(), limites().moniteurs(), "moniteurs");
     }
 
     public void verifierPeutAjouterVehicule() {
-        verifier(voitureRepository.countByActiveTrue(), limites().vehicules(), "véhicules");
+        verifier(voitureRepository.compterActifsToutesEcoles(), limites().vehicules(), "véhicules");
     }
 
     private QuotaProperties.Limites limites() {

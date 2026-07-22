@@ -8,6 +8,7 @@ import app.autoeecoleconnect.exceptions.ValidationMetierException;
 import app.autoeecoleconnect.models.Moniteur;
 import app.autoeecoleconnect.models.StatutMoniteur;
 import app.autoeecoleconnect.repositories.MoniteurRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,13 +37,22 @@ class MoniteurServiceTest {
     @Mock
     private ContexteAutoEcole contexteAutoEcole;
 
+    private static final UUID AUTO_ECOLE = UUID.randomUUID();
+
     @InjectMocks
     private MoniteurService moniteurService;
+
+    @BeforeEach
+    void perimetreParDefaut() {
+        // lenient : toutes les methodes testees ne lisent pas le perimetre
+        // (validations pures), et Mockito strict rejetterait un stub inutilise.
+        lenient().when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
+    }
 
     private Moniteur moniteurAvecStatut(UUID id, StatutMoniteur statut) {
         Moniteur moniteur = new Moniteur();
         moniteur.setStatut(statut);
-        when(moniteurRepository.findByIdAndActiveTrue(id)).thenReturn(Optional.of(moniteur));
+        when(moniteurRepository.findByIdAndActiveTrueAndAutoEcoleId(id, AUTO_ECOLE)).thenReturn(Optional.of(moniteur));
         return moniteur;
     }
 

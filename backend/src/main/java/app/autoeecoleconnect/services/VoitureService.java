@@ -27,12 +27,12 @@ public class VoitureService {
 
     @Transactional(readOnly = true)
     public List<Voiture> lister() {
-        return voitureRepository.findByActiveTrue();
+        return voitureRepository.findByActiveTrueAndAutoEcoleId(contexteAutoEcole.courante());
     }
 
     @Transactional(readOnly = true)
     public Voiture trouver(UUID id) {
-        return voitureRepository.findByIdAndActiveTrue(id)
+        return voitureRepository.findByIdAndActiveTrueAndAutoEcoleId(id, contexteAutoEcole.courante())
                 .orElseThrow(() -> new RessourceIntrouvableException("Voiture", id));
     }
 

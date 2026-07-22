@@ -1,6 +1,7 @@
 package app.autoeecoleconnect.services;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import app.autoeecoleconnect.controllers.dto.ForfaitRequest;
 import app.autoeecoleconnect.exceptions.ValidationMetierException;
@@ -11,6 +12,7 @@ import app.autoeecoleconnect.models.Kilometrage;
 import app.autoeecoleconnect.models.Transmission;
 import app.autoeecoleconnect.models.UniteValidite;
 import app.autoeecoleconnect.repositories.ForfaitRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,8 +36,17 @@ class ForfaitServiceTest {
     @Mock
     private ContexteAutoEcole contexteAutoEcole;
 
+    private static final UUID AUTO_ECOLE = UUID.randomUUID();
+
     @InjectMocks
     private ForfaitService forfaitService;
+
+    @BeforeEach
+    void perimetreParDefaut() {
+        // lenient : toutes les methodes testees ne lisent pas le perimetre
+        // (validations pures), et Mockito strict rejetterait un stub inutilise.
+        lenient().when(contexteAutoEcole.courante()).thenReturn(AUTO_ECOLE);
+    }
 
     private ForfaitRequest requete(Kilometrage kilometrage, Integer nbKilometre) {
         return new ForfaitRequest("Forfait 20h", 20, 6, UniteValidite.MOIS,

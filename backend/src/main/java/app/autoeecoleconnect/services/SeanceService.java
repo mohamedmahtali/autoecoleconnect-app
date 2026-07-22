@@ -45,25 +45,25 @@ public class SeanceService {
 
     @Transactional(readOnly = true)
     public List<Seance> lister() {
-        return seanceRepository.findByActiveTrue();
+        return seanceRepository.findByActiveTrueAndAutoEcoleId(contexteAutoEcole.courante());
     }
 
     @Transactional(readOnly = true)
     public Seance trouver(UUID id) {
-        return seanceRepository.findByIdAndActiveTrue(id)
+        return seanceRepository.findByIdAndActiveTrueAndAutoEcoleId(id, contexteAutoEcole.courante())
                 .orElseThrow(() -> new RessourceIntrouvableException("Seance", id));
     }
 
     @Transactional(readOnly = true)
     public List<Seance> listerPourMoniteur(UUID moniteurId) {
-        return seanceRepository.findByActiveTrueAndMoniteurId(moniteurId);
+        return seanceRepository.findByActiveTrueAndAutoEcoleIdAndMoniteurId(contexteAutoEcole.courante(), moniteurId);
     }
 
     @Transactional(readOnly = true)
     public Seance trouverPourMoniteur(UUID id, UUID moniteurId) {
         // 404 plutôt que 403 : ne révèle pas qu'une séance appartenant à un
         // autre moniteur existe.
-        return seanceRepository.findByIdAndActiveTrueAndMoniteurId(id, moniteurId)
+        return seanceRepository.findByIdAndActiveTrueAndAutoEcoleIdAndMoniteurId(id, contexteAutoEcole.courante(), moniteurId)
                 .orElseThrow(() -> new RessourceIntrouvableException("Seance", id));
     }
 
@@ -80,14 +80,14 @@ public class SeanceService {
 
     @Transactional(readOnly = true)
     public List<Seance> listerPourClient(UUID clientId) {
-        return seanceRepository.findByActiveTrueAndReservationClientId(clientId);
+        return seanceRepository.findByActiveTrueAndAutoEcoleIdAndReservationClientId(contexteAutoEcole.courante(), clientId);
     }
 
     @Transactional(readOnly = true)
     public Seance trouverPourClient(UUID id, UUID clientId) {
         // 404 plutôt que 403 : ne révèle pas qu'une séance appartenant à un
         // autre élève existe (même raisonnement que pour le moniteur).
-        return seanceRepository.findByIdAndActiveTrueAndReservationClientId(id, clientId)
+        return seanceRepository.findByIdAndActiveTrueAndAutoEcoleIdAndReservationClientId(id, contexteAutoEcole.courante(), clientId)
                 .orElseThrow(() -> new RessourceIntrouvableException("Seance", id));
     }
 
@@ -104,7 +104,7 @@ public class SeanceService {
 
     public Seance creer(SeanceCreationRequest request) {
         Reservation reservation = reservationRepository
-                .findByIdAndActiveTrue(request.reservationId())
+                .findByIdAndActiveTrueAndAutoEcoleId(request.reservationId(), contexteAutoEcole.courante())
                 .orElseThrow(() -> new RessourceIntrouvableException(
                         "Reservation", request.reservationId()));
         if (reservation.getStatut() != StatutReservation.PENDING
@@ -172,7 +172,7 @@ public class SeanceService {
 
         Moniteur moniteur = null;
         if (moniteurId != null) {
-            moniteur = moniteurRepository.findByIdAndActiveTrue(moniteurId)
+            moniteur = moniteurRepository.findByIdAndActiveTrueAndAutoEcoleId(moniteurId, contexteAutoEcole.courante())
                     .orElseThrow(() -> new RessourceIntrouvableException("Moniteur", moniteurId));
             if (moniteur.getStatut() != StatutMoniteur.APPROVED) {
                 throw new ValidationMetierException(
@@ -184,7 +184,7 @@ public class SeanceService {
 
         Voiture voiture = null;
         if (voitureId != null) {
-            voiture = voitureRepository.findByIdAndActiveTrue(voitureId)
+            voiture = voitureRepository.findByIdAndActiveTrueAndAutoEcoleId(voitureId, contexteAutoEcole.courante())
                     .orElseThrow(() -> new RessourceIntrouvableException("Voiture", voitureId));
             verifierDisponibiliteVoiture(seance, voitureId, creneau);
         }
