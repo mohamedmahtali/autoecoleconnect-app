@@ -27,7 +27,13 @@ public class JwtService {
     public record TokenGenere(String token, Instant expireLe) {
     }
 
-    public TokenGenere generer(UUID id, String email, String role, String nomComplet) {
+    /**
+     * {@code autoEcoleId} est le périmètre du porteur : l'agence dont il voit
+     * les données (docs/18 §18.3 lot 2). Il est posé dans le jeton à
+     * l'authentification et relu à chaque requête par
+     * {@code FiltrePerimetreAutoEcole}, qui alimente {@link ContexteAutoEcole}.
+     */
+    public TokenGenere generer(UUID id, String email, String role, String nomComplet, UUID autoEcoleId) {
         Instant maintenant = Instant.now();
         Instant expiration = maintenant.plus(dureeMinutes, ChronoUnit.MINUTES);
         JwtClaimsSet claims = JwtClaimsSet.builder()
@@ -37,6 +43,7 @@ public class JwtService {
                 .claim("email", email)
                 .claim("role", role)
                 .claim("nomComplet", nomComplet)
+                .claim("autoEcoleId", autoEcoleId.toString())
                 .build();
         String token = jwtEncoder.encode(JwtEncoderParameters.from(
                 JwsHeader.with(MacAlgorithm.HS256).build(), claims)).getTokenValue();

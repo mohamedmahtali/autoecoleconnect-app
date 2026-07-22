@@ -1,5 +1,7 @@
 package app.autoeecoleconnect.config;
 
+import java.util.UUID;
+
 import app.autoeecoleconnect.models.Directeur;
 import app.autoeecoleconnect.repositories.DirecteurRepository;
 import app.autoeecoleconnect.services.ContexteAutoEcole;
@@ -47,7 +49,11 @@ public class BootstrapAdminInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        if (directeurRepository.count() > 0) {
+        // Par agence et non « si la table est vide » : une organisation peut
+        // avoir plusieurs agences, chacune doit pouvoir recevoir son directeur
+        // de bootstrap sans que la présence d'un directeur ailleurs l'en prive.
+        UUID agence = contexteAutoEcole.courante();
+        if (directeurRepository.countByActiveTrueAndAutoEcoleId(agence) > 0) {
             return;
         }
         Directeur admin = new Directeur();
@@ -55,7 +61,7 @@ public class BootstrapAdminInitializer implements ApplicationRunner {
         admin.setPrenom("Admin");
         admin.setEmail(adminEmail);
         admin.setPasswordHash(passwordEncoder.encode(adminPassword));
-        admin.setAutoEcoleId(contexteAutoEcole.courante());
+        admin.setAutoEcoleId(agence);
         directeurRepository.save(admin);
         log.warn("Compte directeur bootstrap créé : {} — changez le mot de passe", adminEmail);
     }

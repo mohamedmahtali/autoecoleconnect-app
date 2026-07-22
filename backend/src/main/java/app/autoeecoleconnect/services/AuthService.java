@@ -62,7 +62,7 @@ public class AuthService {
     private LoginResponse loginDirecteur(Directeur directeur, String motDePasse) {
         verifierMotDePasse(motDePasse, directeur.getPasswordHash());
         return emettre(directeur.getId(), directeur.getEmail(), "DIRECTEUR",
-                directeur.getPrenom() + " " + directeur.getNom());
+                directeur.getPrenom() + " " + directeur.getNom(), directeur.getAutoEcoleId());
     }
 
     private LoginResponse loginMoniteur(Moniteur moniteur, String motDePasse) {
@@ -75,13 +75,13 @@ public class AuthService {
                             .formatted(moniteur.getStatut()));
         }
         return emettre(moniteur.getId(), moniteur.getEmail(), "MONITEUR",
-                moniteur.getPrenom() + " " + moniteur.getNom());
+                moniteur.getPrenom() + " " + moniteur.getNom(), moniteur.getAutoEcoleId());
     }
 
     private LoginResponse loginClient(Client client, String motDePasse) {
         verifierMotDePasse(motDePasse, client.getPasswordHash());
         return emettre(client.getId(), client.getEmail(), "CLIENT",
-                client.getPrenom() + " " + client.getNom());
+                client.getPrenom() + " " + client.getNom(), client.getAutoEcoleId());
     }
 
     private void verifierMotDePasse(String motDePasse, String hash) {
@@ -90,8 +90,9 @@ public class AuthService {
         }
     }
 
-    private LoginResponse emettre(UUID id, String email, String role, String nomComplet) {
-        JwtService.TokenGenere token = jwtService.generer(id, email, role, nomComplet);
+    private LoginResponse emettre(UUID id, String email, String role, String nomComplet,
+                                  UUID autoEcoleId) {
+        JwtService.TokenGenere token = jwtService.generer(id, email, role, nomComplet, autoEcoleId);
         return new LoginResponse(token.token(), "Bearer", token.expireLe(),
                 id, role, nomComplet);
     }

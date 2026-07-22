@@ -7,10 +7,12 @@ import java.util.UUID;
 import app.autoeecoleconnect.AbstractIntegrationTest;
 import app.autoeecoleconnect.controllers.dto.ClientCreationRequest;
 import app.autoeecoleconnect.exceptions.RessourceIntrouvableException;
+import app.autoeecoleconnect.exceptions.ValidationMetierException;
 import app.autoeecoleconnect.models.AutoEcole;
 import app.autoeecoleconnect.models.CarburantForfait;
 import app.autoeecoleconnect.models.CategorieForfait;
 import app.autoeecoleconnect.models.Client;
+import app.autoeecoleconnect.models.Directeur;
 import app.autoeecoleconnect.models.Forfait;
 import app.autoeecoleconnect.models.Kilometrage;
 import app.autoeecoleconnect.models.Moniteur;
@@ -18,6 +20,7 @@ import app.autoeecoleconnect.models.Transmission;
 import app.autoeecoleconnect.models.UniteValidite;
 import app.autoeecoleconnect.models.Voiture;
 import app.autoeecoleconnect.repositories.AutoEcoleRepository;
+import app.autoeecoleconnect.repositories.DirecteurRepository;
 import app.autoeecoleconnect.repositories.ForfaitRepository;
 import app.autoeecoleconnect.repositories.MoniteurRepository;
 import app.autoeecoleconnect.repositories.VoitureRepository;
@@ -66,6 +69,12 @@ class AutoEcoleIsolationIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private ForfaitRepository forfaitRepository;
+
+    @Autowired
+    private DirecteurService directeurService;
+
+    @Autowired
+    private DirecteurRepository directeurRepository;
 
     @AfterEach
     void nettoyerLeContexte() {
@@ -184,6 +193,32 @@ class AutoEcoleIsolationIntegrationTest extends AbstractIntegrationTest {
                 .doesNotContain(idChezBron);
         assertThatThrownBy(() -> voitureService.trouver(idChezBron))
                 .isInstanceOf(RessourceIntrouvableException.class);
+    }
+
+    /**
+     * Garde-fou du lot 2 : sans lui, un directeur peut supprimer son propre
+     * compte et laisser l'agence sans personne pour y écrire — un
+     * verrouillage dont seul un accès direct à la base permettrait de sortir.
+     * Testé sur une agence dédiée, le nombre de directeurs de l'agence par
+     * défaut dépendant de l'ordre des classes de test.
+     */
+    @Test
+    void le_dernier_directeur_dune_agence_ne_peut_pas_etre_supprime() {
+        AutoEcole agence = creerEcole("dernier-dir-" + UUID.randomUUID());
+
+        Directeur unique = new Directeur();
+        unique.setNom("Seul");
+        unique.setPrenom("Directeur");
+        unique.setEmail("seul-" + UUID.randomUUID() + "@example.fr");
+        unique.setPasswordHash("hash");
+        unique.setAutoEcoleId(agence.getId());
+        UUID idUnique = directeurRepository.save(unique).getId();
+
+        contexteAutoEcole.definir(agence.getId());
+
+        assertThatThrownBy(() -> directeurService.supprimer(idUnique))
+                .isInstanceOf(ValidationMetierException.class)
+                .hasMessageContaining("dernier directeur");
     }
 
     @Test

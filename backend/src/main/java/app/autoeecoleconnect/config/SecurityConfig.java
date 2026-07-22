@@ -57,6 +57,11 @@ public class SecurityConfig {
                         .hasRole("MONITEUR")
                         .requestMatchers(HttpMethod.PATCH, "/api/seances/*/validation-client")
                         .hasRole("CLIENT")
+                        // Comptes directeurs : même la lecture est réservée au
+                        // DIRECTEUR — un moniteur ou un élève n'a pas à connaître
+                        // la liste des responsables de l'agence (item 37).
+                        .requestMatchers("/api/directeurs", "/api/directeurs/**")
+                        .hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.PATCH, "/api/**").hasRole("DIRECTEUR")
