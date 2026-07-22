@@ -67,4 +67,12 @@ public class ClientController {
         clientService.supprimer(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Anonymiser un élève à sa demande (droit à l'effacement RGPD — "
+            + "irréversible : données personnelles effacées, login rendu impossible, "
+            + "réservations/séances conservées pour l'historique comptable)")
+    @PostMapping("/{id}/anonymisation")
+    public ClientResponse anonymiser(@PathVariable UUID id) {
+        return ClientResponse.depuis(clientService.anonymiser(id));
+    }
 }

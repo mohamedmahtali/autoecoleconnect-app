@@ -86,4 +86,30 @@ public class ClientService {
         client.setActive(false);
         clientRepository.save(client);
     }
+
+    /**
+     * Droit à l'effacement RGPD (docs/12 §12.6) : anonymisation, pas
+     * suppression. Les réservations et séances de l'élève portent un
+     * historique comptable que l'auto-école doit conserver — on garde donc la
+     * ligne mais on efface toute donnée personnelle et on rend le login
+     * définitivement impossible. Même approche que
+     * {@code TrialLifecycleScheduler.anonymiser()} côté organisation, à une
+     * différence près : {@code password_hash} est NOT NULL, on ne peut pas le
+     * mettre à null — on le remplace par le hash d'un secret aléatoire, qu'aucun
+     * mot de passe connu ne peut retrouver. {@link #trouver(UUID)} borne
+     * l'opération à l'agence courante et refuse un client déjà anonymisé
+     * (active=false → 404), donc l'action est idempotente-sûre et irréversible.
+     */
+    public Client anonymiser(UUID id) {
+        Client client = trouver(id);
+        client.setNom("[supprimé]");
+        client.setPrenom("[supprimé]");
+        client.setEmail("supprime-" + client.getId() + "@anonyme.invalid");
+        client.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+        client.setTelephone(null);
+        client.setAdresse(null);
+        client.setNotes(null);
+        client.setActive(false);
+        return clientRepository.save(client);
+    }
 }

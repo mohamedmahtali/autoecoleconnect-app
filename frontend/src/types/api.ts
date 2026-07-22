@@ -132,6 +132,13 @@ export interface ReservationDto {
   active: boolean;
 }
 
+// Export RGPD « droit d'accès » : ce que l'élève télécharge sur son portail.
+export interface DonneesPersonnellesDto {
+  identite: ClientDto;
+  reservations: ReservationDto[];
+  seances: SeanceDto[];
+}
+
 export interface InscriptionMensuelleDto {
   mois: string;
   nombre: number;

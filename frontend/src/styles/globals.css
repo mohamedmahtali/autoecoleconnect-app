@@ -173,6 +173,26 @@ p.sous-titre {
   padding: 0.25rem 0;
 }
 
+/* Pied du portail élève : droit d'accès RGPD (télécharger ses données). */
+.eleve-rgpd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-default);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Avertissement avant anonymisation d'un élève (action irréversible). */
+.rgpd-avertissement {
+  align-self: center;
+  font-size: 0.8rem;
+  color: #f87171;
+}
+
 .bouton {
   width: 100%;
   padding: 0.65rem;

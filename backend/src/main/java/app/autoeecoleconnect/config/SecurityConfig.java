@@ -61,6 +61,11 @@ public class SecurityConfig {
                         .hasRole("MONITEUR")
                         .requestMatchers(HttpMethod.PATCH, "/api/seances/*/validation-client")
                         .hasRole("CLIENT")
+                        // Espace élève (droit d'accès RGPD self-service) : réservé au
+                        // CLIENT, qui n'y lit que ses propres données (id tiré du JWT,
+                        // pas d'un paramètre — docs/12 §12.6).
+                        .requestMatchers(HttpMethod.GET, "/api/eleve/**")
+                        .hasRole("CLIENT")
                         // Comptes directeurs : même la lecture est réservée au
                         // DIRECTEUR — un moniteur ou un élève n'a pas à connaître
                         // la liste des responsables de l'agence (item 37).

@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 
 import { getSession } from "@/lib/session";
 import { BoutonDeconnexion } from "@/pages/admin/BoutonDeconnexion";
+import { TelechargerMesDonnees } from "./TelechargerMesDonnees";
 
 export default function EleveLayout() {
   const session = getSession();
@@ -18,6 +19,7 @@ export default function EleveLayout() {
       <main className="moniteur-contenu">
         <h1>Mon planning</h1>
         <Outlet />
+        <TelechargerMesDonnees />
       </main>
     </div>
   );
