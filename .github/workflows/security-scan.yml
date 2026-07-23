@@ -1,0 +1,48 @@
+name: Security scan
+
+# Backlog #22. Scan Trivy : vulnérabilités des dépendances (Maven + npm),
+# secrets committés par erreur, et mauvaises configurations des Dockerfiles.
+# Le schedule hebdomadaire attrape les CVE nouvellement publiées sur des
+# dépendances inchangées (un scan uniquement au push manquerait ce cas).
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1" # lundi 06:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  dependances-et-secrets:
+    name: Dépendances & secrets (trivy fs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trivy — système de fichiers
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scanners: vuln,secret
+          severity: HIGH,CRITICAL
+          # On ne bloque pas le build pour l'instant : une CVE transitive sans
+          # correctif disponible arrêterait tous les push. Objectif = visibilité
+          # d'abord. Passer exit-code à 1 (et retirer ignore-unfixed) une fois la
+          # base propre pour rendre le gate bloquant.
+          ignore-unfixed: true
+          exit-code: "0"
+          format: table
+
+  dockerfiles:
+    name: Dockerfiles (trivy config)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trivy — mauvaises configurations
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: config
+          severity: HIGH,CRITICAL
+          exit-code: "0"
+          format: table

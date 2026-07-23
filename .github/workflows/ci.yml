@@ -39,7 +39,7 @@ jobs:
         run: mvn -B verify
 
   frontend:
-    name: Frontend — build Next.js
+    name: Frontend — build Vite
     runs-on: ubuntu-latest
     defaults:
       run:
