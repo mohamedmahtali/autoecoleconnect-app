@@ -12,6 +12,9 @@ import VoituresListe from "@/pages/admin/voitures/VoituresListe";
 import ForfaitsListe from "@/pages/admin/forfaits/ForfaitsListe";
 import ReservationsListe from "@/pages/admin/reservations/ReservationsListe";
 import ReservationNouvelle from "@/pages/admin/reservations/ReservationNouvelle";
+import ExamensListe from "@/pages/admin/examens/ExamensListe";
+import ExamenNouveau from "@/pages/admin/examens/ExamenNouveau";
+import ExamenModifier from "@/pages/admin/examens/ExamenModifier";
 import MoniteurLayout from "@/pages/moniteur/MoniteurLayout";
 import Planning from "@/pages/moniteur/Planning";
 import EleveLayout from "@/pages/eleve/EleveLayout";
@@ -39,6 +42,9 @@ export default function App() {
           <Route path="forfaits" element={<ForfaitsListe />} />
           <Route path="reservations" element={<ReservationsListe />} />
           <Route path="reservations/nouvelle" element={<ReservationNouvelle />} />
+          <Route path="examens" element={<ExamensListe />} />
+          <Route path="examens/nouveau" element={<ExamenNouveau />} />
+          <Route path="examens/:id" element={<ExamenModifier />} />
         </Route>
         <Route
           path="/moniteur"

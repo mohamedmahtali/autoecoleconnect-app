@@ -25,20 +25,31 @@ export default function Dashboard() {
       fetchBackend<Identifiable[]>("/api/forfaits"),
       fetchBackend<Identifiable[]>("/api/reservations"),
       fetchBackend<Identifiable[]>("/api/seances"),
+      fetchBackend<Identifiable[]>("/api/examens"),
       fetchBackend<StatsDto>("/api/stats/resume"),
-    ]).then(([clients, moniteurs, voitures, forfaits, reservations, seances, kpi]) => {
-      setStats([
+    ]).then(([clients, moniteurs, voitures, forfaits, reservations, seances, examens, kpi]) => {
+      const cartes: Stat[] = [
         { libelle: "Élèves", valeur: clients.length, lien: "/admin/clients" },
         { libelle: "Moniteurs", valeur: moniteurs.length },
         { libelle: "Véhicules", valeur: voitures.length },
         { libelle: "Forfaits", valeur: forfaits.length },
-        { libelle: "Réservations", valeur: reservations.length },
+        { libelle: "Réservations", valeur: reservations.length, lien: "/admin/reservations" },
         { libelle: "Séances", valeur: seances.length },
+        { libelle: "Examens", valeur: examens.length, lien: "/admin/examens" },
         { libelle: "Chiffre d'affaires encaissé", valeur: FORMAT_EUR.format(kpi.caTotal) },
         { libelle: "Élèves actifs", valeur: kpi.elevesActifs },
         { libelle: "Séances terminées", valeur: kpi.seancesTerminees },
         { libelle: "Taux de no-show", valeur: FORMAT_POURCENT.format(kpi.tauxNoShow) },
-      ]);
+      ];
+      // Le taux de réussite n'a de sens qu'avec des présentés (sinon 0/0) :
+      // on masque la carte tant qu'aucun examen n'a été passé.
+      if (kpi.examensPresentes > 0) {
+        cartes.push({
+          libelle: `Taux de réussite examen (${kpi.examensPresentes} présentés)`,
+          valeur: FORMAT_POURCENT.format(kpi.tauxReussiteExamen),
+        });
+      }
+      setStats(cartes);
       setInscriptions(kpi.inscriptionsParMois);
     });
   }, []);

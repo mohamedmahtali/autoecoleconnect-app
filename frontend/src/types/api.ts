@@ -132,11 +132,31 @@ export interface ReservationDto {
   active: boolean;
 }
 
+export type TypeExamen = "CODE" | "CONDUITE";
+export type ResultatExamen = "PLANIFIE" | "REUSSI" | "ECHOUE" | "ABSENT";
+
+export interface ExamenDto {
+  id: string;
+  clientId: string;
+  clientNomComplet: string;
+  type: TypeExamen;
+  dateExamen: string;
+  dateConvocation: string | null;
+  resultat: ResultatExamen;
+  nombreFautes: number | null;
+  centreExamen: string | null;
+  examinateur: string | null;
+  notes: string | null;
+  active: boolean;
+  createdAt: string;
+}
+
 // Export RGPD « droit d'accès » : ce que l'élève télécharge sur son portail.
 export interface DonneesPersonnellesDto {
   identite: ClientDto;
   reservations: ReservationDto[];
   seances: SeanceDto[];
+  examens: ExamenDto[];
 }
 
 export interface InscriptionMensuelleDto {
@@ -150,5 +170,7 @@ export interface StatsDto {
   seancesTerminees: number;
   seancesNoShow: number;
   tauxNoShow: number;
+  examensPresentes: number;
+  tauxReussiteExamen: number;
   inscriptionsParMois: InscriptionMensuelleDto[];
 }

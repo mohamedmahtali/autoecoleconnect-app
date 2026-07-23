@@ -28,3 +28,6 @@ databaseChangeLog:
       file: db/changelog/v1.1/012-backfill-auto-ecole.sql
   - include:
       file: db/changelog/v1.1/013-contraintes-auto-ecole.sql
+  # v1.2 — suivi des examens (backlog #34), alimente le KPI taux de réussite.
+  - include:
+      file: db/changelog/v1.2/014-create-examens.sql

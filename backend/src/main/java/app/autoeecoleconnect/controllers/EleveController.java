@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import app.autoeecoleconnect.controllers.dto.DonneesPersonnellesResponse;
 import app.autoeecoleconnect.services.ClientService;
+import app.autoeecoleconnect.services.ExamenService;
 import app.autoeecoleconnect.services.ReservationService;
 import app.autoeecoleconnect.services.SeanceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,12 +29,14 @@ public class EleveController {
     private final ClientService clientService;
     private final ReservationService reservationService;
     private final SeanceService seanceService;
+    private final ExamenService examenService;
 
     public EleveController(ClientService clientService, ReservationService reservationService,
-                           SeanceService seanceService) {
+                           SeanceService seanceService, ExamenService examenService) {
         this.clientService = clientService;
         this.reservationService = reservationService;
         this.seanceService = seanceService;
+        this.examenService = examenService;
     }
 
     @Operation(summary = "Exporter mes données personnelles (droit d'accès RGPD)")
@@ -43,6 +46,7 @@ public class EleveController {
         return DonneesPersonnellesResponse.depuis(
                 clientService.trouver(clientId),
                 reservationService.listerPourClient(clientId),
-                seanceService.listerPourClient(clientId));
+                seanceService.listerPourClient(clientId),
+                examenService.listerPourClient(clientId));
     }
 }

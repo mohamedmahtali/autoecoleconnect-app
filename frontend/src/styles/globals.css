@@ -193,6 +193,13 @@ p.sous-titre {
   color: #f87171;
 }
 
+/* Le lien « Modifier » d'une ligne de tableau (examens) porte le style
+   .btn-ligne : pas de soulignement, rendu bouton. */
+a.btn-ligne {
+  display: inline-block;
+  text-decoration: none;
+}
+
 .bouton {
   width: 100%;
   padding: 0.65rem;

@@ -1,8 +1,10 @@
 package app.autoeecoleconnect.services;
 
 import app.autoeecoleconnect.controllers.dto.StatsResponse;
+import app.autoeecoleconnect.models.ResultatExamen;
 import app.autoeecoleconnect.models.StatutSeance;
 import app.autoeecoleconnect.repositories.ClientRepository;
+import app.autoeecoleconnect.repositories.ExamenRepository;
 import app.autoeecoleconnect.repositories.ReservationRepository;
 import app.autoeecoleconnect.repositories.SeanceRepository;
 import java.util.List;
@@ -16,16 +18,19 @@ public class StatsService {
     private final ReservationRepository reservationRepository;
     private final ClientRepository clientRepository;
     private final SeanceRepository seanceRepository;
+    private final ExamenRepository examenRepository;
 
     private final ContexteAutoEcole contexteAutoEcole;
 
     public StatsService(ReservationRepository reservationRepository,
                         ClientRepository clientRepository,
                         SeanceRepository seanceRepository,
+                        ExamenRepository examenRepository,
                         ContexteAutoEcole contexteAutoEcole) {
         this.reservationRepository = reservationRepository;
         this.clientRepository = clientRepository;
         this.seanceRepository = seanceRepository;
+        this.examenRepository = examenRepository;
         this.contexteAutoEcole = contexteAutoEcole;
     }
 
@@ -35,6 +40,14 @@ public class StatsService {
         long noShow = seanceRepository.countByActiveTrueAndAutoEcoleIdAndStatut(contexteAutoEcole.courante(), StatutSeance.NO_SHOW);
         long seancesCloturees = terminees + noShow;
         double tauxNoShow = seancesCloturees == 0 ? 0.0 : (double) noShow / seancesCloturees;
+
+        // Taux de réussite sur les présentés (REUSSI + ECHOUE) — les PLANIFIE
+        // et ABSENT sont hors dénominateur, comme le « taux de réussite au
+        // permis » usuel (admis / présentés).
+        long reussis = examenRepository.countByActiveTrueAndAutoEcoleIdAndResultat(contexteAutoEcole.courante(), ResultatExamen.REUSSI);
+        long echoues = examenRepository.countByActiveTrueAndAutoEcoleIdAndResultat(contexteAutoEcole.courante(), ResultatExamen.ECHOUE);
+        long presentes = reussis + echoues;
+        double tauxReussite = presentes == 0 ? 0.0 : (double) reussis / presentes;
 
         List<StatsResponse.InscriptionMensuelle> inscriptions = clientRepository
                 .inscriptionsParMois(contexteAutoEcole.courante())
@@ -49,6 +62,8 @@ public class StatsService {
                 terminees,
                 noShow,
                 tauxNoShow,
+                presentes,
+                tauxReussite,
                 inscriptions);
     }
 
@@ -76,6 +91,11 @@ public class StatsService {
                 terminees,
                 noShow,
                 tauxNoShow,
+                // Le taux de reussite examen alimente le dashboard d'une agence,
+                // pas la vue consolidee du gerant (CA + eleves seulement) : on
+                // ne l'agrege pas ici.
+                0L,
+                0.0,
                 // Les inscriptions mensuelles servent le dashboard d'une agence,
                 // pas le consolide : inutile de les agreger ici.
                 List.of());

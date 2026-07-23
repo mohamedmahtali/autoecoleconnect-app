@@ -71,6 +71,11 @@ public class SecurityConfig {
                         // la liste des responsables de l'agence (item 37).
                         .requestMatchers("/api/directeurs", "/api/directeurs/**")
                         .hasRole("DIRECTEUR")
+                        // Suivi des examens : outil du directeur (item 34). La
+                        // règle couvre aussi les GET, qui sinon retomberaient sur
+                        // anyRequest().authenticated() et fuiteraient à un élève.
+                        .requestMatchers("/api/examens", "/api/examens/**")
+                        .hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.PATCH, "/api/**").hasRole("DIRECTEUR")
