@@ -151,6 +151,26 @@ export interface ExamenDto {
   createdAt: string;
 }
 
+export type JourSemaine =
+  | "LUNDI"
+  | "MARDI"
+  | "MERCREDI"
+  | "JEUDI"
+  | "VENDREDI"
+  | "SAMEDI"
+  | "DIMANCHE";
+
+export interface DisponibiliteDto {
+  id: string;
+  moniteurId: string;
+  moniteurNomComplet: string;
+  jour: JourSemaine;
+  heureDebut: string;
+  heureFin: string;
+  active: boolean;
+  createdAt: string;
+}
+
 // Export RGPD « droit d'accès » : ce que l'élève télécharge sur son portail.
 export interface DonneesPersonnellesDto {
   identite: ClientDto;
@@ -172,5 +192,7 @@ export interface StatsDto {
   tauxNoShow: number;
   examensPresentes: number;
   tauxReussiteExamen: number;
+  heuresDispoHebdo: number;
+  tauxOccupation: number;
   inscriptionsParMois: InscriptionMensuelleDto[];
 }

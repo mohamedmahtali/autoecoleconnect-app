@@ -38,6 +38,18 @@ public interface SeanceRepository extends JpaRepository<Seance, UUID> {
     /** Toutes agences confondues — consolide du gerant (docs/18 §18.3 lot 7). */
     long countByActiveTrueAndStatut(StatutSeance statut);
 
+    // Heures de séances effectivement occupées depuis une date (numérateur du
+    // taux d'occupation, #35) : on exclut les annulées, on garde planifiées,
+    // terminées et no-show (le créneau du moniteur était bien pris). Native :
+    // arithmétique sur TIME, comme la somme des disponibilités.
+    @Query(value = """
+            SELECT COALESCE(SUM(EXTRACT(EPOCH FROM (h_fin - h_deb)) / 3600), 0)
+            FROM seances
+            WHERE active = true AND auto_ecole_id = :autoEcoleId
+              AND statut <> 'CANCELLED' AND date_seance >= :depuis
+            """, nativeQuery = true)
+    double sommeHeuresDepuis(@Param("autoEcoleId") UUID autoEcoleId, @Param("depuis") LocalDate depuis);
+
     // Deux créneaux se chevauchent si chacun commence avant la fin de l'autre.
     // Seules les séances planifiées bloquent un créneau.
     // ⚠️ Ces deux requêtes de conflit sont volontairement NON filtrées par

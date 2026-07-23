@@ -76,6 +76,10 @@ public class SecurityConfig {
                         // anyRequest().authenticated() et fuiteraient à un élève.
                         .requestMatchers("/api/examens", "/api/examens/**")
                         .hasRole("DIRECTEUR")
+                        // Disponibilités moniteur : outil du directeur (item 35),
+                        // même raisonnement que les examens (GET compris).
+                        .requestMatchers("/api/disponibilites", "/api/disponibilites/**")
+                        .hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("DIRECTEUR")
                         .requestMatchers(HttpMethod.PATCH, "/api/**").hasRole("DIRECTEUR")

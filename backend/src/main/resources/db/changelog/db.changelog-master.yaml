@@ -31,3 +31,6 @@ databaseChangeLog:
   # v1.2 — suivi des examens (backlog #34), alimente le KPI taux de réussite.
   - include:
       file: db/changelog/v1.2/014-create-examens.sql
+  # v1.2 — disponibilités moniteur (backlog #35), alimente le taux d'occupation.
+  - include:
+      file: db/changelog/v1.2/015-create-disponibilites-moniteur.sql

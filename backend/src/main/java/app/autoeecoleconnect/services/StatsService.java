@@ -4,9 +4,11 @@ import app.autoeecoleconnect.controllers.dto.StatsResponse;
 import app.autoeecoleconnect.models.ResultatExamen;
 import app.autoeecoleconnect.models.StatutSeance;
 import app.autoeecoleconnect.repositories.ClientRepository;
+import app.autoeecoleconnect.repositories.DisponibiliteMoniteurRepository;
 import app.autoeecoleconnect.repositories.ExamenRepository;
 import app.autoeecoleconnect.repositories.ReservationRepository;
 import app.autoeecoleconnect.repositories.SeanceRepository;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,7 @@ public class StatsService {
     private final ClientRepository clientRepository;
     private final SeanceRepository seanceRepository;
     private final ExamenRepository examenRepository;
+    private final DisponibiliteMoniteurRepository disponibiliteRepository;
 
     private final ContexteAutoEcole contexteAutoEcole;
 
@@ -26,11 +29,13 @@ public class StatsService {
                         ClientRepository clientRepository,
                         SeanceRepository seanceRepository,
                         ExamenRepository examenRepository,
+                        DisponibiliteMoniteurRepository disponibiliteRepository,
                         ContexteAutoEcole contexteAutoEcole) {
         this.reservationRepository = reservationRepository;
         this.clientRepository = clientRepository;
         this.seanceRepository = seanceRepository;
         this.examenRepository = examenRepository;
+        this.disponibiliteRepository = disponibiliteRepository;
         this.contexteAutoEcole = contexteAutoEcole;
     }
 
@@ -49,6 +54,15 @@ public class StatsService {
         long presentes = reussis + echoues;
         double tauxReussite = presentes == 0 ? 0.0 : (double) reussis / presentes;
 
+        // Taux d'occupation (#35) : heures de séances des 7 derniers jours
+        // rapportées aux heures déclarées disponibles par semaine. Dénominateur
+        // stable (créneaux récurrents), numérateur en fenêtre glissante — peut
+        // dépasser 100 % en cas de sur-occupation (docs/13-analytics.md).
+        double heuresDispoHebdo = disponibiliteRepository.sommeHeuresHebdo(contexteAutoEcole.courante());
+        double heuresTravaillees = seanceRepository.sommeHeuresDepuis(
+                contexteAutoEcole.courante(), LocalDate.now().minusDays(7));
+        double tauxOccupation = heuresDispoHebdo == 0.0 ? 0.0 : heuresTravaillees / heuresDispoHebdo;
+
         List<StatsResponse.InscriptionMensuelle> inscriptions = clientRepository
                 .inscriptionsParMois(contexteAutoEcole.courante())
                 .stream()
@@ -64,6 +78,8 @@ public class StatsService {
                 tauxNoShow,
                 presentes,
                 tauxReussite,
+                heuresDispoHebdo,
+                tauxOccupation,
                 inscriptions);
     }
 
@@ -91,10 +107,12 @@ public class StatsService {
                 terminees,
                 noShow,
                 tauxNoShow,
-                // Le taux de reussite examen alimente le dashboard d'une agence,
-                // pas la vue consolidee du gerant (CA + eleves seulement) : on
-                // ne l'agrege pas ici.
+                // Le taux de reussite examen et le taux d'occupation alimentent
+                // le dashboard d'une agence, pas la vue consolidee du gerant
+                // (CA + eleves seulement) : on ne les agrege pas ici.
                 0L,
+                0.0,
+                0.0,
                 0.0,
                 // Les inscriptions mensuelles servent le dashboard d'une agence,
                 // pas le consolide : inutile de les agreger ici.

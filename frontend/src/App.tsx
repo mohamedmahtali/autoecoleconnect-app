@@ -15,6 +15,7 @@ import ReservationNouvelle from "@/pages/admin/reservations/ReservationNouvelle"
 import ExamensListe from "@/pages/admin/examens/ExamensListe";
 import ExamenNouveau from "@/pages/admin/examens/ExamenNouveau";
 import ExamenModifier from "@/pages/admin/examens/ExamenModifier";
+import DisponibilitesListe from "@/pages/admin/disponibilites/DisponibilitesListe";
 import MoniteurLayout from "@/pages/moniteur/MoniteurLayout";
 import Planning from "@/pages/moniteur/Planning";
 import EleveLayout from "@/pages/eleve/EleveLayout";
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="examens" element={<ExamensListe />} />
           <Route path="examens/nouveau" element={<ExamenNouveau />} />
           <Route path="examens/:id" element={<ExamenModifier />} />
+          <Route path="disponibilites" element={<DisponibilitesListe />} />
         </Route>
         <Route
           path="/moniteur"

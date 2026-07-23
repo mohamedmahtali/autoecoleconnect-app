@@ -49,6 +49,14 @@ export default function Dashboard() {
           valeur: FORMAT_POURCENT.format(kpi.tauxReussiteExamen),
         });
       }
+      // Idem pour l'occupation : sans heures déclarées disponibles, le taux
+      // n'a pas de dénominateur.
+      if (kpi.heuresDispoHebdo > 0) {
+        cartes.push({
+          libelle: "Taux d'occupation (7 derniers jours)",
+          valeur: FORMAT_POURCENT.format(kpi.tauxOccupation),
+        });
+      }
       setStats(cartes);
       setInscriptions(kpi.inscriptionsParMois);
     });

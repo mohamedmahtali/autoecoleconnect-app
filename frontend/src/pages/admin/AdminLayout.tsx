@@ -17,6 +17,7 @@ export default function AdminLayout() {
         <Link to="/admin/forfaits">Forfaits</Link>
         <Link to="/admin/reservations">Réservations</Link>
         <Link to="/admin/examens">Examens</Link>
+        <Link to="/admin/disponibilites">Disponibilités</Link>
       </nav>
       <div className="admin-contenu">
         <header className="admin-entete">
