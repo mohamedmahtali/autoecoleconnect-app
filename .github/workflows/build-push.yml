@@ -1,0 +1,55 @@
+name: Build & push images
+
+# Backlog #24 (vrai registry) + #25 (lien tag<->commit). Construit les 3 images
+# et les pousse vers GHCR, taguées par le SHA du commit (sha-<court>) + latest.
+# Pousse avec le GITHUB_TOKEN intégré (permissions.packages: write) — aucun PAT.
+# Remplace le build manuel sur le nœud Hetzner (docker build + ctr import), qui
+# faisait concurrence en CPU/RAM aux pods de prod.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-push:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: backend
+            context: backend
+          - name: frontend
+            context: frontend
+          - name: control-plane
+            context: control-plane/backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Connexion à GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tags & labels (SHA + latest)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/autoecoleconnect-${{ matrix.name }}
+          tags: |
+            type=sha,prefix=sha-,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build & push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
