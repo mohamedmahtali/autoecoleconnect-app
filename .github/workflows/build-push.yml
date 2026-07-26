@@ -53,3 +53,44 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  # Backlog #23 : dernier maillon de la CD. Une fois les 3 images poussées,
+  # bumpe le tag sha-<court> dans le repo infra → ArgoCD déploie. Écrit dans un
+  # AUTRE repo (infra) via une deploy key SSH write (le GITHUB_TOKEN est limité
+  # au repo courant), clé privée dans le secret INFRA_DEPLOY_KEY.
+  deploy:
+    name: Déploie (bump tag infra → ArgoCD)
+    needs: build-push
+    runs-on: ubuntu-latest
+    concurrency:
+      group: infra-deploy
+      cancel-in-progress: false
+    steps:
+      - name: Checkout du repo infra (deploy key SSH)
+        uses: actions/checkout@v4
+        with:
+          repository: mohamedmahtali/autoecoleconnect-infra
+          ssh-key: ${{ secrets.INFRA_DEPLOY_KEY }}
+
+      - name: Bumper le tag vers le SHA courant + push
+        run: |
+          NEW="sha-${GITHUB_SHA::7}"
+          echo "Déploiement de $NEW"
+          sed -i -E "s/tag: sha-[0-9a-f]+/tag: ${NEW}/g" \
+            helm/portail-tenant/values.yaml \
+            helm/control-plane/values.yaml \
+            tenants/*/values.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "Déjà à jour ($NEW) — rien à déployer."
+            exit 0
+          fi
+          git commit -am "CD auto : déploie ${NEW} (autoecoleconnect-app@${GITHUB_SHA::7})"
+          for i in 1 2 3; do
+            git push && exit 0
+            echo "Push rejeté (l'infra a bougé), rebase et nouvel essai..."
+            git pull --rebase origin main
+          done
+          echo "Push échoué après 3 essais" >&2
+          exit 1
