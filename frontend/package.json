@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "gen:types": "openapi-typescript openapi.json -o src/types/api.generated.ts"
+    "gen:types": "openapi-typescript openapi.json --alphabetize -o src/types/api.generated.ts"
   },
   "dependencies": {
     "react": "^19.1.0",

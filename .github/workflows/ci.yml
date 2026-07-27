@@ -84,11 +84,14 @@ jobs:
         run: |
           npm ci
           npm run gen:types
-      - name: Échoue si la spec ou les types committés sont périmés
+      - name: Échoue si les types TS committés sont périmés
+        # On ne compare QUE api.generated.ts : il est trié (--alphabetize) donc
+        # déterministe, insensible à l'ordre des schémas dans la spec (qui peut
+        # varier selon l'environnement). openapi.json n'est qu'un intermédiaire.
         run: |
-          if ! git diff --quiet -- frontend/openapi.json frontend/src/types/api.generated.ts; then
-            echo "::error::openapi.json / api.generated.ts périmés. Lance : (backend) mvn test -Dtest=OpenApiDocsTest && cp target/openapi.json ../frontend/openapi.json ; (frontend) npm run gen:types — puis committe."
-            git --no-pager diff -- frontend/openapi.json frontend/src/types/api.generated.ts | head -80
+          if ! git diff --quiet -- frontend/src/types/api.generated.ts; then
+            echo "::error::types TS périmés vs backend. Lance : (backend) mvn test -Dtest=OpenApiDocsTest && cp target/openapi.json ../frontend/openapi.json ; (frontend) npm run gen:types — puis committe."
+            git --no-pager diff -- frontend/src/types/api.generated.ts | head -80
             exit 1
           fi
           echo "Types TS à jour ✅"

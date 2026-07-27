@@ -4,175 +4,7 @@
  */
 
 export interface paths {
-    "/api/voitures/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Consulter un véhicule */
-        get: operations["trouver"];
-        /** Mettre à jour un véhicule */
-        put: operations["mettreAJour"];
-        post?: never;
-        /** Retirer un véhicule du parc (soft delete) */
-        delete: operations["supprimer"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/seances/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Consulter une séance (un moniteur/élève ne peut consulter que les siennes) */
-        get: operations["trouver_1"];
-        /** Reprogrammer une séance planifiée */
-        put: operations["mettreAJour_1"];
-        post?: never;
-        /** Supprimer une séance (soft delete) */
-        delete: operations["supprimer_1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/moniteurs/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Consulter un moniteur */
-        get: operations["trouver_2"];
-        /** Mettre à jour un moniteur */
-        put: operations["mettreAJour_2"];
-        post?: never;
-        /** Désactiver un moniteur (soft delete) */
-        delete: operations["supprimer_2"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/forfaits/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Consulter un forfait */
-        get: operations["trouver_3"];
-        /** Mettre à jour un forfait */
-        put: operations["mettreAJour_3"];
-        post?: never;
-        /** Retirer un forfait du catalogue (soft delete) */
-        delete: operations["supprimer_3"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/examens/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Consulter un examen */
-        get: operations["trouver_4"];
-        /** Mettre à jour un examen (typiquement pour saisir le résultat) */
-        put: operations["mettreAJour_4"];
-        post?: never;
-        /** Supprimer un examen (soft delete) */
-        delete: operations["supprimer_4"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/clients/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Consulter un client */
-        get: operations["trouver_5"];
-        /** Mettre à jour un client */
-        put: operations["mettreAJour_5"];
-        post?: never;
-        /** Désactiver un client (soft delete) */
-        delete: operations["supprimer_5"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/voitures": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lister les véhicules actifs */
-        get: operations["lister"];
-        put?: never;
-        /** Ajouter un véhicule au parc */
-        post: operations["creer"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/seances": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lister les séances actives (un moniteur/élève ne voit que les siennes) */
-        get: operations["lister_1"];
-        put?: never;
-        /** Planifier une séance (moniteur approuvé, créneau libre) */
-        post: operations["creer_1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/reservations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lister les réservations actives (un élève ne voit que les siennes) */
-        get: operations["lister_2"];
-        put?: never;
-        /** Créer une réservation (dateFin et montant déduits du forfait) */
-        post: operations["creer_2"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/reservations/{id}/annulation": {
+    "/api/auth/login": {
         parameters: {
             query?: never;
             header?: never;
@@ -181,132 +13,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Annuler une réservation (PENDING ou ACTIVE uniquement) */
-        post: operations["annuler"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/moniteurs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lister les moniteurs actifs */
-        get: operations["lister_3"];
-        put?: never;
-        /** Créer un moniteur (statut initial PENDING) */
-        post: operations["creer_3"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/jeton-acces": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Émettre un jeton d'accès pour le gérant (control-plane) */
-        post: operations["jetonAcces"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/auto-ecoles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Créer une agence dans cette organisation (control-plane) */
-        post: operations["creerAgence"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/forfaits": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lister les forfaits actifs */
-        get: operations["lister_4"];
-        put?: never;
-        /** Créer un forfait */
-        post: operations["creer_4"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/examens": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lister les examens de l'agence */
-        get: operations["lister_5"];
-        put?: never;
-        /** Enregistrer un examen (convocation, ou résultat déjà connu) */
-        post: operations["creer_5"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/disponibilites": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lister les créneaux de disponibilité de l'agence */
-        get: operations["lister_6"];
-        put?: never;
-        /** Ajouter un créneau récurrent à un moniteur */
-        post: operations["creer_6"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/directeurs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lister les directeurs de l'agence */
-        get: operations["lister_7"];
-        put?: never;
-        /** Créer un compte directeur dans l'agence courante */
-        post: operations["creer_7"];
+        /** Se connecter et obtenir un JWT */
+        post: operations["login"];
         delete?: never;
         options?: never;
         head?: never;
@@ -331,6 +39,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/clients/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulter un client */
+        get: operations["trouver_5"];
+        /** Mettre à jour un client */
+        put: operations["mettreAJour_5"];
+        post?: never;
+        /** Désactiver un client (soft delete) */
+        delete: operations["supprimer_5"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/clients/{id}/anonymisation": {
         parameters: {
             query?: never;
@@ -348,174 +75,18 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/login": {
+    "/api/directeurs": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Lister les directeurs de l'agence */
+        get: operations["lister_7"];
         put?: never;
-        /** Se connecter et obtenir un JWT */
-        post: operations["login"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/seances/{id}/validation-moniteur": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Confirmer sa présence à une séance planifiée (moniteur) */
-        patch: operations["validerParMoniteur"];
-        trace?: never;
-    };
-    "/api/seances/{id}/validation-client": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Confirmer sa présence à une séance planifiée (élève) */
-        patch: operations["validerParClient"];
-        trace?: never;
-    };
-    "/api/seances/{id}/statut": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Clore une séance (COMPLETED, CANCELLED ou NO_SHOW) */
-        patch: operations["changerStatut"];
-        trace?: never;
-    };
-    "/api/reservations/{id}/paiement": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Enregistrer un paiement manuel (espèces, chèque, virement ou CPF) */
-        patch: operations["enregistrerPaiement"];
-        trace?: never;
-    };
-    "/api/moniteurs/{id}/statut": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Changer le statut (PENDING → APPROVED/REJECTED, APPROVED ↔ INACTIVE) */
-        patch: operations["changerStatut_1"];
-        trace?: never;
-    };
-    "/api/stats/resume": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Résumé chiffré — agence courante (DIRECTEUR) ou organisation entière (control-plane) */
-        get: operations["resume"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/reservations/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Consulter une réservation (un élève ne peut consulter que les siennes) */
-        get: operations["trouver_6"];
-        put?: never;
-        post?: never;
-        /** Supprimer une réservation (soft delete) */
-        delete: operations["supprimer_6"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/ping": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Ping du backend
-         * @description Répond ok si le backend est démarré
-         */
-        get: operations["ping"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/eleve/mes-donnees": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Exporter mes données personnelles (droit d'accès RGPD) */
-        get: operations["mesDonnees"];
-        put?: never;
-        post?: never;
+        /** Créer un compte directeur dans l'agence courante */
+        post: operations["creer_7"];
         delete?: never;
         options?: never;
         head?: never;
@@ -540,6 +111,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/disponibilites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister les créneaux de disponibilité de l'agence */
+        get: operations["lister_6"];
+        put?: never;
+        /** Ajouter un créneau récurrent à un moniteur */
+        post: operations["creer_6"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/disponibilites/{id}": {
         parameters: {
             query?: never;
@@ -557,404 +146,815 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/eleve/mes-donnees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Exporter mes données personnelles (droit d'accès RGPD) */
+        get: operations["mesDonnees"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/examens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister les examens de l'agence */
+        get: operations["lister_5"];
+        put?: never;
+        /** Enregistrer un examen (convocation, ou résultat déjà connu) */
+        post: operations["creer_5"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/examens/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulter un examen */
+        get: operations["trouver_4"];
+        /** Mettre à jour un examen (typiquement pour saisir le résultat) */
+        put: operations["mettreAJour_4"];
+        post?: never;
+        /** Supprimer un examen (soft delete) */
+        delete: operations["supprimer_4"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/forfaits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister les forfaits actifs */
+        get: operations["lister_4"];
+        put?: never;
+        /** Créer un forfait */
+        post: operations["creer_4"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/forfaits/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulter un forfait */
+        get: operations["trouver_3"];
+        /** Mettre à jour un forfait */
+        put: operations["mettreAJour_3"];
+        post?: never;
+        /** Retirer un forfait du catalogue (soft delete) */
+        delete: operations["supprimer_3"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/auto-ecoles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Créer une agence dans cette organisation (control-plane) */
+        post: operations["creerAgence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/jeton-acces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Émettre un jeton d'accès pour le gérant (control-plane) */
+        post: operations["jetonAcces"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/moniteurs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister les moniteurs actifs */
+        get: operations["lister_3"];
+        put?: never;
+        /** Créer un moniteur (statut initial PENDING) */
+        post: operations["creer_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/moniteurs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulter un moniteur */
+        get: operations["trouver_2"];
+        /** Mettre à jour un moniteur */
+        put: operations["mettreAJour_2"];
+        post?: never;
+        /** Désactiver un moniteur (soft delete) */
+        delete: operations["supprimer_2"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/moniteurs/{id}/statut": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Changer le statut (PENDING → APPROVED/REJECTED, APPROVED ↔ INACTIVE) */
+        patch: operations["changerStatut_1"];
+        trace?: never;
+    };
+    "/api/ping": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ping du backend
+         * @description Répond ok si le backend est démarré
+         */
+        get: operations["ping"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reservations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister les réservations actives (un élève ne voit que les siennes) */
+        get: operations["lister_2"];
+        put?: never;
+        /** Créer une réservation (dateFin et montant déduits du forfait) */
+        post: operations["creer_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reservations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulter une réservation (un élève ne peut consulter que les siennes) */
+        get: operations["trouver_6"];
+        put?: never;
+        post?: never;
+        /** Supprimer une réservation (soft delete) */
+        delete: operations["supprimer_6"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reservations/{id}/annulation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Annuler une réservation (PENDING ou ACTIVE uniquement) */
+        post: operations["annuler"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reservations/{id}/paiement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Enregistrer un paiement manuel (espèces, chèque, virement ou CPF) */
+        patch: operations["enregistrerPaiement"];
+        trace?: never;
+    };
+    "/api/seances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister les séances actives (un moniteur/élève ne voit que les siennes) */
+        get: operations["lister_1"];
+        put?: never;
+        /** Planifier une séance (moniteur approuvé, créneau libre) */
+        post: operations["creer_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/seances/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulter une séance (un moniteur/élève ne peut consulter que les siennes) */
+        get: operations["trouver_1"];
+        /** Reprogrammer une séance planifiée */
+        put: operations["mettreAJour_1"];
+        post?: never;
+        /** Supprimer une séance (soft delete) */
+        delete: operations["supprimer_1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/seances/{id}/statut": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Clore une séance (COMPLETED, CANCELLED ou NO_SHOW) */
+        patch: operations["changerStatut"];
+        trace?: never;
+    };
+    "/api/seances/{id}/validation-client": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Confirmer sa présence à une séance planifiée (élève) */
+        patch: operations["validerParClient"];
+        trace?: never;
+    };
+    "/api/seances/{id}/validation-moniteur": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Confirmer sa présence à une séance planifiée (moniteur) */
+        patch: operations["validerParMoniteur"];
+        trace?: never;
+    };
+    "/api/stats/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Résumé chiffré — agence courante (DIRECTEUR) ou organisation entière (control-plane) */
+        get: operations["resume"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/voitures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister les véhicules actifs */
+        get: operations["lister"];
+        put?: never;
+        /** Ajouter un véhicule au parc */
+        post: operations["creer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/voitures/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulter un véhicule */
+        get: operations["trouver"];
+        /** Mettre à jour un véhicule */
+        put: operations["mettreAJour"];
+        post?: never;
+        /** Retirer un véhicule du parc (soft delete) */
+        delete: operations["supprimer"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        VoitureRequest: {
-            nom: string;
-            marque: string;
-            /** @enum {string} */
-            transmission: "MANUELLE" | "AUTOMATIQUE";
-            doubleCommande: boolean;
-            carburant: string;
-            couleur: string;
-            /** Format: int32 */
-            nbPortes: number;
-            /** Format: int32 */
-            nbPassagers: number;
-            airConditionne: boolean;
-            note: string;
-        };
-        VoitureResponse: {
-            /** Format: uuid */
-            id: string;
-            nom: string;
-            marque: string;
-            /** @enum {string} */
-            transmission: "MANUELLE" | "AUTOMATIQUE";
-            doubleCommande: boolean;
-            carburant: string | null;
-            couleur: string | null;
-            /** Format: int32 */
-            nbPortes: number | null;
-            /** Format: int32 */
-            nbPassagers: number | null;
-            airConditionne: boolean;
-            note: string | null;
-            active: boolean;
-        };
-        SeanceMiseAJourRequest: {
-            /** Format: uuid */
-            moniteurId: string;
-            /** Format: uuid */
-            voitureId: string;
-            /** Format: date */
-            dateSeance: string;
-            hDeb: string;
-            hFin: string;
-            notes: string;
-        };
-        SeanceResponse: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            reservationId: string;
-            clientNomComplet: string;
-            /** Format: uuid */
-            moniteurId: string | null;
-            moniteurNomComplet: string | null;
-            /** Format: uuid */
-            voitureId: string | null;
-            voitureNom: string | null;
-            /** Format: date */
-            dateSeance: string;
-            hDeb: string;
-            hFin: string;
-            /** @enum {string} */
-            statut: "SCHEDULED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
-            validatedClient: boolean;
-            validatedMoniteur: boolean;
-            validatedAdmin: boolean;
-            notes: string | null;
-            active: boolean;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        MoniteurMiseAJourRequest: {
-            nom: string;
-            prenom: string;
-            email: string;
-            telephone: string;
-            notes: string;
-        };
-        MoniteurResponse: {
-            /** Format: uuid */
-            id: string;
-            nom: string;
-            prenom: string;
-            email: string;
-            telephone: string | null;
-            /** @enum {string} */
-            statut: "PENDING" | "APPROVED" | "REJECTED" | "INACTIVE";
-            notes: string | null;
-            active: boolean;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        ForfaitRequest: {
-            nom: string;
-            /** Format: int32 */
-            nombreHeure: number;
-            /** Format: int32 */
-            validite: number;
-            /** @enum {string} */
-            unite: "MOIS" | "JOUR";
-            prix: number;
-            conditions: string;
-            /** @enum {string} */
-            categorie: "CONDUITE" | "JOURNALIER";
-            /** @enum {string} */
-            transmission: "MANUELLE" | "AUTOMATIQUE";
-            /** @enum {string} */
-            kilometrage: "ILLIMITE" | "LIMITE";
-            /** Format: int32 */
-            nbKilometre: number;
-            /** @enum {string} */
-            carburant: "INCLUS" | "NON_INCLUS";
-        };
-        ForfaitResponse: {
-            /** Format: uuid */
-            id: string;
-            nom: string;
-            /** Format: int32 */
-            nombreHeure: number;
-            /** Format: int32 */
-            validite: number;
-            /** @enum {string} */
-            unite: "MOIS" | "JOUR";
-            prix: number;
-            conditions: string | null;
-            /** @enum {string} */
-            categorie: "CONDUITE" | "JOURNALIER";
-            /** @enum {string|null} */
-            transmission: "MANUELLE" | "AUTOMATIQUE" | null;
-            /** @enum {string} */
-            kilometrage: "ILLIMITE" | "LIMITE";
-            /** Format: int32 */
-            nbKilometre: number | null;
-            /** @enum {string} */
-            carburant: "INCLUS" | "NON_INCLUS";
-            active: boolean;
-        };
-        ExamenMiseAJourRequest: {
-            /** @enum {string} */
-            type: "CODE" | "CONDUITE";
-            /** Format: date */
-            dateExamen: string;
-            /** Format: date */
-            dateConvocation: string;
-            /** @enum {string} */
-            resultat: "PLANIFIE" | "REUSSI" | "ECHOUE" | "ABSENT";
-            /** Format: int32 */
-            nombreFautes: number;
-            centreExamen: string;
-            examinateur: string;
-            notes: string;
-        };
-        ExamenResponse: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            clientId: string;
-            clientNomComplet: string;
-            /** @enum {string} */
-            type: "CODE" | "CONDUITE";
-            /** Format: date */
-            dateExamen: string;
-            /** Format: date */
-            dateConvocation: string | null;
-            /** @enum {string} */
-            resultat: "PLANIFIE" | "REUSSI" | "ECHOUE" | "ABSENT";
-            /** Format: int32 */
-            nombreFautes: number | null;
-            centreExamen: string | null;
-            examinateur: string | null;
-            notes: string | null;
-            active: boolean;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        ClientMiseAJourRequest: {
-            nom: string;
-            prenom: string;
-            email: string;
-            telephone: string;
-            adresse: string;
-            notes: string;
-        };
-        ClientResponse: {
-            /** Format: uuid */
-            id: string;
-            nom: string;
-            prenom: string;
-            email: string;
-            telephone: string | null;
-            adresse: string | null;
-            notes: string | null;
-            active: boolean;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        SeanceCreationRequest: {
-            /** Format: uuid */
-            reservationId: string;
-            /** Format: uuid */
-            moniteurId: string;
-            /** Format: uuid */
-            voitureId: string;
-            /** Format: date */
-            dateSeance: string;
-            hDeb: string;
-            hFin: string;
-            notes: string;
-        };
-        ReservationCreationRequest: {
-            /** Format: uuid */
-            clientId: string;
-            /** Format: uuid */
-            forfaitId: string;
-            /** Format: date */
-            dateDebut: string;
-            montant: number;
-            /** @enum {string} */
-            paiementType: "STRIPE" | "PAYPLUG" | "ALMA" | "ESPECE" | "CHEQUE" | "VIREMENT" | "CPF" | "PERMIS1EURO";
-            notes: string;
-        };
-        ReservationResponse: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            clientId: string;
-            clientNomComplet: string;
-            /** Format: uuid */
-            forfaitId: string;
-            forfaitNom: string;
-            /** Format: date */
-            dateDebut: string;
-            /** Format: date */
-            dateFin: string;
-            /** Format: date-time */
-            dateReservation: string;
-            montant: number;
-            /** @enum {string|null} */
-            paiementType: "STRIPE" | "PAYPLUG" | "ALMA" | "ESPECE" | "CHEQUE" | "VIREMENT" | "CPF" | "PERMIS1EURO" | null;
-            /** @enum {string} */
-            paiementStatut: "PENDING" | "PAID" | "REFUNDED" | "FAILED";
-            /** @enum {string} */
-            statut: "PENDING" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "EXPIRED";
-            notes: string | null;
-            active: boolean;
-        };
-        MoniteurCreationRequest: {
-            nom: string;
-            prenom: string;
-            email: string;
-            motDePasse: string;
-            telephone: string;
-            notes: string;
-        };
-        JetonAccesInterneRequest: {
-            email: string;
-            nomComplet: string;
-            /** Format: uuid */
-            autoEcoleId: string;
-        };
-        LoginResponse: {
-            token: string;
-            type: string;
-            /** Format: date-time */
-            expireLe: string;
-            /** Format: uuid */
-            id: string;
-            role: string;
-            nomComplet: string;
-        };
         AutoEcoleCreationInterneRequest: {
+            adresse: string;
             nom: string;
             slug: string;
-            adresse: string;
         };
         AutoEcoleResponse: {
+            adresse: string;
             /** Format: uuid */
             id: string;
             nom: string;
             slug: string;
-            adresse: string;
         };
-        ExamenCreationRequest: {
-            /** Format: uuid */
-            clientId: string;
+        ChangementStatutMoniteurRequest: {
             /** @enum {string} */
-            type: "CODE" | "CONDUITE";
-            /** Format: date */
-            dateExamen: string;
-            /** Format: date */
-            dateConvocation: string;
-            /** @enum {string} */
-            resultat: "PLANIFIE" | "REUSSI" | "ECHOUE" | "ABSENT";
-            /** Format: int32 */
-            nombreFautes: number;
-            centreExamen: string;
-            examinateur: string;
-            notes: string;
-        };
-        DisponibiliteCreationRequest: {
-            /** Format: uuid */
-            moniteurId: string;
-            /** @enum {string} */
-            jour: "LUNDI" | "MARDI" | "MERCREDI" | "JEUDI" | "VENDREDI" | "SAMEDI" | "DIMANCHE";
-            heureDebut: string;
-            heureFin: string;
-            plageValide: boolean;
-        };
-        DisponibiliteResponse: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            moniteurId: string;
-            moniteurNomComplet: string;
-            /** @enum {string} */
-            jour: "LUNDI" | "MARDI" | "MERCREDI" | "JEUDI" | "VENDREDI" | "SAMEDI" | "DIMANCHE";
-            heureDebut: string;
-            heureFin: string;
-            active: boolean;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        DirecteurCreationRequest: {
-            nom: string;
-            prenom: string;
-            email: string;
-            motDePasse: string;
-        };
-        DirecteurResponse: {
-            /** Format: uuid */
-            id: string;
-            nom: string;
-            prenom: string;
-            email: string;
-            /** Format: uuid */
-            autoEcoleId: string;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        ClientCreationRequest: {
-            nom: string;
-            prenom: string;
-            email: string;
-            motDePasse: string;
-            telephone: string;
-            adresse: string;
-            notes: string;
-        };
-        LoginRequest: {
-            email: string;
-            motDePasse: string;
+            statut: "PENDING" | "APPROVED" | "REJECTED" | "INACTIVE";
         };
         ChangementStatutSeanceRequest: {
             /** @enum {string} */
             statut: "SCHEDULED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
         };
-        PaiementManuelRequest: {
-            /** @enum {string} */
-            paiementType: "STRIPE" | "PAYPLUG" | "ALMA" | "ESPECE" | "CHEQUE" | "VIREMENT" | "CPF" | "PERMIS1EURO";
-            reference: string;
+        ClientCreationRequest: {
+            adresse: string;
+            email: string;
+            motDePasse: string;
+            nom: string;
+            notes: string;
+            prenom: string;
+            telephone: string;
         };
-        ChangementStatutMoniteurRequest: {
+        ClientMiseAJourRequest: {
+            adresse: string;
+            email: string;
+            nom: string;
+            notes: string;
+            prenom: string;
+            telephone: string;
+        };
+        ClientResponse: {
+            active: boolean;
+            adresse: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            email: string;
+            /** Format: uuid */
+            id: string;
+            nom: string;
+            notes: string | null;
+            prenom: string;
+            telephone: string | null;
+        };
+        DirecteurCreationRequest: {
+            email: string;
+            motDePasse: string;
+            nom: string;
+            prenom: string;
+        };
+        DirecteurResponse: {
+            /** Format: uuid */
+            autoEcoleId: string;
+            /** Format: date-time */
+            createdAt: string;
+            email: string;
+            /** Format: uuid */
+            id: string;
+            nom: string;
+            prenom: string;
+        };
+        DisponibiliteCreationRequest: {
+            heureDebut: string;
+            heureFin: string;
             /** @enum {string} */
-            statut: "PENDING" | "APPROVED" | "REJECTED" | "INACTIVE";
+            jour: "LUNDI" | "MARDI" | "MERCREDI" | "JEUDI" | "VENDREDI" | "SAMEDI" | "DIMANCHE";
+            /** Format: uuid */
+            moniteurId: string;
+            plageValide: boolean;
+        };
+        DisponibiliteResponse: {
+            active: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            heureDebut: string;
+            heureFin: string;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            jour: "LUNDI" | "MARDI" | "MERCREDI" | "JEUDI" | "VENDREDI" | "SAMEDI" | "DIMANCHE";
+            /** Format: uuid */
+            moniteurId: string;
+            moniteurNomComplet: string;
+        };
+        DonneesPersonnellesResponse: {
+            examens: components["schemas"]["ExamenResponse"][];
+            identite: components["schemas"]["ClientResponse"];
+            reservations: components["schemas"]["ReservationResponse"][];
+            seances: components["schemas"]["SeanceResponse"][];
+        };
+        ExamenCreationRequest: {
+            centreExamen: string;
+            /** Format: uuid */
+            clientId: string;
+            /** Format: date */
+            dateConvocation: string;
+            /** Format: date */
+            dateExamen: string;
+            examinateur: string;
+            /** Format: int32 */
+            nombreFautes: number;
+            notes: string;
+            /** @enum {string} */
+            resultat: "PLANIFIE" | "REUSSI" | "ECHOUE" | "ABSENT";
+            /** @enum {string} */
+            type: "CODE" | "CONDUITE";
+        };
+        ExamenMiseAJourRequest: {
+            centreExamen: string;
+            /** Format: date */
+            dateConvocation: string;
+            /** Format: date */
+            dateExamen: string;
+            examinateur: string;
+            /** Format: int32 */
+            nombreFautes: number;
+            notes: string;
+            /** @enum {string} */
+            resultat: "PLANIFIE" | "REUSSI" | "ECHOUE" | "ABSENT";
+            /** @enum {string} */
+            type: "CODE" | "CONDUITE";
+        };
+        ExamenResponse: {
+            active: boolean;
+            centreExamen: string | null;
+            /** Format: uuid */
+            clientId: string;
+            clientNomComplet: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date */
+            dateConvocation: string | null;
+            /** Format: date */
+            dateExamen: string;
+            examinateur: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            nombreFautes: number | null;
+            notes: string | null;
+            /** @enum {string} */
+            resultat: "PLANIFIE" | "REUSSI" | "ECHOUE" | "ABSENT";
+            /** @enum {string} */
+            type: "CODE" | "CONDUITE";
+        };
+        ForfaitRequest: {
+            /** @enum {string} */
+            carburant: "INCLUS" | "NON_INCLUS";
+            /** @enum {string} */
+            categorie: "CONDUITE" | "JOURNALIER";
+            conditions: string;
+            /** @enum {string} */
+            kilometrage: "ILLIMITE" | "LIMITE";
+            /** Format: int32 */
+            nbKilometre: number;
+            nom: string;
+            /** Format: int32 */
+            nombreHeure: number;
+            prix: number;
+            /** @enum {string} */
+            transmission: "MANUELLE" | "AUTOMATIQUE";
+            /** @enum {string} */
+            unite: "MOIS" | "JOUR";
+            /** Format: int32 */
+            validite: number;
+        };
+        ForfaitResponse: {
+            active: boolean;
+            /** @enum {string} */
+            carburant: "INCLUS" | "NON_INCLUS";
+            /** @enum {string} */
+            categorie: "CONDUITE" | "JOURNALIER";
+            conditions: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kilometrage: "ILLIMITE" | "LIMITE";
+            /** Format: int32 */
+            nbKilometre: number | null;
+            nom: string;
+            /** Format: int32 */
+            nombreHeure: number;
+            prix: number;
+            /** @enum {string|null} */
+            transmission: "MANUELLE" | "AUTOMATIQUE" | null;
+            /** @enum {string} */
+            unite: "MOIS" | "JOUR";
+            /** Format: int32 */
+            validite: number;
         };
         InscriptionMensuelle: {
             mois: string;
             /** Format: int64 */
             nombre: number;
         };
+        JetonAccesInterneRequest: {
+            /** Format: uuid */
+            autoEcoleId: string;
+            email: string;
+            nomComplet: string;
+        };
+        LoginRequest: {
+            email: string;
+            motDePasse: string;
+        };
+        LoginResponse: {
+            /** Format: date-time */
+            expireLe: string;
+            /** Format: uuid */
+            id: string;
+            nomComplet: string;
+            role: string;
+            token: string;
+            type: string;
+        };
+        MoniteurCreationRequest: {
+            email: string;
+            motDePasse: string;
+            nom: string;
+            notes: string;
+            prenom: string;
+            telephone: string;
+        };
+        MoniteurMiseAJourRequest: {
+            email: string;
+            nom: string;
+            notes: string;
+            prenom: string;
+            telephone: string;
+        };
+        MoniteurResponse: {
+            active: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            email: string;
+            /** Format: uuid */
+            id: string;
+            nom: string;
+            notes: string | null;
+            prenom: string;
+            /** @enum {string} */
+            statut: "PENDING" | "APPROVED" | "REJECTED" | "INACTIVE";
+            telephone: string | null;
+        };
+        PaiementManuelRequest: {
+            /** @enum {string} */
+            paiementType: "STRIPE" | "PAYPLUG" | "ALMA" | "ESPECE" | "CHEQUE" | "VIREMENT" | "CPF" | "PERMIS1EURO";
+            reference: string;
+        };
+        ReservationCreationRequest: {
+            /** Format: uuid */
+            clientId: string;
+            /** Format: date */
+            dateDebut: string;
+            /** Format: uuid */
+            forfaitId: string;
+            montant: number;
+            notes: string;
+            /** @enum {string} */
+            paiementType: "STRIPE" | "PAYPLUG" | "ALMA" | "ESPECE" | "CHEQUE" | "VIREMENT" | "CPF" | "PERMIS1EURO";
+        };
+        ReservationResponse: {
+            active: boolean;
+            /** Format: uuid */
+            clientId: string;
+            clientNomComplet: string;
+            /** Format: date */
+            dateDebut: string;
+            /** Format: date */
+            dateFin: string;
+            /** Format: date-time */
+            dateReservation: string;
+            /** Format: uuid */
+            forfaitId: string;
+            forfaitNom: string;
+            /** Format: uuid */
+            id: string;
+            montant: number;
+            notes: string | null;
+            /** @enum {string} */
+            paiementStatut: "PENDING" | "PAID" | "REFUNDED" | "FAILED";
+            /** @enum {string|null} */
+            paiementType: "STRIPE" | "PAYPLUG" | "ALMA" | "ESPECE" | "CHEQUE" | "VIREMENT" | "CPF" | "PERMIS1EURO" | null;
+            /** @enum {string} */
+            statut: "PENDING" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "EXPIRED";
+        };
+        SeanceCreationRequest: {
+            /** Format: date */
+            dateSeance: string;
+            hDeb: string;
+            hFin: string;
+            /** Format: uuid */
+            moniteurId: string;
+            notes: string;
+            /** Format: uuid */
+            reservationId: string;
+            /** Format: uuid */
+            voitureId: string;
+        };
+        SeanceMiseAJourRequest: {
+            /** Format: date */
+            dateSeance: string;
+            hDeb: string;
+            hFin: string;
+            /** Format: uuid */
+            moniteurId: string;
+            notes: string;
+            /** Format: uuid */
+            voitureId: string;
+        };
+        SeanceResponse: {
+            active: boolean;
+            clientNomComplet: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date */
+            dateSeance: string;
+            hDeb: string;
+            hFin: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            moniteurId: string | null;
+            moniteurNomComplet: string | null;
+            notes: string | null;
+            /** Format: uuid */
+            reservationId: string;
+            /** @enum {string} */
+            statut: "SCHEDULED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
+            validatedAdmin: boolean;
+            validatedClient: boolean;
+            validatedMoniteur: boolean;
+            /** Format: uuid */
+            voitureId: string | null;
+            voitureNom: string | null;
+        };
         StatsResponse: {
             caTotal: number;
             /** Format: int64 */
             elevesActifs: number;
             /** Format: int64 */
-            seancesTerminees: number;
-            /** Format: int64 */
-            seancesNoShow: number;
-            /** Format: double */
-            tauxNoShow: number;
-            /** Format: int64 */
             examensPresentes: number;
             /** Format: double */
-            tauxReussiteExamen: number;
-            /** Format: double */
             heuresDispoHebdo: number;
+            inscriptionsParMois: components["schemas"]["InscriptionMensuelle"][];
+            /** Format: int64 */
+            seancesNoShow: number;
+            /** Format: int64 */
+            seancesTerminees: number;
+            /** Format: double */
+            tauxNoShow: number;
             /** Format: double */
             tauxOccupation: number;
-            inscriptionsParMois: components["schemas"]["InscriptionMensuelle"][];
+            /** Format: double */
+            tauxReussiteExamen: number;
         };
-        DonneesPersonnellesResponse: {
-            identite: components["schemas"]["ClientResponse"];
-            reservations: components["schemas"]["ReservationResponse"][];
-            seances: components["schemas"]["SeanceResponse"][];
-            examens: components["schemas"]["ExamenResponse"][];
+        VoitureRequest: {
+            airConditionne: boolean;
+            carburant: string;
+            couleur: string;
+            doubleCommande: boolean;
+            marque: string;
+            /** Format: int32 */
+            nbPassagers: number;
+            /** Format: int32 */
+            nbPortes: number;
+            nom: string;
+            note: string;
+            /** @enum {string} */
+            transmission: "MANUELLE" | "AUTOMATIQUE";
+        };
+        VoitureResponse: {
+            active: boolean;
+            airConditionne: boolean;
+            carburant: string | null;
+            couleur: string | null;
+            doubleCommande: boolean;
+            /** Format: uuid */
+            id: string;
+            marque: string;
+            /** Format: int32 */
+            nbPassagers: number | null;
+            /** Format: int32 */
+            nbPortes: number | null;
+            nom: string;
+            note: string | null;
+            /** @enum {string} */
+            transmission: "MANUELLE" | "AUTOMATIQUE";
         };
     };
     responses: never;
@@ -965,40 +965,16 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    trouver: {
+    login: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["VoitureResponse"];
-                };
-            };
-        };
-    };
-    mettreAJour: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VoitureRequest"];
+                "application/json": components["schemas"]["LoginRequest"];
             };
         };
         responses: {
@@ -1008,38 +984,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["VoitureResponse"];
+                    "*/*": components["schemas"]["LoginResponse"];
                 };
             };
         };
     };
-    supprimer: {
+    lister_8: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    trouver_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -1050,23 +1004,21 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SeanceResponse"];
+                    "*/*": components["schemas"]["ClientResponse"][];
                 };
             };
         };
     };
-    mettreAJour_1: {
+    creer_8: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                id: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SeanceMiseAJourRequest"];
+                "application/json": components["schemas"]["ClientCreationRequest"];
             };
         };
         responses: {
@@ -1076,232 +1028,8 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SeanceResponse"];
+                    "*/*": components["schemas"]["ClientResponse"];
                 };
-            };
-        };
-    };
-    supprimer_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    trouver_2: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["MoniteurResponse"];
-                };
-            };
-        };
-    };
-    mettreAJour_2: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MoniteurMiseAJourRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["MoniteurResponse"];
-                };
-            };
-        };
-    };
-    supprimer_2: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    trouver_3: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ForfaitResponse"];
-                };
-            };
-        };
-    };
-    mettreAJour_3: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ForfaitRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ForfaitResponse"];
-                };
-            };
-        };
-    };
-    supprimer_3: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    trouver_4: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ExamenResponse"];
-                };
-            };
-        };
-    };
-    mettreAJour_4: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ExamenMiseAJourRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ExamenResponse"];
-                };
-            };
-        };
-    };
-    supprimer_4: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -1373,139 +1101,7 @@ export interface operations {
             };
         };
     };
-    lister: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["VoitureResponse"][];
-                };
-            };
-        };
-    };
-    creer: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["VoitureRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["VoitureResponse"];
-                };
-            };
-        };
-    };
-    lister_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["SeanceResponse"][];
-                };
-            };
-        };
-    };
-    creer_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SeanceCreationRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["SeanceResponse"];
-                };
-            };
-        };
-    };
-    lister_2: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ReservationResponse"][];
-                };
-            };
-        };
-    };
-    creer_2: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReservationCreationRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ReservationResponse"];
-                };
-            };
-        };
-    };
-    annuler: {
+    anonymiser: {
         parameters: {
             query?: never;
             header?: never;
@@ -1522,235 +1118,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ReservationResponse"];
-                };
-            };
-        };
-    };
-    lister_3: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["MoniteurResponse"][];
-                };
-            };
-        };
-    };
-    creer_3: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MoniteurCreationRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["MoniteurResponse"];
-                };
-            };
-        };
-    };
-    jetonAcces: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Internal-Api-Key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["JetonAccesInterneRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["LoginResponse"];
-                };
-            };
-        };
-    };
-    creerAgence: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Internal-Api-Key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AutoEcoleCreationInterneRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["AutoEcoleResponse"];
-                };
-            };
-        };
-    };
-    lister_4: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ForfaitResponse"][];
-                };
-            };
-        };
-    };
-    creer_4: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ForfaitRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ForfaitResponse"];
-                };
-            };
-        };
-    };
-    lister_5: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ExamenResponse"][];
-                };
-            };
-        };
-    };
-    creer_5: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ExamenCreationRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ExamenResponse"];
-                };
-            };
-        };
-    };
-    lister_6: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["DisponibiliteResponse"][];
-                };
-            };
-        };
-    };
-    creer_6: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DisponibiliteCreationRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["DisponibiliteResponse"];
+                    "*/*": components["schemas"]["ClientResponse"];
                 };
             };
         };
@@ -1799,51 +1167,7 @@ export interface operations {
             };
         };
     };
-    lister_8: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ClientResponse"][];
-                };
-            };
-        };
-    };
-    creer_8: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ClientCreationRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ClientResponse"];
-                };
-            };
-        };
-    };
-    anonymiser: {
+    trouver_7: {
         parameters: {
             query?: never;
             header?: never;
@@ -1860,12 +1184,52 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ClientResponse"];
+                    "*/*": components["schemas"]["DirecteurResponse"];
                 };
             };
         };
     };
-    login: {
+    supprimer_7: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    lister_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DisponibiliteResponse"][];
+                };
+            };
+        };
+    };
+    creer_6: {
         parameters: {
             query?: never;
             header?: never;
@@ -1874,7 +1238,323 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LoginRequest"];
+                "application/json": components["schemas"]["DisponibiliteCreationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DisponibiliteResponse"];
+                };
+            };
+        };
+    };
+    supprimer_8: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    mesDonnees: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DonneesPersonnellesResponse"];
+                };
+            };
+        };
+    };
+    lister_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExamenResponse"][];
+                };
+            };
+        };
+    };
+    creer_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExamenCreationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExamenResponse"];
+                };
+            };
+        };
+    };
+    trouver_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExamenResponse"];
+                };
+            };
+        };
+    };
+    mettreAJour_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExamenMiseAJourRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExamenResponse"];
+                };
+            };
+        };
+    };
+    supprimer_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    lister_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ForfaitResponse"][];
+                };
+            };
+        };
+    };
+    creer_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForfaitRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ForfaitResponse"];
+                };
+            };
+        };
+    };
+    trouver_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ForfaitResponse"];
+                };
+            };
+        };
+    };
+    mettreAJour_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForfaitRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ForfaitResponse"];
+                };
+            };
+        };
+    };
+    supprimer_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    creerAgence: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Internal-Api-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutoEcoleCreationInterneRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AutoEcoleResponse"];
+                };
+            };
+        };
+    };
+    jetonAcces: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Internal-Api-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JetonAccesInterneRequest"];
             };
         };
         responses: {
@@ -1889,7 +1569,51 @@ export interface operations {
             };
         };
     };
-    validerParMoniteur: {
+    lister_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["MoniteurResponse"][];
+                };
+            };
+        };
+    };
+    creer_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoniteurCreationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["MoniteurResponse"];
+                };
+            };
+        };
+    };
+    trouver_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -1906,12 +1630,38 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SeanceResponse"];
+                    "*/*": components["schemas"]["MoniteurResponse"];
                 };
             };
         };
     };
-    validerParClient: {
+    mettreAJour_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoniteurMiseAJourRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["MoniteurResponse"];
+                };
+            };
+        };
+    };
+    supprimer_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -1927,61 +1677,7 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["SeanceResponse"];
-                };
-            };
-        };
-    };
-    changerStatut: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChangementStatutSeanceRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["SeanceResponse"];
-                };
-            };
-        };
-    };
-    enregistrerPaiement: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PaiementManuelRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ReservationResponse"];
-                };
+                content?: never;
             };
         };
     };
@@ -2011,12 +1707,10 @@ export interface operations {
             };
         };
     };
-    resume: {
+    ping: {
         parameters: {
             query?: never;
-            header?: {
-                "X-Internal-Api-Key"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -2028,7 +1722,53 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["StatsResponse"];
+                    "*/*": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
+    lister_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReservationResponse"][];
+                };
+            };
+        };
+    };
+    creer_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReservationCreationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReservationResponse"];
                 };
             };
         };
@@ -2075,49 +1815,7 @@ export interface operations {
             };
         };
     };
-    ping: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": {
-                        [key: string]: string;
-                    };
-                };
-            };
-        };
-    };
-    mesDonnees: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["DonneesPersonnellesResponse"];
-                };
-            };
-        };
-    };
-    trouver_7: {
+    annuler: {
         parameters: {
             query?: never;
             header?: never;
@@ -2134,12 +1832,130 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["DirecteurResponse"];
+                    "*/*": components["schemas"]["ReservationResponse"];
                 };
             };
         };
     };
-    supprimer_7: {
+    enregistrerPaiement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaiementManuelRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReservationResponse"];
+                };
+            };
+        };
+    };
+    lister_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SeanceResponse"][];
+                };
+            };
+        };
+    };
+    creer_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeanceCreationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SeanceResponse"];
+                };
+            };
+        };
+    };
+    trouver_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SeanceResponse"];
+                };
+            };
+        };
+    };
+    mettreAJour_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeanceMiseAJourRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SeanceResponse"];
+                };
+            };
+        };
+    };
+    supprimer_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2159,7 +1975,191 @@ export interface operations {
             };
         };
     };
-    supprimer_8: {
+    changerStatut: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangementStatutSeanceRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SeanceResponse"];
+                };
+            };
+        };
+    };
+    validerParClient: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SeanceResponse"];
+                };
+            };
+        };
+    };
+    validerParMoniteur: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SeanceResponse"];
+                };
+            };
+        };
+    };
+    resume: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Internal-Api-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["StatsResponse"];
+                };
+            };
+        };
+    };
+    lister: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["VoitureResponse"][];
+                };
+            };
+        };
+    };
+    creer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VoitureRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["VoitureResponse"];
+                };
+            };
+        };
+    };
+    trouver: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["VoitureResponse"];
+                };
+            };
+        };
+    };
+    mettreAJour: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VoitureRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["VoitureResponse"];
+                };
+            };
+        };
+    };
+    supprimer: {
         parameters: {
             query?: never;
             header?: never;
