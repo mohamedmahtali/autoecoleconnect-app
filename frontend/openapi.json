@@ -1,0 +1,2607 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "AutoEcoleConnect API",
+    "description" : "API backend de la plateforme SaaS multi-tenant pour auto-écoles",
+    "version" : "v0.1.0"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:33399",
+    "description" : "Generated server url"
+  } ],
+  "security" : [ {
+    "bearerAuth" : [ ]
+  } ],
+  "tags" : [ {
+    "name" : "Voitures",
+    "description" : "Gestion du parc de véhicules"
+  }, {
+    "name" : "Ping",
+    "description" : "Vérification de la disponibilité du backend"
+  }, {
+    "name" : "Authentification",
+    "description" : "Connexion des directeurs, moniteurs et élèves"
+  }, {
+    "name" : "Interne",
+    "description" : "Appels du control-plane (secret partagé)"
+  }, {
+    "name" : "Clients",
+    "description" : "Gestion des élèves de l'auto-école"
+  }, {
+    "name" : "Disponibilités moniteur",
+    "description" : "Créneaux récurrents alimentant le taux d'occupation"
+  }, {
+    "name" : "Réservations",
+    "description" : "Réservations de forfaits par les élèves"
+  }, {
+    "name" : "Moniteurs",
+    "description" : "Gestion des moniteurs et de leur workflow d'approbation"
+  }, {
+    "name" : "Statistiques",
+    "description" : "KPI d'activité de l'auto-école"
+  }, {
+    "name" : "Forfaits",
+    "description" : "Catalogue des forfaits de conduite"
+  }, {
+    "name" : "Séances",
+    "description" : "Planification des séances de conduite"
+  }, {
+    "name" : "Élève — RGPD",
+    "description" : "Droit d'accès de l'élève à ses propres données"
+  }, {
+    "name" : "Directeurs",
+    "description" : "Comptes directeurs de l'agence"
+  }, {
+    "name" : "Examens",
+    "description" : "Suivi des passages d'examen (code/conduite) des élèves"
+  } ],
+  "paths" : {
+    "/api/voitures/{id}" : {
+      "get" : {
+        "tags" : [ "Voitures" ],
+        "summary" : "Consulter un véhicule",
+        "operationId" : "trouver",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VoitureResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Voitures" ],
+        "summary" : "Mettre à jour un véhicule",
+        "operationId" : "mettreAJour",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/VoitureRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VoitureResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Voitures" ],
+        "summary" : "Retirer un véhicule du parc (soft delete)",
+        "operationId" : "supprimer",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/api/seances/{id}" : {
+      "get" : {
+        "tags" : [ "Séances" ],
+        "summary" : "Consulter une séance (un moniteur/élève ne peut consulter que les siennes)",
+        "operationId" : "trouver_1",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SeanceResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Séances" ],
+        "summary" : "Reprogrammer une séance planifiée",
+        "operationId" : "mettreAJour_1",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SeanceMiseAJourRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SeanceResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Séances" ],
+        "summary" : "Supprimer une séance (soft delete)",
+        "operationId" : "supprimer_1",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/api/moniteurs/{id}" : {
+      "get" : {
+        "tags" : [ "Moniteurs" ],
+        "summary" : "Consulter un moniteur",
+        "operationId" : "trouver_2",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MoniteurResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Moniteurs" ],
+        "summary" : "Mettre à jour un moniteur",
+        "operationId" : "mettreAJour_2",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/MoniteurMiseAJourRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MoniteurResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Moniteurs" ],
+        "summary" : "Désactiver un moniteur (soft delete)",
+        "operationId" : "supprimer_2",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/api/forfaits/{id}" : {
+      "get" : {
+        "tags" : [ "Forfaits" ],
+        "summary" : "Consulter un forfait",
+        "operationId" : "trouver_3",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ForfaitResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Forfaits" ],
+        "summary" : "Mettre à jour un forfait",
+        "operationId" : "mettreAJour_3",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ForfaitRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ForfaitResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Forfaits" ],
+        "summary" : "Retirer un forfait du catalogue (soft delete)",
+        "operationId" : "supprimer_3",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/api/examens/{id}" : {
+      "get" : {
+        "tags" : [ "Examens" ],
+        "summary" : "Consulter un examen",
+        "operationId" : "trouver_4",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ExamenResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Examens" ],
+        "summary" : "Mettre à jour un examen (typiquement pour saisir le résultat)",
+        "operationId" : "mettreAJour_4",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ExamenMiseAJourRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ExamenResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Examens" ],
+        "summary" : "Supprimer un examen (soft delete)",
+        "operationId" : "supprimer_4",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/api/clients/{id}" : {
+      "get" : {
+        "tags" : [ "Clients" ],
+        "summary" : "Consulter un client",
+        "operationId" : "trouver_5",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClientResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Clients" ],
+        "summary" : "Mettre à jour un client",
+        "operationId" : "mettreAJour_5",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ClientMiseAJourRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClientResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Clients" ],
+        "summary" : "Désactiver un client (soft delete)",
+        "operationId" : "supprimer_5",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/api/voitures" : {
+      "get" : {
+        "tags" : [ "Voitures" ],
+        "summary" : "Lister les véhicules actifs",
+        "operationId" : "lister",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/VoitureResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Voitures" ],
+        "summary" : "Ajouter un véhicule au parc",
+        "operationId" : "creer",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/VoitureRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VoitureResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/seances" : {
+      "get" : {
+        "tags" : [ "Séances" ],
+        "summary" : "Lister les séances actives (un moniteur/élève ne voit que les siennes)",
+        "operationId" : "lister_1",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/SeanceResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Séances" ],
+        "summary" : "Planifier une séance (moniteur approuvé, créneau libre)",
+        "operationId" : "creer_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SeanceCreationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SeanceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations" : {
+      "get" : {
+        "tags" : [ "Réservations" ],
+        "summary" : "Lister les réservations actives (un élève ne voit que les siennes)",
+        "operationId" : "lister_2",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ReservationResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Réservations" ],
+        "summary" : "Créer une réservation (dateFin et montant déduits du forfait)",
+        "operationId" : "creer_2",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ReservationCreationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ReservationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}/annulation" : {
+      "post" : {
+        "tags" : [ "Réservations" ],
+        "summary" : "Annuler une réservation (PENDING ou ACTIVE uniquement)",
+        "operationId" : "annuler",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ReservationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/moniteurs" : {
+      "get" : {
+        "tags" : [ "Moniteurs" ],
+        "summary" : "Lister les moniteurs actifs",
+        "operationId" : "lister_3",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/MoniteurResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Moniteurs" ],
+        "summary" : "Créer un moniteur (statut initial PENDING)",
+        "operationId" : "creer_3",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/MoniteurCreationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MoniteurResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/internal/jeton-acces" : {
+      "post" : {
+        "tags" : [ "Interne" ],
+        "summary" : "Émettre un jeton d'accès pour le gérant (control-plane)",
+        "operationId" : "jetonAcces",
+        "parameters" : [ {
+          "name" : "X-Internal-Api-Key",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/JetonAccesInterneRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/internal/auto-ecoles" : {
+      "post" : {
+        "tags" : [ "Interne" ],
+        "summary" : "Créer une agence dans cette organisation (control-plane)",
+        "operationId" : "creerAgence",
+        "parameters" : [ {
+          "name" : "X-Internal-Api-Key",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AutoEcoleCreationInterneRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AutoEcoleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/forfaits" : {
+      "get" : {
+        "tags" : [ "Forfaits" ],
+        "summary" : "Lister les forfaits actifs",
+        "operationId" : "lister_4",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ForfaitResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Forfaits" ],
+        "summary" : "Créer un forfait",
+        "operationId" : "creer_4",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ForfaitRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ForfaitResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/examens" : {
+      "get" : {
+        "tags" : [ "Examens" ],
+        "summary" : "Lister les examens de l'agence",
+        "operationId" : "lister_5",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ExamenResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Examens" ],
+        "summary" : "Enregistrer un examen (convocation, ou résultat déjà connu)",
+        "operationId" : "creer_5",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ExamenCreationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ExamenResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/disponibilites" : {
+      "get" : {
+        "tags" : [ "Disponibilités moniteur" ],
+        "summary" : "Lister les créneaux de disponibilité de l'agence",
+        "operationId" : "lister_6",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DisponibiliteResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Disponibilités moniteur" ],
+        "summary" : "Ajouter un créneau récurrent à un moniteur",
+        "operationId" : "creer_6",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/DisponibiliteCreationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DisponibiliteResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/directeurs" : {
+      "get" : {
+        "tags" : [ "Directeurs" ],
+        "summary" : "Lister les directeurs de l'agence",
+        "operationId" : "lister_7",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DirecteurResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Directeurs" ],
+        "summary" : "Créer un compte directeur dans l'agence courante",
+        "operationId" : "creer_7",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/DirecteurCreationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DirecteurResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clients" : {
+      "get" : {
+        "tags" : [ "Clients" ],
+        "summary" : "Lister les clients actifs",
+        "operationId" : "lister_8",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ClientResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Clients" ],
+        "summary" : "Créer un client",
+        "operationId" : "creer_8",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ClientCreationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClientResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clients/{id}/anonymisation" : {
+      "post" : {
+        "tags" : [ "Clients" ],
+        "summary" : "Anonymiser un élève à sa demande (droit à l'effacement RGPD — irréversible : données personnelles effacées, login rendu impossible, réservations/séances conservées pour l'historique comptable)",
+        "operationId" : "anonymiser",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ClientResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login" : {
+      "post" : {
+        "tags" : [ "Authentification" ],
+        "summary" : "Se connecter et obtenir un JWT",
+        "operationId" : "login",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/seances/{id}/validation-moniteur" : {
+      "patch" : {
+        "tags" : [ "Séances" ],
+        "summary" : "Confirmer sa présence à une séance planifiée (moniteur)",
+        "operationId" : "validerParMoniteur",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SeanceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/seances/{id}/validation-client" : {
+      "patch" : {
+        "tags" : [ "Séances" ],
+        "summary" : "Confirmer sa présence à une séance planifiée (élève)",
+        "operationId" : "validerParClient",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SeanceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/seances/{id}/statut" : {
+      "patch" : {
+        "tags" : [ "Séances" ],
+        "summary" : "Clore une séance (COMPLETED, CANCELLED ou NO_SHOW)",
+        "operationId" : "changerStatut",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangementStatutSeanceRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SeanceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}/paiement" : {
+      "patch" : {
+        "tags" : [ "Réservations" ],
+        "summary" : "Enregistrer un paiement manuel (espèces, chèque, virement ou CPF)",
+        "operationId" : "enregistrerPaiement",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PaiementManuelRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ReservationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/moniteurs/{id}/statut" : {
+      "patch" : {
+        "tags" : [ "Moniteurs" ],
+        "summary" : "Changer le statut (PENDING → APPROVED/REJECTED, APPROVED ↔ INACTIVE)",
+        "operationId" : "changerStatut_1",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangementStatutMoniteurRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MoniteurResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/stats/resume" : {
+      "get" : {
+        "tags" : [ "Statistiques" ],
+        "summary" : "Résumé chiffré — agence courante (DIRECTEUR) ou organisation entière (control-plane)",
+        "operationId" : "resume",
+        "parameters" : [ {
+          "name" : "X-Internal-Api-Key",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StatsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reservations/{id}" : {
+      "get" : {
+        "tags" : [ "Réservations" ],
+        "summary" : "Consulter une réservation (un élève ne peut consulter que les siennes)",
+        "operationId" : "trouver_6",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ReservationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Réservations" ],
+        "summary" : "Supprimer une réservation (soft delete)",
+        "operationId" : "supprimer_6",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/api/ping" : {
+      "get" : {
+        "tags" : [ "Ping" ],
+        "summary" : "Ping du backend",
+        "description" : "Répond ok si le backend est démarré",
+        "operationId" : "ping",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "object",
+                  "additionalProperties" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/eleve/mes-donnees" : {
+      "get" : {
+        "tags" : [ "Élève — RGPD" ],
+        "summary" : "Exporter mes données personnelles (droit d'accès RGPD)",
+        "operationId" : "mesDonnees",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DonneesPersonnellesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/directeurs/{id}" : {
+      "get" : {
+        "tags" : [ "Directeurs" ],
+        "summary" : "Consulter un directeur",
+        "operationId" : "trouver_7",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DirecteurResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Directeurs" ],
+        "summary" : "Désactiver un directeur (refusé s'il est le dernier de l'agence)",
+        "operationId" : "supprimer_7",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/api/disponibilites/{id}" : {
+      "delete" : {
+        "tags" : [ "Disponibilités moniteur" ],
+        "summary" : "Supprimer un créneau (soft delete)",
+        "operationId" : "supprimer_8",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "VoitureRequest" : {
+        "required" : [ "airConditionne", "carburant", "couleur", "doubleCommande", "marque", "nbPassagers", "nbPortes", "nom", "note", "transmission" ],
+        "type" : "object",
+        "properties" : {
+          "nom" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "marque" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "transmission" : {
+            "type" : "string",
+            "enum" : [ "MANUELLE", "AUTOMATIQUE" ]
+          },
+          "doubleCommande" : {
+            "type" : "boolean"
+          },
+          "carburant" : {
+            "maxLength" : 50,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "couleur" : {
+            "maxLength" : 50,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "nbPortes" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "nbPassagers" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "airConditionne" : {
+            "type" : "boolean"
+          },
+          "note" : {
+            "type" : "string"
+          }
+        }
+      },
+      "VoitureResponse" : {
+        "required" : [ "active", "airConditionne", "carburant", "couleur", "doubleCommande", "id", "marque", "nbPassagers", "nbPortes", "nom", "note", "transmission" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "marque" : {
+            "type" : "string"
+          },
+          "transmission" : {
+            "type" : "string",
+            "enum" : [ "MANUELLE", "AUTOMATIQUE" ]
+          },
+          "doubleCommande" : {
+            "type" : "boolean"
+          },
+          "carburant" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "couleur" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "nbPortes" : {
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : true
+          },
+          "nbPassagers" : {
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : true
+          },
+          "airConditionne" : {
+            "type" : "boolean"
+          },
+          "note" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "active" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "SeanceMiseAJourRequest" : {
+        "required" : [ "dateSeance", "hDeb", "hFin", "moniteurId", "notes", "voitureId" ],
+        "type" : "object",
+        "properties" : {
+          "moniteurId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "voitureId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "dateSeance" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "hDeb" : {
+            "type" : "string"
+          },
+          "hFin" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "SeanceResponse" : {
+        "required" : [ "active", "clientNomComplet", "createdAt", "dateSeance", "hDeb", "hFin", "id", "moniteurId", "moniteurNomComplet", "notes", "reservationId", "statut", "validatedAdmin", "validatedClient", "validatedMoniteur", "voitureId", "voitureNom" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "reservationId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "clientNomComplet" : {
+            "type" : "string"
+          },
+          "moniteurId" : {
+            "type" : "string",
+            "format" : "uuid",
+            "nullable" : true
+          },
+          "moniteurNomComplet" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "voitureId" : {
+            "type" : "string",
+            "format" : "uuid",
+            "nullable" : true
+          },
+          "voitureNom" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "dateSeance" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "hDeb" : {
+            "type" : "string"
+          },
+          "hFin" : {
+            "type" : "string"
+          },
+          "statut" : {
+            "type" : "string",
+            "enum" : [ "SCHEDULED", "COMPLETED", "CANCELLED", "NO_SHOW" ]
+          },
+          "validatedClient" : {
+            "type" : "boolean"
+          },
+          "validatedMoniteur" : {
+            "type" : "boolean"
+          },
+          "validatedAdmin" : {
+            "type" : "boolean"
+          },
+          "notes" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "active" : {
+            "type" : "boolean"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "MoniteurMiseAJourRequest" : {
+        "required" : [ "email", "nom", "notes", "prenom", "telephone" ],
+        "type" : "object",
+        "properties" : {
+          "nom" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "prenom" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "email" : {
+            "maxLength" : 255,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "telephone" : {
+            "maxLength" : 20,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "MoniteurResponse" : {
+        "required" : [ "active", "createdAt", "email", "id", "nom", "notes", "prenom", "statut", "telephone" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "telephone" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "statut" : {
+            "type" : "string",
+            "enum" : [ "PENDING", "APPROVED", "REJECTED", "INACTIVE" ]
+          },
+          "notes" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "active" : {
+            "type" : "boolean"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "ForfaitRequest" : {
+        "required" : [ "carburant", "categorie", "conditions", "kilometrage", "nbKilometre", "nom", "nombreHeure", "prix", "transmission", "unite", "validite" ],
+        "type" : "object",
+        "properties" : {
+          "nom" : {
+            "maxLength" : 255,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "nombreHeure" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "validite" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "unite" : {
+            "type" : "string",
+            "enum" : [ "MOIS", "JOUR" ]
+          },
+          "prix" : {
+            "type" : "number"
+          },
+          "conditions" : {
+            "type" : "string"
+          },
+          "categorie" : {
+            "type" : "string",
+            "enum" : [ "CONDUITE", "JOURNALIER" ]
+          },
+          "transmission" : {
+            "type" : "string",
+            "enum" : [ "MANUELLE", "AUTOMATIQUE" ]
+          },
+          "kilometrage" : {
+            "type" : "string",
+            "enum" : [ "ILLIMITE", "LIMITE" ]
+          },
+          "nbKilometre" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "carburant" : {
+            "type" : "string",
+            "enum" : [ "INCLUS", "NON_INCLUS" ]
+          }
+        }
+      },
+      "ForfaitResponse" : {
+        "required" : [ "active", "carburant", "categorie", "conditions", "id", "kilometrage", "nbKilometre", "nom", "nombreHeure", "prix", "transmission", "unite", "validite" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "nombreHeure" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "validite" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "unite" : {
+            "type" : "string",
+            "enum" : [ "MOIS", "JOUR" ]
+          },
+          "prix" : {
+            "type" : "number"
+          },
+          "conditions" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "categorie" : {
+            "type" : "string",
+            "enum" : [ "CONDUITE", "JOURNALIER" ]
+          },
+          "transmission" : {
+            "type" : "string",
+            "nullable" : true,
+            "enum" : [ "MANUELLE", "AUTOMATIQUE" ]
+          },
+          "kilometrage" : {
+            "type" : "string",
+            "enum" : [ "ILLIMITE", "LIMITE" ]
+          },
+          "nbKilometre" : {
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : true
+          },
+          "carburant" : {
+            "type" : "string",
+            "enum" : [ "INCLUS", "NON_INCLUS" ]
+          },
+          "active" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "ExamenMiseAJourRequest" : {
+        "required" : [ "centreExamen", "dateConvocation", "dateExamen", "examinateur", "nombreFautes", "notes", "resultat", "type" ],
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "enum" : [ "CODE", "CONDUITE" ]
+          },
+          "dateExamen" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "dateConvocation" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "resultat" : {
+            "type" : "string",
+            "enum" : [ "PLANIFIE", "REUSSI", "ECHOUE", "ABSENT" ]
+          },
+          "nombreFautes" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "centreExamen" : {
+            "type" : "string"
+          },
+          "examinateur" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ExamenResponse" : {
+        "required" : [ "active", "centreExamen", "clientId", "clientNomComplet", "createdAt", "dateConvocation", "dateExamen", "examinateur", "id", "nombreFautes", "notes", "resultat", "type" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "clientId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "clientNomComplet" : {
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "CODE", "CONDUITE" ]
+          },
+          "dateExamen" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "dateConvocation" : {
+            "type" : "string",
+            "format" : "date",
+            "nullable" : true
+          },
+          "resultat" : {
+            "type" : "string",
+            "enum" : [ "PLANIFIE", "REUSSI", "ECHOUE", "ABSENT" ]
+          },
+          "nombreFautes" : {
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : true
+          },
+          "centreExamen" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "examinateur" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "notes" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "active" : {
+            "type" : "boolean"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "ClientMiseAJourRequest" : {
+        "required" : [ "adresse", "email", "nom", "notes", "prenom", "telephone" ],
+        "type" : "object",
+        "properties" : {
+          "nom" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "prenom" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "email" : {
+            "maxLength" : 255,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "telephone" : {
+            "maxLength" : 20,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ClientResponse" : {
+        "required" : [ "active", "adresse", "createdAt", "email", "id", "nom", "notes", "prenom", "telephone" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "telephone" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "adresse" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "notes" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "active" : {
+            "type" : "boolean"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "SeanceCreationRequest" : {
+        "required" : [ "dateSeance", "hDeb", "hFin", "moniteurId", "notes", "reservationId", "voitureId" ],
+        "type" : "object",
+        "properties" : {
+          "reservationId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "moniteurId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "voitureId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "dateSeance" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "hDeb" : {
+            "type" : "string"
+          },
+          "hFin" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ReservationCreationRequest" : {
+        "required" : [ "clientId", "dateDebut", "forfaitId", "montant", "notes", "paiementType" ],
+        "type" : "object",
+        "properties" : {
+          "clientId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "forfaitId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "dateDebut" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "montant" : {
+            "type" : "number"
+          },
+          "paiementType" : {
+            "type" : "string",
+            "enum" : [ "STRIPE", "PAYPLUG", "ALMA", "ESPECE", "CHEQUE", "VIREMENT", "CPF", "PERMIS1EURO" ]
+          },
+          "notes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ReservationResponse" : {
+        "required" : [ "active", "clientId", "clientNomComplet", "dateDebut", "dateFin", "dateReservation", "forfaitId", "forfaitNom", "id", "montant", "notes", "paiementStatut", "paiementType", "statut" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "clientId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "clientNomComplet" : {
+            "type" : "string"
+          },
+          "forfaitId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "forfaitNom" : {
+            "type" : "string"
+          },
+          "dateDebut" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "dateFin" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "dateReservation" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "montant" : {
+            "type" : "number"
+          },
+          "paiementType" : {
+            "type" : "string",
+            "nullable" : true,
+            "enum" : [ "STRIPE", "PAYPLUG", "ALMA", "ESPECE", "CHEQUE", "VIREMENT", "CPF", "PERMIS1EURO" ]
+          },
+          "paiementStatut" : {
+            "type" : "string",
+            "enum" : [ "PENDING", "PAID", "REFUNDED", "FAILED" ]
+          },
+          "statut" : {
+            "type" : "string",
+            "enum" : [ "PENDING", "ACTIVE", "COMPLETED", "CANCELLED", "EXPIRED" ]
+          },
+          "notes" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "active" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "MoniteurCreationRequest" : {
+        "required" : [ "email", "motDePasse", "nom", "notes", "prenom", "telephone" ],
+        "type" : "object",
+        "properties" : {
+          "nom" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "prenom" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "email" : {
+            "maxLength" : 255,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "motDePasse" : {
+            "maxLength" : 72,
+            "minLength" : 8,
+            "type" : "string"
+          },
+          "telephone" : {
+            "maxLength" : 20,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "JetonAccesInterneRequest" : {
+        "required" : [ "autoEcoleId", "email", "nomComplet" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "minLength" : 1,
+            "type" : "string"
+          },
+          "nomComplet" : {
+            "minLength" : 1,
+            "type" : "string"
+          },
+          "autoEcoleId" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }
+      },
+      "LoginResponse" : {
+        "required" : [ "expireLe", "id", "nomComplet", "role", "token", "type" ],
+        "type" : "object",
+        "properties" : {
+          "token" : {
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string"
+          },
+          "expireLe" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "role" : {
+            "type" : "string"
+          },
+          "nomComplet" : {
+            "type" : "string"
+          }
+        }
+      },
+      "AutoEcoleCreationInterneRequest" : {
+        "required" : [ "adresse", "nom", "slug" ],
+        "type" : "object",
+        "properties" : {
+          "nom" : {
+            "maxLength" : 255,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "slug" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          }
+        }
+      },
+      "AutoEcoleResponse" : {
+        "required" : [ "adresse", "id", "nom", "slug" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ExamenCreationRequest" : {
+        "required" : [ "centreExamen", "clientId", "dateConvocation", "dateExamen", "examinateur", "nombreFautes", "notes", "resultat", "type" ],
+        "type" : "object",
+        "properties" : {
+          "clientId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "CODE", "CONDUITE" ]
+          },
+          "dateExamen" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "dateConvocation" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "resultat" : {
+            "type" : "string",
+            "enum" : [ "PLANIFIE", "REUSSI", "ECHOUE", "ABSENT" ]
+          },
+          "nombreFautes" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "centreExamen" : {
+            "type" : "string"
+          },
+          "examinateur" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "DisponibiliteCreationRequest" : {
+        "required" : [ "heureDebut", "heureFin", "jour", "moniteurId", "plageValide" ],
+        "type" : "object",
+        "properties" : {
+          "moniteurId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "jour" : {
+            "type" : "string",
+            "enum" : [ "LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI", "SAMEDI", "DIMANCHE" ]
+          },
+          "heureDebut" : {
+            "type" : "string"
+          },
+          "heureFin" : {
+            "type" : "string"
+          },
+          "plageValide" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "DisponibiliteResponse" : {
+        "required" : [ "active", "createdAt", "heureDebut", "heureFin", "id", "jour", "moniteurId", "moniteurNomComplet" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "moniteurId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "moniteurNomComplet" : {
+            "type" : "string"
+          },
+          "jour" : {
+            "type" : "string",
+            "enum" : [ "LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI", "SAMEDI", "DIMANCHE" ]
+          },
+          "heureDebut" : {
+            "type" : "string"
+          },
+          "heureFin" : {
+            "type" : "string"
+          },
+          "active" : {
+            "type" : "boolean"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "DirecteurCreationRequest" : {
+        "required" : [ "email", "motDePasse", "nom", "prenom" ],
+        "type" : "object",
+        "properties" : {
+          "nom" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "prenom" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "email" : {
+            "maxLength" : 255,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "motDePasse" : {
+            "maxLength" : 72,
+            "minLength" : 8,
+            "type" : "string"
+          }
+        }
+      },
+      "DirecteurResponse" : {
+        "required" : [ "autoEcoleId", "createdAt", "email", "id", "nom", "prenom" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "autoEcoleId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "ClientCreationRequest" : {
+        "required" : [ "adresse", "email", "motDePasse", "nom", "notes", "prenom", "telephone" ],
+        "type" : "object",
+        "properties" : {
+          "nom" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "prenom" : {
+            "maxLength" : 100,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "email" : {
+            "maxLength" : 255,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "motDePasse" : {
+            "maxLength" : 72,
+            "minLength" : 8,
+            "type" : "string"
+          },
+          "telephone" : {
+            "maxLength" : 20,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "LoginRequest" : {
+        "required" : [ "email", "motDePasse" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "minLength" : 1,
+            "type" : "string"
+          },
+          "motDePasse" : {
+            "minLength" : 1,
+            "type" : "string"
+          }
+        }
+      },
+      "ChangementStatutSeanceRequest" : {
+        "required" : [ "statut" ],
+        "type" : "object",
+        "properties" : {
+          "statut" : {
+            "type" : "string",
+            "enum" : [ "SCHEDULED", "COMPLETED", "CANCELLED", "NO_SHOW" ]
+          }
+        }
+      },
+      "PaiementManuelRequest" : {
+        "required" : [ "paiementType", "reference" ],
+        "type" : "object",
+        "properties" : {
+          "paiementType" : {
+            "type" : "string",
+            "enum" : [ "STRIPE", "PAYPLUG", "ALMA", "ESPECE", "CHEQUE", "VIREMENT", "CPF", "PERMIS1EURO" ]
+          },
+          "reference" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ChangementStatutMoniteurRequest" : {
+        "required" : [ "statut" ],
+        "type" : "object",
+        "properties" : {
+          "statut" : {
+            "type" : "string",
+            "enum" : [ "PENDING", "APPROVED", "REJECTED", "INACTIVE" ]
+          }
+        }
+      },
+      "InscriptionMensuelle" : {
+        "required" : [ "mois", "nombre" ],
+        "type" : "object",
+        "properties" : {
+          "mois" : {
+            "type" : "string"
+          },
+          "nombre" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
+      "StatsResponse" : {
+        "required" : [ "caTotal", "elevesActifs", "examensPresentes", "heuresDispoHebdo", "inscriptionsParMois", "seancesNoShow", "seancesTerminees", "tauxNoShow", "tauxOccupation", "tauxReussiteExamen" ],
+        "type" : "object",
+        "properties" : {
+          "caTotal" : {
+            "type" : "number"
+          },
+          "elevesActifs" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "seancesTerminees" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "seancesNoShow" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "tauxNoShow" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "examensPresentes" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "tauxReussiteExamen" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "heuresDispoHebdo" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "tauxOccupation" : {
+            "type" : "number",
+            "format" : "double"
+          },
+          "inscriptionsParMois" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/InscriptionMensuelle"
+            }
+          }
+        }
+      },
+      "DonneesPersonnellesResponse" : {
+        "required" : [ "examens", "identite", "reservations", "seances" ],
+        "type" : "object",
+        "properties" : {
+          "identite" : {
+            "$ref" : "#/components/schemas/ClientResponse"
+          },
+          "reservations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ReservationResponse"
+            }
+          },
+          "seances" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SeanceResponse"
+            }
+          },
+          "examens" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ExamenResponse"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}

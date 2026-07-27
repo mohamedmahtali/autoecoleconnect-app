@@ -9,6 +9,7 @@ import app.autoeecoleconnect.models.PaiementStatut;
 import app.autoeecoleconnect.models.PaiementType;
 import app.autoeecoleconnect.models.Reservation;
 import app.autoeecoleconnect.models.StatutReservation;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record ReservationResponse(
         UUID id,
@@ -20,10 +21,10 @@ public record ReservationResponse(
         LocalDate dateFin,
         LocalDateTime dateReservation,
         BigDecimal montant,
-        PaiementType paiementType,
+        @Schema(nullable = true) PaiementType paiementType,
         PaiementStatut paiementStatut,
         StatutReservation statut,
-        String notes,
+        @Schema(nullable = true) String notes,
         boolean active) {
 
     public static ReservationResponse depuis(Reservation reservation) {

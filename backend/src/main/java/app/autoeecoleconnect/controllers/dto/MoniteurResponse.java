@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import app.autoeecoleconnect.models.Moniteur;
 import app.autoeecoleconnect.models.StatutMoniteur;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 // Ne jamais exposer passwordHash dans une réponse API.
 public record MoniteurResponse(
@@ -12,9 +13,9 @@ public record MoniteurResponse(
         String nom,
         String prenom,
         String email,
-        String telephone,
+        @Schema(nullable = true) String telephone,
         StatutMoniteur statut,
-        String notes,
+        @Schema(nullable = true) String notes,
         boolean active,
         LocalDateTime createdAt) {
 

@@ -61,6 +61,11 @@ app:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+  # OpenAPI 3.0 (et pas 3.1) : le mapping `nullable: true` -> `T | null` par
+  # openapi-typescript est prévisible en 3.0 (en 3.1 la nullabilité passe par
+  # `type: [..., "null"]`, moins stable selon les versions). Backlog #29.
+  api-docs:
+    version: openapi_3_0
 
 management:
   endpoints:

@@ -1,198 +1,48 @@
-// Types de l'API backend.
-// Cible (voir docs/03-stack-technique.md) : générés automatiquement depuis la
-// spec OpenAPI de Spring Boot (/v3/api-docs). Écrits à la main en Phase 0.
+// Types de l'API backend — SOURCE UNIQUE DE VÉRITÉ : la spec OpenAPI du backend.
+//
+// Ce fichier n'est qu'un ADAPTATEUR : il ré-exporte, sous leurs noms usuels, les
+// types de `api.generated.ts` (généré par `npm run gen:types` depuis
+// `openapi.json`, lui-même produit par le backend — voir docs/16 #29). Ne pas
+// éditer à la main la FORME des types : modifier le DTO backend, puis régénérer
+// (`npm run gen:types`). Le check CI échoue si les types committés ne
+// correspondent plus au backend → zéro dérive silencieuse.
+import type { components } from "./api.generated";
 
+type Schemas = components["schemas"];
+
+// --- Objets (réponses API) ---
+export type LoginBackendResponse = Schemas["LoginResponse"];
+export type ClientDto = Schemas["ClientResponse"];
+export type MoniteurDto = Schemas["MoniteurResponse"];
+export type VoitureDto = Schemas["VoitureResponse"];
+export type ForfaitDto = Schemas["ForfaitResponse"];
+export type SeanceDto = Schemas["SeanceResponse"];
+export type ReservationDto = Schemas["ReservationResponse"];
+export type ExamenDto = Schemas["ExamenResponse"];
+export type DisponibiliteDto = Schemas["DisponibiliteResponse"];
+export type DonneesPersonnellesDto = Schemas["DonneesPersonnellesResponse"];
+export type InscriptionMensuelleDto = Schemas["InscriptionMensuelle"];
+export type StatsDto = Schemas["StatsResponse"];
+
+// --- Énumérations (émises inline dans les schémas → extraites de la propriété) ---
+export type StatutMoniteur = Schemas["MoniteurResponse"]["statut"];
+export type StatutSeance = Schemas["SeanceResponse"]["statut"];
+export type PaiementType = NonNullable<Schemas["ReservationResponse"]["paiementType"]>;
+export type PaiementStatut = Schemas["ReservationResponse"]["paiementStatut"];
+export type StatutReservation = Schemas["ReservationResponse"]["statut"];
+export type TypeExamen = Schemas["ExamenResponse"]["type"];
+export type ResultatExamen = Schemas["ExamenResponse"]["resultat"];
+export type JourSemaine = Schemas["DisponibiliteResponse"]["jour"];
+
+// --- Types purement frontend (aucun schéma backend correspondant) ---
+// Ping renvoie un Map côté backend (pas de DTO), donc pas de schéma généré.
 export interface PingResponse {
   status: string;
   service: string;
   timestamp: string;
 }
 
-export interface LoginBackendResponse {
-  token: string;
-  type: string;
-  expireLe: string;
-  id: string;
-  role: "DIRECTEUR" | "MONITEUR" | "CLIENT";
-  nomComplet: string;
-}
-
-export interface ClientDto {
-  id: string;
-  nom: string;
-  prenom: string;
-  email: string;
-  telephone: string | null;
-  adresse: string | null;
-  notes: string | null;
-  active: boolean;
-  createdAt: string;
-}
-
-export type StatutMoniteur = "PENDING" | "APPROVED" | "REJECTED" | "INACTIVE";
-
-export interface MoniteurDto {
-  id: string;
-  nom: string;
-  prenom: string;
-  email: string;
-  telephone: string | null;
-  statut: StatutMoniteur;
-  notes: string | null;
-  active: boolean;
-  createdAt: string;
-}
-
-export interface VoitureDto {
-  id: string;
-  nom: string;
-  marque: string;
-  transmission: "MANUELLE" | "AUTOMATIQUE";
-  doubleCommande: boolean;
-  carburant: string | null;
-  couleur: string | null;
-  nbPortes: number | null;
-  nbPassagers: number | null;
-  airConditionne: boolean;
-  note: string | null;
-  active: boolean;
-}
-
-export interface ForfaitDto {
-  id: string;
-  nom: string;
-  nombreHeure: number;
-  validite: number;
-  unite: "MOIS" | "JOUR";
-  prix: number;
-  conditions: string | null;
-  categorie: "CONDUITE" | "JOURNALIER";
-  transmission: "MANUELLE" | "AUTOMATIQUE" | null;
-  kilometrage: "ILLIMITE" | "LIMITE";
-  nbKilometre: number | null;
-  carburant: "INCLUS" | "NON_INCLUS";
-  active: boolean;
-}
-
 // Pour les compteurs du tableau de bord, seule la présence des éléments compte.
 export interface Identifiable {
   id: string;
-}
-
-export type StatutSeance = "SCHEDULED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
-
-export interface SeanceDto {
-  id: string;
-  reservationId: string;
-  clientNomComplet: string;
-  moniteurId: string | null;
-  moniteurNomComplet: string | null;
-  voitureId: string | null;
-  voitureNom: string | null;
-  dateSeance: string;
-  hDeb: string;
-  hFin: string;
-  statut: StatutSeance;
-  validatedClient: boolean;
-  validatedMoniteur: boolean;
-  validatedAdmin: boolean;
-  notes: string | null;
-  active: boolean;
-  createdAt: string;
-}
-
-export type PaiementType =
-  | "STRIPE"
-  | "PAYPLUG"
-  | "ALMA"
-  | "ESPECE"
-  | "CHEQUE"
-  | "VIREMENT"
-  | "CPF"
-  | "PERMIS1EURO";
-
-export type PaiementStatut = "PENDING" | "PAID" | "REFUNDED" | "FAILED";
-
-export type StatutReservation = "PENDING" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "EXPIRED";
-
-export interface ReservationDto {
-  id: string;
-  clientId: string;
-  clientNomComplet: string;
-  forfaitId: string;
-  forfaitNom: string;
-  dateDebut: string;
-  dateFin: string;
-  dateReservation: string;
-  montant: number;
-  paiementType: PaiementType | null;
-  paiementStatut: PaiementStatut;
-  statut: StatutReservation;
-  notes: string | null;
-  active: boolean;
-}
-
-export type TypeExamen = "CODE" | "CONDUITE";
-export type ResultatExamen = "PLANIFIE" | "REUSSI" | "ECHOUE" | "ABSENT";
-
-export interface ExamenDto {
-  id: string;
-  clientId: string;
-  clientNomComplet: string;
-  type: TypeExamen;
-  dateExamen: string;
-  dateConvocation: string | null;
-  resultat: ResultatExamen;
-  nombreFautes: number | null;
-  centreExamen: string | null;
-  examinateur: string | null;
-  notes: string | null;
-  active: boolean;
-  createdAt: string;
-}
-
-export type JourSemaine =
-  | "LUNDI"
-  | "MARDI"
-  | "MERCREDI"
-  | "JEUDI"
-  | "VENDREDI"
-  | "SAMEDI"
-  | "DIMANCHE";
-
-export interface DisponibiliteDto {
-  id: string;
-  moniteurId: string;
-  moniteurNomComplet: string;
-  jour: JourSemaine;
-  heureDebut: string;
-  heureFin: string;
-  active: boolean;
-  createdAt: string;
-}
-
-// Export RGPD « droit d'accès » : ce que l'élève télécharge sur son portail.
-export interface DonneesPersonnellesDto {
-  identite: ClientDto;
-  reservations: ReservationDto[];
-  seances: SeanceDto[];
-  examens: ExamenDto[];
-}
-
-export interface InscriptionMensuelleDto {
-  mois: string;
-  nombre: number;
-}
-
-export interface StatsDto {
-  caTotal: number;
-  elevesActifs: number;
-  seancesTerminees: number;
-  seancesNoShow: number;
-  tauxNoShow: number;
-  examensPresentes: number;
-  tauxReussiteExamen: number;
-  heuresDispoHebdo: number;
-  tauxOccupation: number;
-  inscriptionsParMois: InscriptionMensuelleDto[];
 }

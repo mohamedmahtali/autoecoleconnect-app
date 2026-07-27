@@ -7,6 +7,7 @@ import java.util.UUID;
 import app.autoeecoleconnect.models.Examen;
 import app.autoeecoleconnect.models.ResultatExamen;
 import app.autoeecoleconnect.models.TypeExamen;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record ExamenResponse(
         UUID id,
@@ -14,12 +15,12 @@ public record ExamenResponse(
         String clientNomComplet,
         TypeExamen type,
         LocalDate dateExamen,
-        LocalDate dateConvocation,
+        @Schema(nullable = true) LocalDate dateConvocation,
         ResultatExamen resultat,
-        Integer nombreFautes,
-        String centreExamen,
-        String examinateur,
-        String notes,
+        @Schema(nullable = true) Integer nombreFautes,
+        @Schema(nullable = true) String centreExamen,
+        @Schema(nullable = true) String examinateur,
+        @Schema(nullable = true) String notes,
         boolean active,
         LocalDateTime createdAt) {
 

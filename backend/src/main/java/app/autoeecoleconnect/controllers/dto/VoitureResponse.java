@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import app.autoeecoleconnect.models.Transmission;
 import app.autoeecoleconnect.models.Voiture;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record VoitureResponse(
         UUID id,
@@ -11,12 +12,12 @@ public record VoitureResponse(
         String marque,
         Transmission transmission,
         boolean doubleCommande,
-        String carburant,
-        String couleur,
-        Integer nbPortes,
-        Integer nbPassagers,
+        @Schema(nullable = true) String carburant,
+        @Schema(nullable = true) String couleur,
+        @Schema(nullable = true) Integer nbPortes,
+        @Schema(nullable = true) Integer nbPassagers,
         boolean airConditionne,
-        String note,
+        @Schema(nullable = true) String note,
         boolean active) {
 
     public static VoitureResponse depuis(Voiture voiture) {

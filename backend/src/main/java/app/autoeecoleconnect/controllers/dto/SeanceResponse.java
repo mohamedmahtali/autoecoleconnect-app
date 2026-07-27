@@ -7,15 +7,16 @@ import java.util.UUID;
 
 import app.autoeecoleconnect.models.Seance;
 import app.autoeecoleconnect.models.StatutSeance;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record SeanceResponse(
         UUID id,
         UUID reservationId,
         String clientNomComplet,
-        UUID moniteurId,
-        String moniteurNomComplet,
-        UUID voitureId,
-        String voitureNom,
+        @Schema(nullable = true) UUID moniteurId,
+        @Schema(nullable = true) String moniteurNomComplet,
+        @Schema(nullable = true) UUID voitureId,
+        @Schema(nullable = true) String voitureNom,
         LocalDate dateSeance,
         LocalTime hDeb,
         LocalTime hFin,
@@ -23,7 +24,7 @@ public record SeanceResponse(
         boolean validatedClient,
         boolean validatedMoniteur,
         boolean validatedAdmin,
-        String notes,
+        @Schema(nullable = true) String notes,
         boolean active,
         LocalDateTime createdAt) {
 

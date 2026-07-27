@@ -55,3 +55,40 @@ jobs:
         run: npm ci
       - name: Build de production
         run: npm run build
+
+  # Backlog #29 — garantie anti-dérive : les types TS du frontend sont générés
+  # depuis la spec OpenAPI du backend. On régénère spec + types et on échoue si
+  # le committé ne correspond plus au backend (un DTO changé sans régénérer).
+  openapi-types:
+    name: OpenAPI — types TS à jour ?
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Régénère la spec OpenAPI (dump par OpenApiDocsTest)
+        working-directory: backend
+        run: mvn -B test -Dtest=OpenApiDocsTest
+      - name: Copie la spec vers le frontend
+        run: cp backend/target/openapi.json frontend/openapi.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Régénère les types TS
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run gen:types
+      - name: Échoue si la spec ou les types committés sont périmés
+        run: |
+          if ! git diff --quiet -- frontend/openapi.json frontend/src/types/api.generated.ts; then
+            echo "::error::openapi.json / api.generated.ts périmés. Lance : (backend) mvn test -Dtest=OpenApiDocsTest && cp target/openapi.json ../frontend/openapi.json ; (frontend) npm run gen:types — puis committe."
+            git --no-pager diff -- frontend/openapi.json frontend/src/types/api.generated.ts | head -80
+            exit 1
+          fi
+          echo "Types TS à jour ✅"

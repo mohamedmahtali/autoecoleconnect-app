@@ -9,6 +9,7 @@ import app.autoeecoleconnect.models.Forfait;
 import app.autoeecoleconnect.models.Kilometrage;
 import app.autoeecoleconnect.models.Transmission;
 import app.autoeecoleconnect.models.UniteValidite;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record ForfaitResponse(
         UUID id,
@@ -17,11 +18,11 @@ public record ForfaitResponse(
         Integer validite,
         UniteValidite unite,
         BigDecimal prix,
-        String conditions,
+        @Schema(nullable = true) String conditions,
         CategorieForfait categorie,
-        Transmission transmission,
+        @Schema(nullable = true) Transmission transmission,
         Kilometrage kilometrage,
-        Integer nbKilometre,
+        @Schema(nullable = true) Integer nbKilometre,
         CarburantForfait carburant,
         boolean active) {
 
